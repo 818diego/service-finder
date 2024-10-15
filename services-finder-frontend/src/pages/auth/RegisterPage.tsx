@@ -1,18 +1,13 @@
 import React from "react";
+import RegisterForm from "../../components/auth/RegisterForm";
 
-const AboutPage: React.FC = () => {
-    return (
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg transition-colors duration-300 ease-in-out">
-            <div className="px-4 py-5 sm:px-6">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    Welcome to Register to my app
-                </h1>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-300">
-                    This is the register page for the services finder app.
-                </p>
-            </div>
-        </div>
-    );
-};
+const RegisterPage: React.FC = () => (
+    <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 max-w-lg mx-auto mt-10 transition-colors duration-300 ease-in-out">
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+            Register to My App
+        </h1>
+        <RegisterForm />
+    </div>
+);
 
-export default AboutPage;
+export default RegisterPage;

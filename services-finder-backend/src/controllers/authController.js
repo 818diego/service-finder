@@ -1,27 +1,70 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 
-exports.register = async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
-    const user = new User({ username, email, password });
-    await user.save();
-    res.status(201).json({ message: 'User registered successfully' });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+exports.register = [
+  // Validate and sanitize inputs
+  body('username').isLength({ min: 5 }).trim().escape(),
+  body('firstName').isLength({ min: 3 }).trim().escape(),
+  body('lastName').isLength({ min: 3 }).trim().escape(),
+  body('userType').isIn(['Cliente', 'Proveedor']).trim().escape(),
+  body('email').isEmail().normalizeEmail(),
+  body('address').isLength({ min: 10 }).trim().escape(),
+  body('specialty').optional().trim().escape(),
+  body('password').isLength({ min: 8 }).trim().escape(),
 
-exports.login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email });
-    if (!user || !(await user.comparePassword(password))) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.json({ token });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+
+    try {
+      const { username, firstName, lastName, userType, email, address, specialty, password } = req.body;
+
+      const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+      if (existingUser) {
+        return res.status(400).json({ error: 'This user already exists' });
+      }
+
+      const user = new User({ username, firstName, lastName, userType, email, address, specialty, password });
+      await user.save();
+      res.status(201).json({ message: 'User registered successfully' });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
-};
+];
+
+exports.login = [
+  body('email').isEmail().normalizeEmail(),
+  body('password').isLength({ min: 6 }).trim().escape(),
+
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const { email, password } = req.body;
+      const user = await User.findOne({ email });
+      if (!user || !(await user.comparePassword(password))) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      const tokenPayload = {
+        userId: user._id,
+        username: user.username,
+        userType: user.userType,
+        email: user.email,
+      }
+
+      const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+      res.json({ token });
+    } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  }
+];
