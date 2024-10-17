@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { User, Mail, Lock, Home, Briefcase, UserCheck } from "lucide-react";
+import { User, Mail, Lock, Home, NotebookPen, Briefcase, UserCheck } from "lucide-react";
 import { registerUser } from "../../services/usersFetch";
 import { User as UserType } from "../../types/users";
 import FormInput from "../utils/FormInput";
@@ -164,7 +164,7 @@ const RegisterForm: React.FC = () => {
                                     required: userType === "Proveedor",
                                 })}
                                 error={errors.specialty}
-                                icon={Briefcase}
+                                icon={NotebookPen}
                                 validationMessage="Specialty is required for Proveedor"
                             />
                             <div className="flex justify-between space-x-4">
