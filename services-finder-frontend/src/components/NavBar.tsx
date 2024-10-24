@@ -61,14 +61,12 @@ const Navbar: React.FC = () => {
                                 />
                             </div>
                             {[
-                                "/",
                                 "/services",
                                 "/category",
                                 "/about",
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
-                                    "Home",
                                     "Services",
                                     "Category",
                                     "About",
@@ -90,15 +88,19 @@ const Navbar: React.FC = () => {
                                 );
                             })}
                         </div>
-                        <div className="relative w-1/3 mx-auto">
-                            <Search className="absolute right-3 top-2 h-5 w-5 text-gray-500 dark:text-gray-300" />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search..."
-                                className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-                            />
+                        <div className="relative w-full max-w-2xl mx-auto">
+                            <div className="relative">
+                                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-gray-300" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
+                                    placeholder="Search..."
+                                    className="w-full pl-4 pr-10 py-3 rounded-full border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
+                                />
+                            </div>
                         </div>
                         <div className="flex items-center space-x-4 w-1/3 justify-end relative">
                             <div className="relative" ref={dropdownRef}>
