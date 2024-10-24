@@ -7,6 +7,7 @@ import { User as UserType } from "../../types/users";
 import FormInput from "../../components/utils/FormInput";
 import { Mail, Lock } from "lucide-react";
 import { loginUser } from "../../services/usersFetch";
+import { useAuth } from "../../Context/AuthContext";
 
 const LoginPage: React.FC = () => {
     const {
@@ -17,12 +18,13 @@ const LoginPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [redirecting, setRedirecting] = useState(false);
     const navigate = useNavigate();
+    const { login } = useAuth();
 
     const onSubmit: SubmitHandler<UserType> = async (data) => {
         setLoading(true);
         try {
             const response = await loginUser(data);
-            localStorage.setItem("authToken", response.token);
+            login(response.token);
             setLoading(false);
             setRedirecting(true);
             toast.success("Successfully logged in!", {
@@ -30,7 +32,7 @@ const LoginPage: React.FC = () => {
                 autoClose: 2000,
                 onClose: () => {
                     setRedirecting(false);
-                    navigate("/"); // Redirige al home después de loguearse exitosamente
+                    navigate("/");
                 },
             });
         } catch (error: unknown) {
@@ -64,7 +66,7 @@ const LoginPage: React.FC = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
                 {loading && <div className="text-center">Loading...</div>}
                 {redirecting && (
-                    <div className="text-center">Redirigiendo al home...</div>
+                    <div className="text-center">Redirecting to home...</div>
                 )}
                 <FormInput
                     label="Email"
