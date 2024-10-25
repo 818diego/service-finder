@@ -49,19 +49,24 @@ exports.login = [
     try {
       const { email, password } = req.body;
       const user = await User.findOne({ email });
+
+      // Verificar si el usuario existe y la contraseña es correcta
       if (!user || !(await user.comparePassword(password))) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      // Payload del token, incluyendo el userId, username, userType y email
       const tokenPayload = {
         userId: user._id,
         username: user.username,
         userType: user.userType,
-        email: user.email,
-      }
+        email: user.email
+      };
 
+      // Firmar el token con una duración de 1 hora
       const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1h' });
 
+      // Devolver el token al cliente
       res.json({ token });
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
