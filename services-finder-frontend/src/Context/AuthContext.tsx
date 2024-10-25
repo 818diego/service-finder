@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, {
+    createContext,
+    useContext,
+    useState,
+    ReactNode,
+    useEffect,
+} from "react";
 import { jwtDecode } from "jwt-decode";
-
 interface User {
     username: string;
 }
@@ -18,19 +23,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
     const [user, setUser] = useState<User | null>(null);
 
-    const login = (token: string) => {
-        interface DecodedToken {
-            username: string;
+    useEffect(() => {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            try {
+                const decodedToken = jwtDecode<{ username: string }>(token);
+                setUser({ username: decodedToken.username });
+            } catch (error) {
+                console.error("Invalid token:", error);
+                localStorage.removeItem("authToken");
+            }
         }
-        const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
+    }, []);
 
-        // Only update user if it actually changes.
-        if (user?.username !== decodedToken.username) {
+    const login = (token: string) => {
+        try {
+            const decodedToken = jwtDecode<{ username: string }>(token);
+            localStorage.setItem("authToken", token);
             setUser({ username: decodedToken.username });
+        } catch (error) {
+            console.error("Invalid token:", error);
         }
     };
 
-    const logout = () => setUser(null);
+    const logout = () => {
+        localStorage.removeItem("authToken");
+        setUser(null);
+    };
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>
