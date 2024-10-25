@@ -2,14 +2,16 @@ import React, { useEffect } from "react";
 import { useAuth } from "./AuthContext";
 
 const InitAuth: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { login } = useAuth();
+    const { login, logout } = useAuth();
 
     useEffect(() => {
         const token = localStorage.getItem("authToken");
         if (token) {
             login(token);
+        } else {
+            logout();
         }
-    }, [login]);
+    }, [login, logout]);
 
     return <>{children}</>;
 };

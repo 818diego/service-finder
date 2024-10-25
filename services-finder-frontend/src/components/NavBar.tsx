@@ -7,18 +7,25 @@ import {
     LogOut,
     Settings,
     PlusCircle,
+    FilePlus as NewPostIcon,
 } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Context/AuthContext";
+import { User } from "../types/users";
+import Modal from "../components/Modals/Modal";
+import ModalPost from "../components/Modals/ModalPost";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout }: { user: User | null; logout: () => void } =
+        useAuth();
 
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
@@ -48,6 +55,15 @@ const Navbar: React.FC = () => {
         }
     };
 
+    const handlePostSubmit = () => {
+        //api.createPost(data);
+    };
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    const openNewPostModal = () => setIsPostModalOpen(true);
+    const closeNewPostModal = () => setIsPostModalOpen(false);
     return (
         <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 w-full">
             <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,12 +79,14 @@ const Navbar: React.FC = () => {
                             {[
                                 "/services",
                                 "/category",
+                                "/posts",
                                 "/about",
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
                                     "Services",
                                     "Category",
+                                    "Posts",
                                     "About",
                                     "Contact",
                                 ];
@@ -106,10 +124,18 @@ const Navbar: React.FC = () => {
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
-                                        <PlusCircle
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                            onClick={() => navigate("/post")}
-                                        />
+                                        {user.userType === "Proveedor" && (
+                                            <>
+                                                <PlusCircle
+                                                    className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                    onClick={openModal}
+                                                />
+                                                <NewPostIcon
+                                                    className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                    onClick={openNewPostModal}
+                                                />
+                                            </>
+                                        )}
                                         <Settings
                                             className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
                                             onClick={() => navigate("/profile")}
@@ -166,6 +192,19 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={handlePostSubmit}
+            />
+
+            <ModalPost
+                isOpen={isPostModalOpen}
+                onClose={closeNewPostModal}
+                onSubmit={handlePostSubmit}
+                portfolioId={""}
+            />
         </nav>
     );
 };
