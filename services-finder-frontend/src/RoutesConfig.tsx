@@ -1,13 +1,22 @@
 import { Routes, Route } from "react-router-dom";
+
+// Import pages principal
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import ServicesPage from "./pages/ServicesPage"
+import ServicesPage from "./pages/ServicesPage";
 import CategoryPage from "./pages/CategoryPage";
+import PostsPage from "./pages/PostsPage";
+
+// Import pages auth
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+
+// Import pages accounts
 import ProfilePage from "./pages/accounts/ProfilePage";
-import PostsPage from "./pages/PostsPage";
+import MyServicesPage from "./pages/accounts/MyServicesPage";
+import MyPostPage from "./pages/accounts/MyPostPage";
+import MyChatsPage from "./pages/accounts/MyChatsPage";
 
 export const AppRoutes: React.FC = () => (
     <Routes>
@@ -22,7 +31,10 @@ export const AppRoutes: React.FC = () => (
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Page for users */}
+        {/* Options for a user */}
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/my-services" element={<MyServicesPage />} />
+        <Route path="/my-posts" element={<MyPostPage />} />
+        <Route path="/chats" element={<MyChatsPage />} />
     </Routes>
 );

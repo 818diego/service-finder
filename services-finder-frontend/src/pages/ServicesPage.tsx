@@ -30,7 +30,7 @@ const ServicesPage: React.FC = () => {
     if (error) return <p>Error: {error}</p>;
 
     return (
-        <div className="shadow overflow-hidden sm:rounded-lg transition-colors duration-300 ease-in-out">
+        <div className="overflow-hidden transition-colors duration-300 ease-in-out">
             <div className="px-4 py-5 sm:px-6">
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                     Welcome to Services

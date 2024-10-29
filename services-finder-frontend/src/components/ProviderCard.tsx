@@ -1,5 +1,5 @@
 import React from "react";
-import { FaInfoCircle, FaShoppingCart } from "react-icons/fa";
+import { FaShoppingCart, FaPlus, FaClock, FaTag } from "react-icons/fa";
 
 interface ProviderCardProps {
     providerName: string;
@@ -8,8 +8,8 @@ interface ProviderCardProps {
     price: string | number;
     duration: string;
     category: string;
-    onDetailsClick: () => void;
     onHireClick: () => void;
+    onCreatePostClick: () => void;
 }
 
 const ProviderCard: React.FC<ProviderCardProps> = ({
@@ -19,49 +19,58 @@ const ProviderCard: React.FC<ProviderCardProps> = ({
     price,
     duration,
     category,
-    onDetailsClick,
     onHireClick,
+    onCreatePostClick,
 }) => {
     return (
-        <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 p-6 flex flex-col justify-between space-y-4">
+        <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 p-6 space-y-5 transform hover:shadow-xl">
             <div className="text-center">
-                <h2 className="font-semibold text-xl mb-1 text-gray-900 dark:text-gray-100">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
                     {providerName}
                 </h2>
-                <span className="inline-block bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 px-3 py-1 rounded-full text-xs font-medium mb-4">
-                    {category}
-                </span>
-                <div className="text-start">
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mt-2">
-                        {title}
-                    </h3>
-                    <p className="text-gray-600 dark:text-gray-400 mt-2 text-justify leading-relaxed">
-                        {description}
-                    </p>
+            </div>
+            
+            <div className="text-start space-y-2">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    {title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
+                    {description}
+                </p>
+            </div>
+            
+            {/* Duration and Price with Icons */}
+            <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+                <div className="flex items-center text-sm text-gray-500 dark:text-gray-300">
+                    <FaClock className="mr-2" />
+                    <span className="font-medium">Duration:</span> {duration}
+                </div>
+                <div className="flex items-center text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <FaTag className="mr-2 text-yellow-300 text-sm" />
+                    ${price}
                 </div>
             </div>
 
-            <div className="flex justify-between items-center text-gray-600 dark:text-gray-400 mt-4">
-                <p className=" px-3 py-1 rounded-full text-sm">
-                    Duración: {duration}
-                </p>
-                <p className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                    ${price}
-                </p>
+            {/* Category Tag at Bottom */}
+            <div className="mt-4 text-center">
+                <span className="inline-flex items-center bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-medium">
+                    {category}
+                </span>
             </div>
 
-            <div className="flex justify-center space-x-2 mt-6">
+            {/* Action Buttons */}
+            <div className="flex justify-center mt-4 space-x-4">
                 <button
-                    className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-1 px-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-sm"
-                    onClick={onDetailsClick}>
-                    <FaInfoCircle className="mr-1" />
-                    Ver detalles
+                    className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-green-600 dark:text-green-400 font-medium text-sm focus:outline-none hover:underline"
+                    onClick={onHireClick}>
+                    <FaShoppingCart className="text-lg" />
+                    <span>Hire Service</span>
                 </button>
                 <button
-                    className="flex items-center bg-green-500 hover:bg-green-600 text-white font-semibold py-1 px-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-sm"
-                    onClick={onHireClick}>
-                    <FaShoppingCart className="mr-1" />
-                    Contratar servicio
+                    className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-blue-600 dark:text-blue-400 font-medium text-sm focus:outline-none hover:underline"
+                    onClick={onCreatePostClick}>
+                    <FaPlus className="text-lg" />
+                    <span>Create Post</span>
                 </button>
             </div>
         </div>
