@@ -1,3 +1,16 @@
+export interface Service {
+    _id: string;
+    id: number;
+    title: string;
+    description: string;
+    price: number;
+    duration: string;
+    category: string;
+    provider: {
+        username: string;
+    };
+}
+
 export const createService = async (data: {
     title: string;
     description: string;
@@ -37,6 +50,14 @@ export const createService = async (data: {
         console.error("Error creating service:", error);
         throw error;
     }
+};
+
+export const fetchServices = async (): Promise<Service[]> => {
+    const response = await fetch("http://localhost:3000/api/services/list");
+    if (!response.ok) {
+        throw new Error("Error al obtener los servicios");
+    }
+    return response.json();
 };
 
 export const createPost = async (
