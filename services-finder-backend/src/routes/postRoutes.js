@@ -12,6 +12,7 @@ router.get('/post/portfolio/:portfolioId/posts', authMiddleware, postController.
 
 // Ruta para obtener un post específico por su ID
 router.get('/post/:postId', authMiddleware, postController.getPostById);
+// En la ruta hay que poner en :postId el id del post que se quiere obtener
 
 // Ruta para actualizar un post específico por su ID
 router.put('/post/:postId/update', authMiddleware, postController.updatePost);
