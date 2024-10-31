@@ -18,10 +18,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/', serviceRoutes);
 app.use('/api/', portfolioRoutes);
-app.use('/api/posts', postRoutes);
-
-
-
+app.use('/api/', postRoutes);
 
 
 // Connect to MongoDB

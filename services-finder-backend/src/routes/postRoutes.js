@@ -4,13 +4,11 @@ const postController = require('../controllers/postController');
 const authMiddleware = require('../middleware/auth'); // Asegúrate de usar autenticación si es necesario
 
 // Ruta para agregar posts existentes a un portfolio específico
-router.put('/portfolio/:portfolioId/add-posts', authMiddleware, postController.addPostsToPortfolio);
-
-// Ruta para crear un nuevo post en un portfolio específico
-router.post('/portfolio/:portfolioId/create-post', authMiddleware, postController.createPost);
+router.put('/post/portfolio/:portfolioId/add-create-posts', authMiddleware, postController.createPost);
+// En la ruta hay que poner el id del portfolio al que se le quiere agregar el post
 
 // Ruta para obtener todos los posts de un portfolio específico
-router.get('/portfolio/:portfolioId/posts', authMiddleware, postController.getPostsByPortfolio);
+router.get('/post/portfolio/:portfolioId/posts', authMiddleware, postController.getPostsByPortfolio);
 
 // Ruta para obtener un post específico por su ID
 router.get('/post/:postId', authMiddleware, postController.getPostById);

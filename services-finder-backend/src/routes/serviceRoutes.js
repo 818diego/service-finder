@@ -4,6 +4,7 @@ const {
   createService,
   getAllServices,
   getServiceById,
+  getServicesByUserId,
   updateService,
   deleteService
 } = require('../controllers/serviceController');
@@ -17,6 +18,9 @@ router.get('/services/list', getAllServices);
 
 // Ruta para obtener un servicio por ID
 router.get('/services/view/:id', getServiceById);
+
+// Ruta para obtener todos los servicios de un usuario específico por su ID
+router.get('/services/user/:userId/services', auth, getServicesByUserId);
 
 // Ruta para actualizar un servicio
 router.put('/services/update/:id', auth, updateService);

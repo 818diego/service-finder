@@ -95,10 +95,28 @@ const deleteService = async (req, res) => {
   }
 };
 
+// Obtener todos los servicios de un usuario específico por su ID
+const getServicesByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params; // ID del usuario recibido como parámetro en la URL
+    const services = await Service.find({ provider: userId }).populate('provider').populate('portfolio');
+    
+    if (!services || services.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron servicios para este usuario' });
+    }
+
+    res.status(200).json(services);
+  } catch (error) {
+    console.error("Error al obtener los servicios del usuario:", error);
+    res.status(500).json({ message: 'Error al obtener los servicios del usuario' });
+  }
+};
+
 module.exports = {
   createService,
+  getServicesByUserId,
   getAllServices,
   getServiceById,
   updateService,
-  deleteService
+  deleteService,
 };

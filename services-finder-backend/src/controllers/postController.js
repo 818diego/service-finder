@@ -1,35 +1,6 @@
 const Post = require('../models/Post');
 const Portfolio = require('../models/Portfolio');
 
-// Agregar posts a un portfolio existente
-exports.addPostsToPortfolio = async (req, res) => {
-  try {
-    const { portfolioId } = req.params;
-    const { posts } = req.body;
-
-    // Verificar que el portfolio exista
-    const portfolio = await Portfolio.findById(portfolioId);
-    if (!portfolio) {
-      return res.status(404).json({ message: 'Portafolio no encontrado' });
-    }
-
-    // Verificar que todos los posts existan
-    const existingPosts = await Post.find({ _id: { $in: posts } });
-    if (existingPosts.length !== posts.length) {
-      return res.status(400).json({ message: 'Uno o más posts no existen' });
-    }
-
-    // Agregar los posts al portfolio
-    portfolio.posts = [...portfolio.posts, ...posts];
-    const updatedPortfolio = await portfolio.save();
-
-    res.status(200).json(updatedPortfolio);
-  } catch (error) {
-    console.error("Error al agregar posts al portfolio:", error);
-    res.status(500).json({ message: 'Error al agregar posts al portfolio' });
-  }
-};
-
 // Crear un nuevo post asociado a un portafolio
 exports.createPost = async (req, res) => {
   try {
@@ -37,11 +8,22 @@ exports.createPost = async (req, res) => {
     const { title, description, images } = req.body;
     const newPost = new Post({ portfolio: portfolioId, title, description, images });
     const savedPost = await newPost.save();
+
+    // Actualizar el portafolio para incluir el nuevo post
+    const portfolio = await Portfolio.findById(portfolioId);
+    if (!portfolio) {
+      return res.status(404).json({ message: 'Portafolio no encontrado' });
+    }
+    portfolio.posts.push(savedPost._id);
+    await portfolio.save();
+
     res.status(201).json(savedPost);
   } catch (err) {
     res.status(500).json({ message: 'Error al crear el post', error: err });
   }
 };
+
+
 
 // Obtener todos los posts de un portafolio específico
 exports.getPostsByPortfolio = async (req, res) => {
