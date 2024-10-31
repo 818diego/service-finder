@@ -45,12 +45,15 @@ export const createService = async (data: {
 
         const result = await response.json();
         console.log("Service created successfully:", result);
-        return result;
+        
+        // Retornamos el resultado, que contiene el portfolioId
+        return result; // result debería contener el portfolioId en su estructura de datos
     } catch (error) {
         console.error("Error creating service:", error);
         throw error;
     }
 };
+
 
 export const fetchServices = async (): Promise<Service[]> => {
     const response = await fetch("http://localhost:3000/api/services/list");
@@ -72,7 +75,7 @@ export const createPost = async (
 
     try {
         const response = await fetch(
-            `http://localhost:3000/api/posts/portfolio/${portfolioId}/create-post`,
+            `http://localhost:3000/api/post/portfolio/${portfolioId}/add-create-posts`,
             {
                 method: "POST",
                 headers: {
@@ -97,3 +100,24 @@ export const createPost = async (
         throw error;
     }
 };
+
+export const createServiceAndAddPost = async (
+    serviceData: { title: string; description: string; price: number; duration: string; category: string },
+    postData: { title: string; description: string; images: string[] }
+) => {
+    try {
+        // Primero, creamos el servicio y obtenemos el portfolioId
+        const serviceResult = await createService(serviceData);
+        const portfolioId = serviceResult.portfolioId; // Obtén el portfolioId del resultado
+
+        // Ahora creamos el post usando el portfolioId obtenido
+        const postResult = await createPost(portfolioId, postData);
+        
+        console.log("Service and post created successfully:", { serviceResult, postResult });
+        return { serviceResult, postResult };
+    } catch (error) {
+        console.error("Error creating service and post:", error);
+        throw error;
+    }
+};
+
