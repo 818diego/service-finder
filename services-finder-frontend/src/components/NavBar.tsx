@@ -4,24 +4,37 @@ import {
     Home,
     User as UserIcon,
     Search,
-    LogOut,
     Settings,
+    LogOut,
     PlusCircle,
+    FilePlus as NewPostIcon,
 } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Context/AuthContext";
+import { User } from "../types/users";
+import Modal from "../components/Modals/Modal";
+import ModalPost from "../components/Modals/ModalPost";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
     const [searchQuery, setSearchQuery] = useState<string>("");
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+    const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false);
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const optionsRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout }: { user: User | null; logout: () => void } =
+        useAuth();
 
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
+    };
+
+    const toggleOptions = () => {
+        setIsOptionsOpen((prev) => !prev);
     };
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -30,6 +43,12 @@ const Navbar: React.FC = () => {
             !dropdownRef.current.contains(event.target as Node)
         ) {
             setIsDropdownOpen(false);
+        }
+        if (
+            optionsRef.current &&
+            !optionsRef.current.contains(event.target as Node)
+        ) {
+            setIsOptionsOpen(false);
         }
     };
 
@@ -48,6 +67,16 @@ const Navbar: React.FC = () => {
         }
     };
 
+    const handlePostSubmit = () => {
+        //api.createPost(data);
+    };
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    const openNewPostModal = () => setIsPostModalOpen(true);
+    const closeNewPostModal = () => setIsPostModalOpen(false);
+
     return (
         <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 w-full">
             <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,12 +92,14 @@ const Navbar: React.FC = () => {
                             {[
                                 "/services",
                                 "/category",
+                                "/posts",
                                 "/about",
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
                                     "Services",
                                     "Category",
+                                    "Posts",
                                     "About",
                                     "Contact",
                                 ];
@@ -106,14 +137,88 @@ const Navbar: React.FC = () => {
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
-                                        <PlusCircle
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                            onClick={() => navigate("/post")}
-                                        />
-                                        <Settings
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                            onClick={() => navigate("/profile")}
-                                        />
+                                        {user.userType === "Proveedor" && (
+                                            <>
+                                                <PlusCircle
+                                                    className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                    onClick={openModal}
+                                                />
+                                                <NewPostIcon
+                                                    className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                    onClick={openNewPostModal}
+                                                />
+                                            </>
+                                        )}
+                                        <div
+                                            className="relative"
+                                            ref={optionsRef}>
+                                            <button
+                                                onClick={toggleOptions}
+                                                className="text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer mt-1">
+                                                <Settings />
+                                            </button>
+                                            <AnimatePresence>
+                                                {isOptionsOpen && (
+                                                    <motion.div
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        exit={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        transition={{
+                                                            duration: 0.3,
+                                                            ease: "easeOut",
+                                                        }}
+                                                        className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
+                                                        {user.userType ===
+                                                        "Proveedor" ? (
+                                                            <>
+                                                                <Link
+                                                                    to="/my-services"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Services
+                                                                </Link>
+                                                                <Link
+                                                                    to="/my-posts"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Posts
+                                                                </Link>
+                                                                <Link
+                                                                    to="/profile"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Profile
+                                                                </Link>
+                                                                <Link
+                                                                    to="/chats"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Chats
+                                                                </Link>
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Link
+                                                                    to="/profile"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Profile
+                                                                </Link>
+                                                                <Link
+                                                                    to="/chats"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Chats
+                                                                </Link>
+                                                            </>
+                                                        )}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
                                         <LogOut
                                             className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300 ease-in-out cursor-pointer"
                                             onClick={handleLogout}
@@ -166,6 +271,19 @@ const Navbar: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <Modal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onSubmit={handlePostSubmit}
+            />
+
+            <ModalPost
+                isOpen={isPostModalOpen}
+                onClose={closeNewPostModal}
+                onSubmit={handlePostSubmit}
+                portfolioId={""}
+            />
         </nav>
     );
 };

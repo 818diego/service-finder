@@ -30,6 +30,7 @@ export const loginUser = async (data: User): Promise<RegisterResponse> => {
         if (token) {
             localStorage.setItem("authToken", token);
         }
+        console.log("Token:", token);
         return response.data;
     } catch (error: unknown) {
         if (error instanceof Error) {

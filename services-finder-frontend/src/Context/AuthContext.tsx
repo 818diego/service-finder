@@ -1,14 +1,13 @@
-import React, {
-    createContext,
-    useContext,
-    useState,
-    ReactNode,
-    useEffect,
-} from "react";
 import { jwtDecode } from "jwt-decode";
-interface User {
-    username: string;
-}
+import { User } from "../types/users";
+import {
+    createContext,
+    ReactNode,
+    useCallback,
+    useContext,
+    useEffect,
+    useState,
+} from "react";
 
 interface AuthContextType {
     user: User | null;
@@ -23,12 +22,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
     const [user, setUser] = useState<User | null>(null);
 
+    const isTokenExpired = (token: string): boolean => {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const decodedToken: any = jwtDecode(token);
+            const currentTime = Date.now() / 1000;
+            return decodedToken.exp < currentTime;
+        } catch (error) {
+            console.error("Error decoding token:", error);
+            return true;
+        }
+    };
+
     useEffect(() => {
         const token = localStorage.getItem("authToken");
-        if (token) {
+        if (token && !isTokenExpired(token)) {
             try {
-                const decodedToken = jwtDecode<{ username: string }>(token);
-                setUser({ username: decodedToken.username });
+                const decodedToken = jwtDecode<User>(token);
+                setUser(decodedToken);
             } catch (error) {
                 console.error("Invalid token:", error);
                 localStorage.removeItem("authToken");
@@ -36,20 +47,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
     }, []);
 
-    const login = (token: string) => {
-        try {
-            const decodedToken = jwtDecode<{ username: string }>(token);
-            localStorage.setItem("authToken", token);
-            setUser({ username: decodedToken.username });
-        } catch (error) {
-            console.error("Invalid token:", error);
-        }
-    };
-
-    const logout = () => {
+    const logout = useCallback(() => {
         localStorage.removeItem("authToken");
         setUser(null);
-    };
+    }, []);
+
+    const login = useCallback(
+        (token: string) => {
+            try {
+                if (!isTokenExpired(token)) {
+                    const decodedToken = jwtDecode<User>(token);
+                    localStorage.setItem("authToken", token);
+                    setUser(decodedToken);
+                } else {
+                    console.error("Token has expired");
+                    logout();
+                }
+            } catch (error) {
+                console.error("Invalid token:", error);
+                logout();
+            }
+        },
+        [logout]
+    );
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>

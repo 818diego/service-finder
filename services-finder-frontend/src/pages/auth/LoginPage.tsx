@@ -8,6 +8,7 @@ import FormInput from "../../components/utils/FormInput";
 import { Mail, Lock } from "lucide-react";
 import { loginUser } from "../../services/usersFetch";
 import { useAuth } from "../../Context/AuthContext";
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage: React.FC = () => {
     const {
@@ -25,6 +26,11 @@ const LoginPage: React.FC = () => {
         try {
             const response = await loginUser(data);
             login(response.token);
+            localStorage.setItem("token", response.token);
+
+            const decodedToken = jwtDecode(response.token);
+            console.log("Decoded token:", decodedToken);
+            
             setLoading(false);
             setRedirecting(true);
             toast.success("Successfully logged in!", {
