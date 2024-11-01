@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPost } from "../../services/postFetch";
+import { fetchUserServices } from "../../services/serviceFetch";
 import { toast } from "react-toastify";
 import { PostFormInput, PostResponse } from "../../types/post";
 
@@ -10,26 +11,46 @@ interface ModalPostProps {
     onSubmit: (data: PostResponse) => void;
 }
 
+interface Service {
+    _id: string;
+    title: string;
+    portfolio: string;
+}
+
 const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [imageUrls, setImageUrls] = useState<string[]>([""]);
     const [loading, setLoading] = useState(false);
+    const [services, setServices] = useState<Service[]>([]);
+    const [selectedPortfolioId, setSelectedPortfolioId] = useState("");
 
     const resetForm = () => {
+        setSelectedPortfolioId("");
         setTitle("");
         setDescription("");
-        setImageUrls([""]); // Limpiar el estado de URLs
+        setImageUrls([""]);
     };
 
-    const handleAddImageUrl = () => {
-        setImageUrls([...imageUrls, ""]); // Añadir un nuevo campo de URL vacío
-    };
+    const loadServices = async () => {
+        const token = localStorage.getItem("token");
 
-    const handleImageUrlChange = (index: number, url: string) => {
-        const newImageUrls = [...imageUrls];
-        newImageUrls[index] = url;
-        setImageUrls(newImageUrls); // Actualizar las URLs en el estado
+        if (!token) {
+            toast.error("No token found");
+            return;
+        }
+
+        try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            const userId = payload.userId;
+            const servicesData = await fetchUserServices(userId, token);
+            console.log("Fetched services:", servicesData);
+            setServices(servicesData);
+            setSelectedPortfolioId(servicesData[0]?.portfolio || "");
+        } catch (error) {
+            console.error("Error fetching services:", error);
+            toast.error("Error loading services");
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -39,19 +60,18 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
         const data: PostFormInput = {
             title,
             description,
-            images: imageUrls.filter((url) => url !== ""), // Send only non-empty URLs
+            images: imageUrls.filter((url) => url !== ""),
         };
 
         try {
-            const result = await createPost(data);
+            console.log("Selected portfolio ID:", selectedPortfolioId);
+            const result = await createPost(selectedPortfolioId, data);
             console.log("Post created successfully:", result);
-
             toast.success("Post created successfully", {
                 position: "top-right",
                 autoClose: 3000,
             });
-
-            onSubmit(result); // Pass the response to the callback function
+            onSubmit(result);
             onClose();
             resetForm();
         } catch (error) {
@@ -62,8 +82,19 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
         }
     };
 
+    const handleAddImageUrl = () => {
+        setImageUrls([...imageUrls, ""]);
+    };
+
+    const handleImageUrlChange = (index: number, url: string) => {
+        const newImageUrls = [...imageUrls];
+        newImageUrls[index] = url;
+        setImageUrls(newImageUrls);
+    };
+
     useEffect(() => {
         if (isOpen) {
+            loadServices();
             document.body.style.overflow = "hidden";
         } else {
             document.body.style.overflow = "auto";
@@ -104,6 +135,24 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
                         <form
                             onSubmit={handleSubmit}
                             className="space-y-4 mt-4">
+                            <select
+                                value={selectedPortfolioId}
+                                onChange={(e) =>
+                                    setSelectedPortfolioId(e.target.value)
+                                }
+                                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required>
+                                <option value="" disabled>
+                                    Select a Service
+                                </option>
+                                {services.map((service) => (
+                                    <option
+                                        key={service._id}
+                                        value={service.portfolio}>
+                                        {service.title}
+                                    </option>
+                                ))}
+                            </select>
                             <input
                                 type="text"
                                 value={title}
