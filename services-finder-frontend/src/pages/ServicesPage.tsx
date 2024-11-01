@@ -51,7 +51,7 @@ const ServicesPage: React.FC = () => {
                                 price={service.price}
                                 duration={service.duration}
                                 category={service.category}
-                                onDetailsClick={() =>
+                                onCreatePostClick={() =>
                                     console.log(
                                         "Ver detalles de",
                                         service.title

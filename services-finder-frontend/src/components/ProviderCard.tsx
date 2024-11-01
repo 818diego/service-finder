@@ -29,7 +29,6 @@ const ProviderCard: React.FC<ProviderCardProps> = ({
                     {providerName}
                 </h2>
             </div>
-            
             <div className="text-start space-y-2">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     {title}
