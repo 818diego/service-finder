@@ -6,7 +6,6 @@ const authMiddleware = require('../middleware/auth');
 // Ruta para agregar posts existentes a un portfolio específico
 router.put('/post/portfolio/:portfolioId/add-create-posts', authMiddleware, postController.createPost);
 
-
 // Ruta para obtener todos los posts de un portfolio específico
 router.get('/post/portfolio/:portfolioId/posts', authMiddleware, postController.getPostsByPortfolio);
 

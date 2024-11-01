@@ -1,5 +1,6 @@
 const Service = require('../models/Service');
 const Portfolio = require('../models/Portfolio');
+const Post = require('../models/Post');
 const User = require('../models/User');
 
 // Crear un servicio
@@ -37,8 +38,8 @@ const createService = async (req, res) => {
     // Agregar el ID del servicio al array de servicios del usuario
     await User.findByIdAndUpdate(
       userId,
-      { 
-        $push: { 
+      {
+        $push: {
           services: savedService._id,
           portfolios: savedPortfolio._id
         }
@@ -63,11 +64,27 @@ const getAllServices = async (req, res) => {
   }
 };
 
+// Obtener todos los servicios de un usuario específico por su ID
+const getServicesByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const services = await Service.find({ provider: userId });
+
+    if (!services || services.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron servicios para este usuario' });
+    }
+
+    res.status(200).json(services);
+  } catch (error) {
+    console.error("Error al obtener los servicios del usuario:", error);
+    res.status(500).json({ message: 'Error al obtener los servicios del usuario' });
+  }
+};
 
 // Obtener un servicio por ID
 const getServiceById = async (req, res) => {
   try {
-    const service = await Service.findById(req.params.id).populate('provider').populate('portfolio');
+    const service = await Service.findById(req.params.id);
     if (!service) {
       return res.status(404).json({ message: 'Servicio no encontrado' });
     }
@@ -80,20 +97,24 @@ const getServiceById = async (req, res) => {
 // Actualizar un servicio
 const updateService = async (req, res) => {
   try {
-    const { title, description, price, duration, category } = req.body;
-    const updatedService = await Service.findByIdAndUpdate(
-      req.params.id,
-      { title, description, price, duration, category },
-      { new: true }
-    );
+    const updateData = {};
+
+    for (const key in req.body) {
+      if (req.body[key] !== '') {  
+        updateData[key] = req.body[key];
+      }
+    }
+
+    const updatedService = await Service.findByIdAndUpdate(req.params.id, updateData, { new: true });
     if (!updatedService) {
       return res.status(404).json({ message: 'Servicio no encontrado' });
     }
     res.status(200).json(updatedService);
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el servicio' });
+    res.status(500).json({ message: 'Error al actualizar el servicio', error });
   }
 };
+
 
 // Eliminar un servicio
 const deleteService = async (req, res) => {
@@ -102,28 +123,21 @@ const deleteService = async (req, res) => {
     if (!deletedService) {
       return res.status(404).json({ message: 'Servicio no encontrado' });
     }
-    res.status(200).json({ message: 'Servicio eliminado correctamente' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error al eliminar el servicio' });
-  }
-};
 
-// Obtener todos los servicios de un usuario específico por su ID
-const getServicesByUserId = async (req, res) => {
-  try {
-    const { userId } = req.params; // ID del usuario recibido como parámetro en la URL
-    const services = await Service.find({ provider: userId }).populate('provider').populate('portfolio');
-
-    if (!services || services.length === 0) {
-      return res.status(404).json({ message: 'No se encontraron servicios para este usuario' });
+    // Elimina el portfolio asociado al servicio
+    if (deletedService.portfolio) {
+      // Elimina todos los posts asociados a ese portfolio
+      await Post.deleteMany({ portfolio: deletedService.portfolio });
+      // Luego elimina el portfolio
+      await Portfolio.findByIdAndDelete(deletedService.portfolio);
     }
 
-    res.status(200).json(services);
+    res.status(200).json({ message: 'Servicio y sus datos relacionados eliminados correctamente' });
   } catch (error) {
-    console.error("Error al obtener los servicios del usuario:", error);
-    res.status(500).json({ message: 'Error al obtener los servicios del usuario' });
+    res.status(500).json({ message: 'Error al eliminar el servicio y sus datos relacionados' });
   }
 };
+
 
 module.exports = {
   createService,

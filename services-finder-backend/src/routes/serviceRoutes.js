@@ -23,7 +23,7 @@ router.get('/services/view/:id', getServiceById);
 router.get('/services/user/:userId/services', auth, getServicesByUserId);
 
 // Ruta para actualizar un servicio
-router.put('/services/update/:id', auth, updateService);
+router.patch('/services/update/:id', auth, updateService);
 
 // Ruta para eliminar un servicio
 router.delete('/services/delete/:id', auth, deleteService);
