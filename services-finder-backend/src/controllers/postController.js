@@ -23,13 +23,11 @@ exports.createPost = async (req, res) => {
   }
 };
 
-
-
 // Obtener todos los posts de un portafolio específico
 exports.getPostsByPortfolio = async (req, res) => {
   try {
-    const { portfolioId } = req.params; // Obtenemos el ID del portafolio desde la URL
-    const posts = await Post.find({ portfolio: portfolioId }).populate('portfolio');
+    const { portfolioId } = req.params;
+    const posts = await Post.find({ portfolio: portfolioId });
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Error al obtener los posts del portafolio', error: err });
@@ -39,7 +37,7 @@ exports.getPostsByPortfolio = async (req, res) => {
 // Obtener un post por ID
 exports.getPostById = async (req, res) => {
   try {
-    const post = await Post.findById(req.params.postId).populate('portfolio');
+    const post = await Post.findById(req.params.postId);
     if (!post) return res.status(404).json({ message: 'Post no encontrado' });
     res.status(200).json(post);
   } catch (err) {
@@ -50,7 +48,15 @@ exports.getPostById = async (req, res) => {
 // Actualizar un post
 exports.updatePost = async (req, res) => {
   try {
-    const updatedPost = await Post.findByIdAndUpdate(req.params.postId, req.body, { new: true });
+    const updateData = {};
+
+    for (const key in req.body) {
+      if (req.body[key] !== '') {
+        updateData[key] = req.body[key];
+      }
+    }
+
+    const updatedPost = await Post.findByIdAndUpdate(req.params.postId, updateData, { new: true });
     if (!updatedPost) return res.status(404).json({ message: 'Post no encontrado' });
     res.status(200).json(updatedPost);
   } catch (err) {
