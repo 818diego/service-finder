@@ -1,6 +1,6 @@
 const Post = require('../models/Post');
 const Portfolio = require('../models/Portfolio');
-
+//test  
 // Crear un nuevo post asociado a un portafolio
 exports.createPost = async (req, res) => {
   try {
