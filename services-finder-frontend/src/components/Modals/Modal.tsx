@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createService } from "../../services/providerFetch";
+import { createService } from "../../services/serviceFetch";
 import { toast } from "react-toastify";
 
 interface ModalProps {

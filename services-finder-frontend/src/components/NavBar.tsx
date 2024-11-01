@@ -92,14 +92,14 @@ const Navbar: React.FC = () => {
                             {[
                                 "/services",
                                 "/category",
-                                "/posts",
+                                "/portfolio",
                                 "/about",
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
                                     "Services",
                                     "Category",
-                                    "Posts",
+                                    "Portfolio",
                                     "About",
                                     "Contact",
                                 ];
@@ -282,7 +282,7 @@ const Navbar: React.FC = () => {
                 isOpen={isPostModalOpen}
                 onClose={closeNewPostModal}
                 onSubmit={handlePostSubmit}
-                portfolioId={""}
+                // portfolioId={""}
             />
         </nav>
     );

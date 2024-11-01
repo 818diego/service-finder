@@ -1,29 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { createPost } from "../../services/providerFetch"; // La función createPost ajustada
+import { createPost } from "../../services/postFetch";
 import { toast } from "react-toastify";
+import { PostFormInput, PostResponse } from "../../types/post";
 
 interface ModalPostProps {
     isOpen: boolean;
     onClose: () => void;
-    portfolioId: string; // El ID del portfolio
-    onSubmit: (data: {
-        portfolio: string;
-        title: string;
-        description: string;
-        images: string[];
-    }) => void;
+    onSubmit: (data: PostResponse) => void;
 }
 
-const ModalPost: React.FC<ModalPostProps> = ({
-    isOpen,
-    onClose,
-    portfolioId,
-    onSubmit,
-}) => {
+const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [imageUrls, setImageUrls] = useState<string[]>([""]); // Estado para las URLs de las imágenes
+    const [imageUrls, setImageUrls] = useState<string[]>([""]);
     const [loading, setLoading] = useState(false);
 
     const resetForm = () => {
@@ -46,23 +36,22 @@ const ModalPost: React.FC<ModalPostProps> = ({
         e.preventDefault();
         setLoading(true);
 
-        const data = {
+        const data: PostFormInput = {
             title,
             description,
-            images: imageUrls.filter((url) => url !== ""), // Enviar solo URLs no vacías
+            images: imageUrls.filter((url) => url !== ""), // Send only non-empty URLs
         };
 
         try {
-            // Crear el post asociado al portfolioId
-            const result = await createPost(portfolioId, data); // Llamada a la API
-            console.log("Post creado exitosamente:", result);
+            const result = await createPost(data);
+            console.log("Post created successfully:", result);
 
             toast.success("Post created successfully", {
                 position: "top-right",
                 autoClose: 3000,
             });
 
-            onSubmit(result); // Enviamos la respuesta a la función de callback
+            onSubmit(result); // Pass the response to the callback function
             onClose();
             resetForm();
         } catch (error) {
@@ -149,8 +138,7 @@ const ModalPost: React.FC<ModalPostProps> = ({
                             <button
                                 type="button"
                                 onClick={handleAddImageUrl}
-                                className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-400"
-                            >
+                                className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-400">
                                 Add Another Image URL
                             </button>
 
