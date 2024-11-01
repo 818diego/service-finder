@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import ServiceCard from "../components/ServiceCard";
 // import ProviderCard from "../components/ProviderCard"; // Nuevo componente para Proveedores
 import { popularServices, randomServices, Service } from "../data/services";
+import { workProposals } from "../data/workProposals";
+import WorkProposalCard from "../components/ClientCard";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
@@ -42,8 +44,11 @@ const Home: React.FC = () => {
                     <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                         Servicios Disponibles para Proveedores
                     </h2>
-                    {/* <ProviderCard /> */}
-                    {/* Aquí puedes agregar contenido específico para proveedores */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {workProposals.map((proposal, index) => (
+                            <WorkProposalCard key={index} proposal={proposal} />
+                        ))}
+                    </div>
                 </>
             )}
             {userType === "Cliente" && (

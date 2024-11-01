@@ -1,14 +1,21 @@
 import React from "react";
-import { FaUser, FaClock, FaTag, FaBriefcase } from "react-icons/fa";
+import { FaClock, FaTag, FaBriefcase } from "react-icons/fa";
+import { WorkProposal } from "../data/workProposals";
 
-const WorkProposalCard: React.FC = () => {
-    const clientName = "John Doe";
-    const jobTitle = "Website Development";
-    const jobDescription = "Looking for a web developer to create a responsive and SEO-friendly website for my business.";
-    const budget = "500-1000";
-    const duration = "2 weeks";
-    const category = "Web Development";
-    const imageUrl = "https://landingi.com/wp-content/uploads/2023/02/healthcare-landing-page-cover.png";
+interface WorkProposalCardProps {
+    proposal: WorkProposal;
+}
+
+const WorkProposalCard: React.FC<WorkProposalCardProps> = ({ proposal }) => {
+    const {
+        clientName,
+        jobTitle,
+        jobDescription,
+        budget,
+        duration,
+        category,
+        imageUrl,
+    } = proposal;
 
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 p-6 space-y-5 transform hover:shadow-xl">
@@ -17,7 +24,6 @@ const WorkProposalCard: React.FC = () => {
                     {clientName}
                 </h2>
             </div>
-            
             <div className="text-start space-y-2">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     {jobTitle}
@@ -26,35 +32,29 @@ const WorkProposalCard: React.FC = () => {
                     {jobDescription}
                 </p>
             </div>
-            
-            {/* Duration and Budget with Icons */}
             <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-md">
                 <div className="flex items-center text-sm text-gray-500 dark:text-gray-300">
                     <FaClock className="mr-2" />
                     <span className="font-medium">Duration:</span> {duration}
                 </div>
                 <div className="flex items-center text-lg font-semibold text-gray-900 dark:text-gray-100">
-                    <FaTag className="mr-2 text-yellow-300 text-sm" />
-                    ${budget}
+                    <FaTag className="mr-2 text-yellow-300 text-sm" />${budget}
                 </div>
             </div>
-
-            {/* Category Tag */}
             <div className="mt-4 text-center">
                 <span className="inline-flex items-center bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-medium">
                     {category}
                 </span>
             </div>
-
-            {/* Image at the Bottom */}
             <div className="mt-4">
-                <img src={imageUrl} alt="Work Proposal" className="w-full h-40 object-cover rounded-md" />
+                <img
+                    src={imageUrl}
+                    alt="Work Proposal"
+                    className="w-full h-40 object-cover rounded-md"
+                />
             </div>
-
-            {/* Apply Now Button at the Very Bottom */}
             <div className="flex justify-center mt-4">
-                <button
-                    className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-green-600 dark:text-green-400 font-medium text-sm focus:outline-none hover:underline">
+                <button className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-green-600 dark:text-green-400 font-medium text-sm focus:outline-none hover:underline">
                     <FaBriefcase className="text-lg" />
                     <span>Apply Now</span>
                 </button>
