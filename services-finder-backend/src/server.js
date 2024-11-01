@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const postRoutes = require('./routes/postRoutes');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use('/api/', serviceRoutes);
 app.use('/api/', portfolioRoutes);
 app.use('/api/', postRoutes);
 
+app.use('/api/users', userRoutes);
 
 // Connect to MongoDB
 connectDB();

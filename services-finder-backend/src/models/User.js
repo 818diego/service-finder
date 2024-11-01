@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
   address: { type: String, required: true },
   specialty: { type: String },
   password: { type: String, required: true },
+  services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service' }],
+  portfolios: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Portfolio' }]
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {
