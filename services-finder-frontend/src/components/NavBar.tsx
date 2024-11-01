@@ -134,6 +134,11 @@ const Navbar: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex items-center space-x-4 w-1/3 justify-end relative">
+                                {user && (
+                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                        {user.userType}
+                                    </span>
+                                )}
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
