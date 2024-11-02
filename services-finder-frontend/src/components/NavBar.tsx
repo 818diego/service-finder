@@ -89,14 +89,12 @@ const Navbar: React.FC = () => {
                             {[
                                 "/services",
                                 "/category",
-                                "/portfolio",
                                 "/about",
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
                                     "Services",
                                     "Category",
-                                    "Portfolio",
                                     "About",
                                     "Contact",
                                 ];
