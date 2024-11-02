@@ -60,11 +60,8 @@ const Navbar: React.FC = () => {
     }, []);
 
     const handleLogout = () => {
-        const confirmed = window.confirm("Are you sure you want to log out?");
-        if (confirmed) {
-            logout();
-            navigate("/login");
-        }
+        localStorage.removeItem("token");
+        logout();
     };
 
     const handlePostSubmit = () => {

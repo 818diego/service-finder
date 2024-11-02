@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import ProviderCard from "../components/ProviderCard";
-import { fetchServices, Service } from "../services/serviceFetch";
+import ProviderCard from "../components/ServicesPage/ServicesPageCard";
+import { fetchServices } from "../services/serviceFetch";
+import { Service } from "../types/service";
 
 const ServicesPage: React.FC = () => {
     const [services, setServices] = useState<Service[]>([]);

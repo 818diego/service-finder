@@ -6,31 +6,30 @@ import { workProposals } from "../data/workProposals";
 import WorkProposalCard from "../components/ClientCard";
 
 const Home: React.FC = () => {
-    const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
-        null
-    );
+    const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
             try {
                 const payload = JSON.parse(atob(token.split(".")[1]));
-                setUserType(
-                    payload.userType === "Proveedor" ? "Proveedor" : "Cliente"
-                );
+                if (payload.userType === "Proveedor" || payload.userType === "Cliente") {
+                    setUserType(payload.userType);
+                } else {
+                    setUserType(null);
+                }
             } catch (error) {
                 console.error("Error al decodificar el token", error);
                 setUserType(null);
             }
         } else {
             console.warn("No hay token");
+            setUserType(null);
         }
     }, []);
 
     const handleCardClick = (providerId: number) => {
-        console.log(
-            `Redirigiendo a la página del proveedor con ID: ${providerId}`
-        );
+        console.log(`Redirigiendo a la página del proveedor con ID: ${providerId}`);
     };
 
     const handleHireClick = (providerId: number) => {
@@ -69,9 +68,7 @@ const Home: React.FC = () => {
                                 tools={service.tools}
                                 exampleImages={service.exampleImages}
                                 price={service.price}
-                                onDetailsClick={() =>
-                                    handleCardClick(service.id)
-                                }
+                                onDetailsClick={() => handleCardClick(service.id)}
                                 onHireClick={() => handleHireClick(service.id)}
                             />
                         ))}
@@ -94,16 +91,25 @@ const Home: React.FC = () => {
                                 tools={service.tools}
                                 exampleImages={service.exampleImages}
                                 price={service.price}
-                                onDetailsClick={() =>
-                                    handleCardClick(service.id)
-                                }
+                                onDetailsClick={() => handleCardClick(service.id)}
                                 onHireClick={() => handleHireClick(service.id)}
                             />
                         ))}
                     </div>
                 </>
             )}
-            {userType === null && <p>Cargando...</p>}
+            {userType === null &&(
+                <>
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                            Welcome to Services Finder
+                        </h1>
+                        <p className="text-lg text-gray-700 dark:text-gray-300">
+                            See the best services in your area
+                        </p>
+                    </div>
+                </>
+        )}
         </div>
     );
 };
