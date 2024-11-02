@@ -63,9 +63,11 @@ const Navbar: React.FC = () => {
 
     const handleLogout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("authToken");
         logout();
         setIsLogoutModalOpen(false);
-        window.location.reload();
+        navigate("/");
     };
 
     const handlePostSubmit = () => {
