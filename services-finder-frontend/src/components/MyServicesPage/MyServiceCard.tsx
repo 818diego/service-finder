@@ -1,8 +1,7 @@
 import React from "react";
-import { FaPlus, FaTrash, FaClock, FaTag } from "react-icons/fa";
+import { FaPlus, FaTrash, FaClock, FaTag, FaEdit } from "react-icons/fa";
 
 interface MyServicesCardProps {
-    providerName: string;
     title: string;
     description: string;
     price: string | number;
@@ -14,7 +13,6 @@ interface MyServicesCardProps {
 }
 
 const MyServicesCard: React.FC<MyServicesCardProps> = ({
-    providerName,
     title,
     description,
     price,
@@ -26,11 +24,6 @@ const MyServicesCard: React.FC<MyServicesCardProps> = ({
 }) => {
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 p-6 space-y-5 transform hover:shadow-xl">
-            <div className="text-center">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {providerName}
-                </h2>
-            </div>
             <div className="text-start space-y-2">
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                     {title}
@@ -70,7 +63,7 @@ const MyServicesCard: React.FC<MyServicesCardProps> = ({
                 <button
                     className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-green-600 dark:text-green-400 font-medium text-sm focus:outline-none hover:underline"
                     onClick={onEditServiceClick}>
-                    <FaTrash className="text-lg" />
+                    <FaEdit className="text-lg" />
                     <span>Edit</span>
                 </button>
             </div>

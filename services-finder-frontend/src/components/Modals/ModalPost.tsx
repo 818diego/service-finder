@@ -4,6 +4,7 @@ import { createPost } from "../../services/postFetch";
 import { fetchUserServices } from "../../services/serviceFetch";
 import { toast } from "react-toastify";
 import { PostFormInput, PostResponse } from "../../types/post";
+import { FaPlus } from "react-icons/fa";
 
 interface ModalPostProps {
     isOpen: boolean;
@@ -16,6 +17,15 @@ interface Service {
     title: string;
     portfolio: string;
 }
+
+const isValidUrl = (url: string) => {
+    const urlPattern = new RegExp(
+        "^(https?:\\/\\/)?" + // protocolo
+            "((([a-zA-Z0-9_-]+)\\.)+[a-zA-Z]{2,})" + // dominio
+            "(\\/[a-zA-Z0-9@:%_+.~#?&//=]*)?" // ruta
+    );
+    return urlPattern.test(url);
+};
 
 const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
     const [title, setTitle] = useState("");
@@ -44,11 +54,9 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
             const payload = JSON.parse(atob(token.split(".")[1]));
             const userId = payload.userId;
             const servicesData = await fetchUserServices(userId, token);
-            console.log("Fetched services:", servicesData);
             setServices(servicesData);
             setSelectedPortfolioId(servicesData[0]?.portfolio || "");
-        } catch (error) {
-            console.error("Error fetching services:", error);
+        } catch {
             toast.error("Error loading services");
         }
     };
@@ -57,16 +65,23 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
         e.preventDefault();
         setLoading(true);
 
+        const validUrls = imageUrls.filter(
+            (url) => url.trim() !== "" && isValidUrl(url)
+        );
+        if (validUrls.length === 0) {
+            toast.error("At least one valid image URL is required.");
+            setLoading(false);
+            return;
+        }
+
         const data: PostFormInput = {
             title,
             description,
-            images: imageUrls.filter((url) => url !== ""),
+            images: validUrls,
         };
 
         try {
-            console.log("Selected portfolio ID:", selectedPortfolioId);
             const result = await createPost(selectedPortfolioId, data);
-            console.log("Post created successfully:", result);
             toast.success("Post created successfully", {
                 position: "top-right",
                 autoClose: 3000,
@@ -74,8 +89,7 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
             onSubmit(result);
             onClose();
             resetForm();
-        } catch (error) {
-            console.error("Error creating post:", error);
+        } catch {
             toast.error("Error creating post. Please try again.");
         } finally {
             setLoading(false);
@@ -169,7 +183,9 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
                                 required
                             />
                             {imageUrls.map((url, index) => (
-                                <div key={index} className="space-y-2">
+                                <div
+                                    key={index}
+                                    className="space-y-2 flex items-center">
                                     <input
                                         type="text"
                                         value={url}
@@ -184,13 +200,14 @@ const ModalPost: React.FC<ModalPostProps> = ({ isOpen, onClose, onSubmit }) => {
                                     />
                                 </div>
                             ))}
-                            <button
-                                type="button"
-                                onClick={handleAddImageUrl}
-                                className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-400">
-                                Add Another Image URL
-                            </button>
-
+                            <div className="flex justify-center mt-2">
+                                <button
+                                    type="button"
+                                    onClick={handleAddImageUrl}
+                                    className="flex justify-center items-center bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-400 transition-all duration-300 transform hover:scale-105 w-8 h-8">
+                                    <FaPlus />
+                                </button>
+                            </div>
                             <div className="flex justify-end space-x-2 mt-4">
                                 <button
                                     type="button"

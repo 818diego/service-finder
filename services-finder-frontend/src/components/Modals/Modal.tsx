@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createService } from "../../services/serviceFetch";
 import { toast } from "react-toastify";
+import { durationOptions, categoryOptions } from "../../data/dropdownOptions";
 
 interface ModalProps {
     isOpen: boolean;
@@ -29,6 +30,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
         setPrice("");
         setDuration("");
         setCategory("");
+    };
+
+    const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(e.target.value);
+        if (value < 0) {
+            toast.error("El precio no puede ser negativo.");
+            setPrice("");
+        } else {
+            setPrice(value || "");
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -61,11 +72,7 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
     };
 
     useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "auto";
-        }
+        document.body.style.overflow = isOpen ? "hidden" : "auto";
         return () => {
             document.body.style.overflow = "auto";
         };
@@ -120,33 +127,35 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onSubmit }) => {
                             <input
                                 type="number"
                                 value={price}
-                                onChange={(e) =>
-                                    setPrice(
-                                        e.target.value
-                                            ? Number(e.target.value)
-                                            : ""
-                                    )
-                                }
+                                onChange={handlePriceChange}
                                 placeholder="Precio"
                                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                 required
                             />
-                            <input
-                                type="text"
+                            <select
                                 value={duration}
                                 onChange={(e) => setDuration(e.target.value)}
-                                placeholder="Duración"
                                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                required
-                            />
-                            <input
-                                type="text"
+                                required>
+                                <option value="">Seleccione Duración</option>
+                                {durationOptions.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                            <select
                                 value={category}
                                 onChange={(e) => setCategory(e.target.value)}
-                                placeholder="Categoría"
                                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                required
-                            />
+                                required>
+                                <option value="">Seleccione Categoría</option>
+                                {categoryOptions.map((option) => (
+                                    <option key={option} value={option}>
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
                             <div className="flex justify-end space-x-2 mt-4">
                                 <button
                                     type="button"
