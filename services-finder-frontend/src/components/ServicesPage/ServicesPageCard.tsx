@@ -1,5 +1,5 @@
 import React from "react";
-import { FaShoppingCart, FaPlus, FaClock, FaTag } from "react-icons/fa";
+import { FaShoppingCart, FaClock, FaTag } from "react-icons/fa";
 
 interface ProviderCardProps {
     providerName: string;
@@ -20,7 +20,6 @@ const ProviderCard: React.FC<ProviderCardProps> = ({
     duration,
     category,
     onHireClick,
-    onCreatePostClick,
 }) => {
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 p-6 space-y-5 transform hover:shadow-xl">
@@ -64,12 +63,6 @@ const ProviderCard: React.FC<ProviderCardProps> = ({
                     onClick={onHireClick}>
                     <FaShoppingCart className="text-lg" />
                     <span>Hire Service</span>
-                </button>
-                <button
-                    className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-blue-600 dark:text-blue-400 font-medium text-sm focus:outline-none hover:underline"
-                    onClick={onCreatePostClick}>
-                    <FaPlus className="text-lg" />
-                    <span>Create Post</span>
                 </button>
             </div>
         </div>

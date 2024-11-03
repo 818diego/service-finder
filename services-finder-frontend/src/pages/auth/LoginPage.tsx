@@ -5,7 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { User as UserType } from "../../types/users";
 import FormInput from "../../components/utils/FormInput";
-import { Mail, Lock } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { loginUser } from "../../services/usersFetch";
 import { useAuth } from "../../Context/AuthContext";
 import { jwtDecode } from "jwt-decode";
@@ -18,6 +18,7 @@ const LoginPage: React.FC = () => {
     } = useForm<UserType>();
     const [loading, setLoading] = useState(false);
     const [redirecting, setRedirecting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
     const { login } = useAuth();
 
@@ -30,7 +31,7 @@ const LoginPage: React.FC = () => {
 
             const decodedToken = jwtDecode(response.token);
             console.log("Decoded token:", decodedToken);
-            
+
             setLoading(false);
             setRedirecting(true);
             toast.success("Successfully logged in!", {
@@ -59,62 +60,73 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-lg transition-colors duration-300 ease-in-out">
+        <div className="flex items-center justify-center mt-32 bg-gray-100 dark:bg-gray-900">
             <ToastContainer />
-            <div className="px-4 py-5 sm:px-6">
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                    Welcome to Login for my app
+            <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md">
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+                    Welcome Back
                 </h1>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-300">
-                    This is the login page for the services finder app.
-                </p>
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                    {loading && <div className="text-center">Loading...</div>}
+                    {redirecting && (
+                        <div className="text-center">Redirecting to home...</div>
+                    )}
+                    <FormInput
+                        label="Email"
+                        type="email"
+                        placeholder="Enter your email"
+                        register={register("email", {
+                            required: "Email is required",
+                            pattern: {
+                                value:
+                                    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                                message: "Invalid email address",
+                            },
+                        })}
+                        error={errors.email}
+                        icon={Mail}
+                        validationMessage={
+                            errors.email?.message || "Valid email is required"
+                        }
+                    />
+                    <div className="relative">
+                        <FormInput
+                            label="Password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter your password"
+                            register={register("password", {
+                                required: "Password is required",
+                                minLength: {
+                                    value: 8,
+                                    message:
+                                        "Password should be at least 8 characters long",
+                                },
+                            })}
+                            error={errors.password}
+                            icon={Lock}
+                            validationMessage={
+                                errors.password?.message || "Password is required"
+                            }
+                        />
+                        <div
+                            className="absolute mt-6 inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? (
+                                <EyeOff className="h-5 w-5 text-gray-500" />
+                            ) : (
+                                <Eye className="h-5 w-5 text-gray-500" />
+                            )}
+                        </div>
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+                    >
+                        Login
+                    </button>
+                </form>
             </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
-                {loading && <div className="text-center">Loading...</div>}
-                {redirecting && (
-                    <div className="text-center">Redirecting to home...</div>
-                )}
-                <FormInput
-                    label="Email"
-                    type="email"
-                    placeholder="Enter your email"
-                    register={register("email", {
-                        required: "Email is required",
-                        pattern: {
-                            value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                            message: "Invalid email address",
-                        },
-                    })}
-                    error={errors.email}
-                    icon={Mail}
-                    validationMessage={
-                        errors.email?.message || "Valid email is required"
-                    }
-                />
-                <FormInput
-                    label="Password"
-                    type="password"
-                    placeholder="Enter your password"
-                    register={register("password", {
-                        required: "Password is required",
-                        minLength: {
-                            value: 8,
-                            message:
-                                "Password should be at least 8 characters long",
-                        },
-                    })}
-                    error={errors.password}
-                    icon={Lock}
-                    validationMessage={
-                        errors.password?.message || "Password is required"
-                    }
-                />
-                <button
-                    type="submit"
-                    className="w-full bg-blue-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-600 transition-colors duration-300 ease-in-out">
-                    Login
-                </button>
-            </form>
         </div>
     );
 };

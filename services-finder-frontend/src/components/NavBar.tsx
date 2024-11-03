@@ -15,6 +15,7 @@ import { useAuth } from "../Context/AuthContext";
 import { User } from "../types/users";
 import Modal from "../components/Modals/Modal";
 import ModalPost from "../components/Modals/ModalPost";
+import ConfirmLogoutModal from "./utils/ConfirmLogoutModal";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
@@ -28,6 +29,7 @@ const Navbar: React.FC = () => {
     const navigate = useNavigate();
     const { user, logout }: { user: User | null; logout: () => void } =
         useAuth();
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
     const toggleDropdown = () => {
         setIsDropdownOpen((prev) => !prev);
@@ -60,11 +62,12 @@ const Navbar: React.FC = () => {
     }, []);
 
     const handleLogout = () => {
-        const confirmed = window.confirm("Are you sure you want to log out?");
-        if (confirmed) {
-            logout();
-            navigate("/login");
-        }
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("authToken");
+        logout();
+        setIsLogoutModalOpen(false);
+        navigate("/");
     };
 
     const handlePostSubmit = () => {
@@ -76,6 +79,9 @@ const Navbar: React.FC = () => {
 
     const openNewPostModal = () => setIsPostModalOpen(true);
     const closeNewPostModal = () => setIsPostModalOpen(false);
+
+    const closeLogoutModal = () => setIsLogoutModalOpen(false);
+    const openLogoutModal = () => setIsLogoutModalOpen(true);
 
     return (
         <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 w-full">
@@ -92,14 +98,12 @@ const Navbar: React.FC = () => {
                             {[
                                 "/services",
                                 "/category",
-                                "/portfolio",
                                 "/about",
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
                                     "Services",
                                     "Category",
-                                    "Portfolio",
                                     "About",
                                     "Contact",
                                 ];
@@ -134,11 +138,11 @@ const Navbar: React.FC = () => {
                             </div>
                         </div>
                         <div className="flex items-center space-x-4 w-1/3 justify-end relative">
-                                {user && (
-                                    <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                                        {user.userType}
-                                    </span>
-                                )}
+                            {user && (
+                                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                                    {user.userType}
+                                </span>
+                            )}
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
@@ -225,8 +229,8 @@ const Navbar: React.FC = () => {
                                             </AnimatePresence>
                                         </div>
                                         <LogOut
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                            onClick={handleLogout}
+                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 cursor-pointer"
+                                            onClick={openLogoutModal}
                                         />
                                     </div>
                                 ) : (
@@ -288,6 +292,12 @@ const Navbar: React.FC = () => {
                 onClose={closeNewPostModal}
                 onSubmit={handlePostSubmit}
                 // portfolioId={""}
+            />
+
+            <ConfirmLogoutModal
+                isOpen={isLogoutModalOpen}
+                onClose={closeLogoutModal}
+                onConfirm={handleLogout}
             />
         </nav>
     );

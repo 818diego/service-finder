@@ -6,7 +6,6 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import ServicesPage from "./pages/ServicesPage";
 import CategoryPage from "./pages/CategoryPage";
-import PortfolioPage from "./pages/PortfolioPage";
 
 // Import pages auth
 import LoginPage from "./pages/auth/LoginPage";
@@ -25,8 +24,6 @@ export const AppRoutes: React.FC = () => (
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/services" element={<ServicesPage />} />
         <Route path="/category" element={<CategoryPage />} />
-        <Route path="/portfolio" element={<PortfolioPage />} />
-
         {/* Authentication Routing here */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

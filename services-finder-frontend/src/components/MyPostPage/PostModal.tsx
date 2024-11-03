@@ -3,24 +3,29 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { FaPlus } from "react-icons/fa";
 
-interface ModalServiceProps {
+interface ModalPostProps {
     isOpen: boolean;
     onClose: () => void;
-    mode: "create" | "edit" | "delete";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSubmit: (data: any) => void;
-    initialData?: {
-        title: string;
-        description: string;
-        price?: number;
-        duration?: string;
-        category?: string;
+    mode: "edit" | "delete";
+    onSubmit: (data: {
+        title?: string;
+        description?: string;
         images?: string[];
-    };
-    serviceId?: string;
+    }) => void;
+    initialData?: { title: string; description: string; images?: string[] };
+    postId?: string;
 }
 
-const ModalService: React.FC<ModalServiceProps> = ({
+const isValidUrl = (url: string) => {
+    const urlPattern = new RegExp(
+        "^(https?:\\/\\/)?" +
+            "((([a-zA-Z0-9_-]+)\\.)+[a-zA-Z]{2,})" +
+            "(\\/[a-zA-Z0-9@:%_+.~#?&//=]*)?"
+    );
+    return urlPattern.test(url);
+};
+
+const ModalPost: React.FC<ModalPostProps> = ({
     isOpen,
     onClose,
     mode,
@@ -31,31 +36,19 @@ const ModalService: React.FC<ModalServiceProps> = ({
     const [description, setDescription] = useState(
         initialData?.description || ""
     );
-    const [price, setPrice] = useState<number | "">(initialData?.price || "");
-    const [duration, setDuration] = useState(initialData?.duration || "");
-    const [category, setCategory] = useState(initialData?.category || "");
     const [imageUrls, setImageUrls] = useState<string[]>(
         initialData?.images || [""]
     );
-
-    const resetForm = () => {
-        setTitle("");
-        setDescription("");
-        setPrice("");
-        setDuration("");
-        setCategory("");
-        setImageUrls([""]);
-    };
 
     useEffect(() => {
         if (mode === "edit" && initialData) {
             setTitle(initialData.title);
             setDescription(initialData.description);
-            setPrice(initialData.price || "");
-            setDuration(initialData.duration || "");
-            setCategory(initialData.category || "");
-        } else if (mode === "create") {
-            resetForm();
+            setImageUrls(initialData.images || [""]);
+        } else if (mode === "delete") {
+            setTitle("");
+            setDescription("");
+            setImageUrls([""]);
         }
     }, [initialData, mode]);
 
@@ -72,49 +65,34 @@ const ModalService: React.FC<ModalServiceProps> = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (price && price < 0) {
-            toast.error("Price cannot be negative.");
+        if (!title.trim()) {
+            toast.error("Title is required.");
             return;
         }
 
-        const isValidUrl = (url: string) => {
-            try {
-                new URL(url);
-                return true;
-            } catch {
-                return false;
-            }
-        };
+        if (!description.trim()) {
+            toast.error("Description is required.");
+            return;
+        }
 
         const validUrls = imageUrls.filter(
             (url) => url.trim() !== "" && isValidUrl(url)
         );
-        if (mode === "create" && validUrls.length === 0) {
+        if (validUrls.length === 0) {
             toast.error("At least one valid image URL is required.");
             return;
         }
 
-        const data = {
+        onSubmit({
             title,
             description,
-            ...(mode === "create" ? { images: validUrls } : {}),
-            ...(mode !== "create"
-                ? { price: Number(price), duration, category }
-                : {}),
-        };
-        onSubmit(data);
-        resetForm();
+            images: validUrls,
+        });
         onClose();
     };
 
     const handleDelete = () => {
-        onSubmit({
-            title: "",
-            description: "",
-            price: 0,
-            duration: "",
-            category: "",
-        });
+        onSubmit({});
         onClose();
     };
 
@@ -143,8 +121,7 @@ const ModalService: React.FC<ModalServiceProps> = ({
                                     Confirm Delete
                                 </h2>
                                 <p className="mt-4 text-gray-600 dark:text-gray-300">
-                                    Are you sure you want to delete this
-                                    service?
+                                    Are you sure you want to delete this post?
                                 </p>
                                 <div className="flex justify-end space-x-2 mt-4">
                                     <button
@@ -164,9 +141,7 @@ const ModalService: React.FC<ModalServiceProps> = ({
                         ) : (
                             <>
                                 <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                                    {mode === "create"
-                                        ? "New Post"
-                                        : "Edit Service"}
+                                    Edit Post
                                 </h2>
                                 <form
                                     onSubmit={handleSubmit}
@@ -190,75 +165,32 @@ const ModalService: React.FC<ModalServiceProps> = ({
                                         className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                         required
                                     />
-                                    {mode === "create" ? (
-                                        <>
-                                            {imageUrls.map((url, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="space-y-2">
-                                                    <input
-                                                        type="text"
-                                                        value={url}
-                                                        onChange={(e) =>
-                                                            handleImageUrlChange(
-                                                                index,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder={`Image URL ${
-                                                            index + 1
-                                                        }`}
-                                                        className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                    />
-                                                </div>
-                                            ))}
-                                            <div className="flex justify-center mt-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={handleAddImageUrl}
-                                                    className="flex justify-center items-center bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-400 transition-all duration-300 transform hover:scale-105 w-8 h-8">
-                                                    <FaPlus />
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
+                                    {imageUrls.map((url, index) => (
+                                        <div key={index} className="space-y-2">
                                             <input
-                                                type="number"
-                                                value={price}
+                                                type="text"
+                                                value={url}
                                                 onChange={(e) =>
-                                                    setPrice(
-                                                        Number(
-                                                            e.target.value
-                                                        ) || ""
+                                                    handleImageUrlChange(
+                                                        index,
+                                                        e.target.value
                                                     )
                                                 }
-                                                placeholder="Price"
+                                                placeholder={`Image URL ${
+                                                    index + 1
+                                                }`}
                                                 className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                required
                                             />
-                                            <input
-                                                type="text"
-                                                value={duration}
-                                                onChange={(e) =>
-                                                    setDuration(e.target.value)
-                                                }
-                                                placeholder="Duration"
-                                                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                required
-                                            />
-                                            <input
-                                                type="text"
-                                                value={category}
-                                                onChange={(e) =>
-                                                    setCategory(e.target.value)
-                                                }
-                                                placeholder="Category"
-                                                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </>
-                                    )}
+                                        </div>
+                                    ))}
+                                    <div className="flex justify-center mt-2">
+                                        <button
+                                            type="button"
+                                            onClick={handleAddImageUrl}
+                                            className="flex justify-center items-center bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-400 transition-all duration-300 transform hover:scale-105 w-8 h-8">
+                                            <FaPlus />
+                                        </button>
+                                    </div>
                                     <div className="flex justify-end space-x-2 mt-4">
                                         <button
                                             type="button"
@@ -282,4 +214,4 @@ const ModalService: React.FC<ModalServiceProps> = ({
     );
 };
 
-export default ModalService;
+export default ModalPost;
