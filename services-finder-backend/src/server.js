@@ -20,7 +20,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/', serviceRoutes);
 app.use('/api/', portfolioRoutes);
 app.use('/api/', postRoutes);
-
+app.use('/api/', userRoutes);
 app.use('/api/users', userRoutes);
 
 // Connect to MongoDB
