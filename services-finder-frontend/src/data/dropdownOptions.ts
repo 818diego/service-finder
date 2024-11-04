@@ -14,25 +14,6 @@ export const durationOptions = [
 ];
 
 export const categoryOptions = [
-    // Medicina y Salud
-    "Cardiólogo",
-    "Neurólogo",
-    "Ginecólogo",
-    "Pediatra",
-    "Oncólogo",
-    "Oftalmólogo",
-    "Odontólogo",
-    "Dermatólogo",
-    "Traumatólogo",
-    "Endocrinólogo",
-    "Psicólogo Clínico",
-    "Psicoterapeuta",
-    "Fisioterapeuta",
-    "Logopeda",
-    "Nutricionista Deportivo",
-    "Cirujano Plástico",
-    "Genetista",
-
     // Tecnología
     "Especialista en Inteligencia Artificial",
     "Ingeniero de Machine Learning",
@@ -48,21 +29,8 @@ export const categoryOptions = [
     "Ingeniero de Computación Cuántica",
     "Diseñador de Experiencia de Usuario (UX)",
     "Especialista en Comercio Electrónico",
-
-    // Ciencias
-    "Bioquímico",
-    "Microbiólogo",
-    "Biotecnólogo",
-    "Científico de Materiales",
-    "Astrofísico",
-    "Oceanógrafo",
-    "Geofísico",
-    "Neurocientífico",
-    "Ecólogo",
-    "Químico Forense",
-    "Geólogo de Petróleo",
-    "Meteorólogo",
-    "Biólogo Marino",
+    "Desarrollador de Videojuegos",
+    "Desarrollador web",
 
     // Ingeniería y Arquitectura
     "Ingeniero Estructural",
@@ -70,14 +38,15 @@ export const categoryOptions = [
     "Ingeniero Ambiental",
     "Ingeniero de Energías Renovables",
     "Ingeniero Aeroespacial",
+    "Ingeniero de Sistemas",
+    "Ingeniero de Telecomunicaciones",
+    "Ingeniero de Software",
     "Ingeniero en Robótica",
     "Ingeniero en Automatización",
     "Ingeniero de Seguridad Industrial",
     "Ingeniero de Procesos",
-    "Ingeniero Textil",
     "Ingeniero en Manufactura",
     "Diseñador Urbano",
-    "Paisajista",
 
     // Finanzas y Negocios
     "Asesor Financiero",
@@ -97,11 +66,6 @@ export const categoryOptions = [
     "Ilustrador",
     "Animador 3D",
     "Diseñador de Interiores",
-    "Diseñador de Moda",
-    "Diseñador de Producto",
-    "Fotógrafo de Moda",
-    "Escultor",
-    "Curador de Arte",
     "Cinematógrafo",
     "Director de Arte",
     "Decorador de Eventos",
@@ -117,16 +81,4 @@ export const categoryOptions = [
     "Consultor de Compliance",
     "Especialista en Derecho Ambiental",
     "Abogado en Derecho Digital",
-
-    // Educación
-    "Profesor de Matemáticas",
-    "Profesor de Ciencias Naturales",
-    "Profesor de Literatura",
-    "Docente en Educación Especial",
-    "Docente de Lengua Extranjera",
-    "Pedagogo",
-    "Orientador Educativo",
-    "Tutor Académico",
-    "Desarrollador de Planes de Estudio",
-    "Capacitador Corporativo",
 ];

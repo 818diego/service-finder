@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jobOfferController = require('../controllers/jobOfferController');
-const authMiddleware = require('../middleware/auth'); // Middleware de autenticación
+const authMiddleware = require('../middleware/auth');
 
 // Crear una nueva oferta de trabajo
 router.post('/job-offers/create', authMiddleware, jobOfferController.createJobOffer);
@@ -16,7 +16,7 @@ router.get('/job-offers/client/:clientId', authMiddleware, jobOfferController.ge
 router.get('/job-offers/:jobOfferId', jobOfferController.getJobOfferById);
 
 // Actualizar una oferta de trabajo por ID
-router.put('/job-offers/:jobOfferId/update', authMiddleware, jobOfferController.updateJobOffer);
+router.patch('/job-offers/:jobOfferId/update', authMiddleware, jobOfferController.updateJobOffer);
 
 // Eliminar una oferta de trabajo por ID
 router.delete('/job-offers/:jobOfferId/delete', authMiddleware, jobOfferController.deleteJobOffer);

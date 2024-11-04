@@ -8,6 +8,7 @@ import {
     LogOut,
     PlusCircle,
     FilePlus as NewPostIcon,
+    BadgeDollarSignIcon,
 } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
 import { motion, AnimatePresence } from "framer-motion";
@@ -16,6 +17,7 @@ import { User } from "../types/users";
 import Modal from "../components/Modals/Modal";
 import ModalPost from "../components/Modals/ModalPost";
 import ConfirmLogoutModal from "./utils/ConfirmLogoutModal";
+import ModalOffer from "./utils/ModalOffer";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
@@ -23,6 +25,7 @@ const Navbar: React.FC = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
     const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isModalOfferOpen, setIsModalOfferOpen] = useState<boolean>(false);
     const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const optionsRef = useRef<HTMLDivElement>(null);
@@ -82,6 +85,9 @@ const Navbar: React.FC = () => {
 
     const closeLogoutModal = () => setIsLogoutModalOpen(false);
     const openLogoutModal = () => setIsLogoutModalOpen(true);
+
+    const openModalOffer = () => setIsModalOfferOpen(true);
+    const closeModalOffer = () => setIsModalOfferOpen(false);
 
     return (
         <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 w-full">
@@ -146,6 +152,11 @@ const Navbar: React.FC = () => {
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
+                                        <BadgeDollarSignIcon
+                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                            onClick={openModalOffer}
+                                        />
+
                                         {user.userType === "Proveedor" && (
                                             <>
                                                 <PlusCircle
@@ -298,6 +309,12 @@ const Navbar: React.FC = () => {
                 isOpen={isLogoutModalOpen}
                 onClose={closeLogoutModal}
                 onConfirm={handleLogout}
+            />
+
+            <ModalOffer
+                isOpen={isModalOfferOpen}
+                onClose={closeModalOffer}
+                onConfirm={handlePostSubmit}
             />
         </nav>
     );
