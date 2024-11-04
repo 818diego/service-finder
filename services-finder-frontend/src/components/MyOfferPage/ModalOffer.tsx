@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { categoryOptions } from "../../data/dropdownOptions";
 import { toast } from "react-toastify";
+import { FaPlus } from "react-icons/fa";
 
 interface ModalOfferProps {
     isOpen: boolean;
@@ -184,17 +185,19 @@ const ModalOffer: React.FC<ModalOfferProps> = ({
                                             onClick={() =>
                                                 removeImageField(index)
                                             }
-                                            className="px-2 py-1 bg-red-600 text-white rounded-lg">
+                                            className="px-2 py-1 bg-red-600 text-white text-sm rounded-lg">
                                             Eliminar
                                         </button>
                                     </div>
                                 ))}
-                                <button
-                                    type="button"
-                                    onClick={addImageField}
-                                    className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500">
-                                    Añadir Imagen
-                                </button>
+                                <div className="flex justify-center mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={addImageField}
+                                        className="flex justify-center items-center bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-400 transition-all duration-300 transform hover:scale-105 w-8 h-8">
+                                        <FaPlus />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <div className="flex justify-end space-x-2 mt-6">

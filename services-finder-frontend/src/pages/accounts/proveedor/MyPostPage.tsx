@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getPostsByPortfolioId, deletePost, updatePost } from "../../services/postFetch";
-import { fetchUserServices } from "../../services/serviceFetch";
-import { PostResponse } from "../../types/post";
-import PostCard from "../../components/MyPostPage/PostCard";
-import ModalPost from "../../components/MyPostPage/PostModal";
-import { Service } from "../../types/service";
+import { getPostsByPortfolioId, deletePost, updatePost } from "../../../services/postFetch";
+import { fetchUserServices } from "../../../services/serviceFetch";
+import { PostResponse } from "../../../types/post";
+import PostCard from "../../../components/MyPostPage/PostCard";
+import ModalPost from "../../../components/MyPostPage/PostModal";
+import { Service } from "../../../types/service";
 import { toast } from "react-toastify";
 
 const decodeToken = (token: string) => {

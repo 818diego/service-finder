@@ -12,10 +12,13 @@ import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 
 // Import pages accounts
-import ProfilePage from "./pages/accounts/ProfilePage";
-import MyServicesPage from "./pages/accounts/MyServicesPage";
-import MyPostPage from "./pages/accounts/MyPostPage";
-import MyChatsPage from "./pages/accounts/MyChatsPage";
+import ProfilePage from "./pages/accounts/proveedor/ProfilePage";
+import MyServicesPage from "./pages/accounts/proveedor/MyServicesPage";
+import MyPostPage from "./pages/accounts/proveedor/MyPostPage";
+import MyChatsPage from "./pages/accounts/proveedor/MyChatsPage";
+
+// Import pages cliente
+import MyOffersPage from "./pages/accounts/cliente/MyOffersPage";
 
 export const AppRoutes: React.FC = () => (
     <Routes>
@@ -28,10 +31,13 @@ export const AppRoutes: React.FC = () => (
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Options for a user */}
+        {/* Options for a Provider */}
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/my-services" element={<MyServicesPage />} />
         <Route path="/my-posts" element={<MyPostPage />} />
         <Route path="/chats" element={<MyChatsPage />} />
+
+        {/* Options for a Cliente */}
+        <Route path="/offers" element={<MyOffersPage />} />
     </Routes>
 );

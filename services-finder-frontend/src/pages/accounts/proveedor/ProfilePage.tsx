@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../Context/AuthContext";
+import { useAuth } from "../../../Context/AuthContext";
 
 const ProfilePage: React.FC = () => {
     const { user } = useAuth();

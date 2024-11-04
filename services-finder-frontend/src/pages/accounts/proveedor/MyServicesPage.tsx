@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from "react";
-import MyServicesCard from "../../components/MyServicesPage/MyServiceCard";
+import MyServicesCard from "../../../components/MyServicesPage/MyServiceCard";
 import {
     fetchUserServices,
     updateService,
     deleteService,
-} from "../../services/serviceFetch";
+} from "../../../services/serviceFetch";
 import { toast } from "react-toastify";
-import ModalService from "../../components/MyServicesPage/ModalService";
-import { Service, CreateServiceData } from "../../types/service";
-import { PostFormInput } from "../../types/post";
-import { createPost } from "../../services/postFetch";
+import ModalService from "../../../components/MyServicesPage/ModalService";
+import { Service, CreateServiceData } from "../../../types/service";
+import { PostFormInput } from "../../../types/post";
+import { createPost } from "../../../services/postFetch";
 
 const MyServicesPage: React.FC = () => {
     const [services, setServices] = useState<Service[]>([]);

@@ -17,7 +17,9 @@ import { User } from "../types/users";
 import Modal from "../components/Modals/Modal";
 import ModalPost from "../components/Modals/ModalPost";
 import ConfirmLogoutModal from "./utils/ConfirmLogoutModal";
-import ModalOffer from "./utils/ModalOffer";
+import ModalOffer from "./MyOfferPage/ModalOffer";
+import { createOffer } from "../services/offersFetch";
+import { OfferData } from "../types/offer";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
@@ -75,6 +77,23 @@ const Navbar: React.FC = () => {
 
     const handlePostSubmit = () => {
         //api.createPost(data);
+    };
+
+    const handleCreateOffer = async (offerData: OfferData) => {
+        try {
+            const token = localStorage.getItem("token");
+            if (token) {
+                const createdOffer = await createOffer(token, offerData);
+                console.log("Oferta creada:", createdOffer);
+                setIsModalOpen(false);
+            } else {
+                console.error("Token is null");
+            }
+            setIsModalOpen(false);
+            // Aquí puedes actualizar la lista de ofertas o mostrar un mensaje de éxito.
+        } catch (error) {
+            console.error("Error al crear la oferta:", error);
+        }
     };
 
     const openModal = () => setIsModalOpen(true);
@@ -152,10 +171,12 @@ const Navbar: React.FC = () => {
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
-                                        <BadgeDollarSignIcon
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                            onClick={openModalOffer}
-                                        />
+                                        {user.userType === "Cliente" && (
+                                            <BadgeDollarSignIcon
+                                                className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                onClick={openModalOffer}
+                                            />
+                                        )}
 
                                         {user.userType === "Proveedor" && (
                                             <>
@@ -223,6 +244,11 @@ const Navbar: React.FC = () => {
                                                             </>
                                                         ) : (
                                                             <>
+                                                                <Link
+                                                                    to="/offers"
+                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                                    Offers
+                                                                </Link>
                                                                 <Link
                                                                     to="/profile"
                                                                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
@@ -314,7 +340,7 @@ const Navbar: React.FC = () => {
             <ModalOffer
                 isOpen={isModalOfferOpen}
                 onClose={closeModalOffer}
-                onConfirm={handlePostSubmit}
+                onConfirm={handleCreateOffer}
             />
         </nav>
     );

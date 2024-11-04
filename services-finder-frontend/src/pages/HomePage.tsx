@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ServiceCard from "../components/ServiceCard";
-// import ProviderCard from "../components/ProviderCard"; // Nuevo componente para Proveedores
-import { popularServices, randomServices, Service } from "../data/services";
-import { workProposals } from "../data/workProposals";
 import WorkProposalCard from "../components/ClientCard";
+import { popularServices, randomServices, Service } from "../data/services";
+import { getAllOffers } from "../services/offersFetch";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(null);
+    const [offers, setOffers] = useState([]); // Estado para las ofertas
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -28,6 +28,22 @@ const Home: React.FC = () => {
         }
     }, []);
 
+    useEffect(() => {
+        const fetchOffersData = async () => {
+            const token = localStorage.getItem("token");
+            if (token && userType === "Proveedor") {
+                try {
+                    const offersData = await getAllOffers(token);
+                    setOffers(offersData); // Guardar ofertas en el estado
+                    console.log("Ofertas obtenidas:", offersData);
+                } catch (error) {
+                    console.error("Error al obtener las ofertas:", error);
+                }
+            }
+        };
+        fetchOffersData();
+    }, [userType]);
+
     const handleCardClick = (providerId: number) => {
         console.log(`Redirigiendo a la página del proveedor con ID: ${providerId}`);
     };
@@ -44,8 +60,8 @@ const Home: React.FC = () => {
                         Servicios Disponibles para Proveedores
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {workProposals.map((proposal, index) => (
-                            <WorkProposalCard key={index} proposal={proposal} />
+                        {offers.map((offer, index) => (
+                            <WorkProposalCard key={index} proposal={offer} />
                         ))}
                     </div>
                 </>
@@ -74,7 +90,6 @@ const Home: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Sección de servicios aleatorios para Clientes */}
                     <h2 className="text-3xl font-bold mt-12 mb-6 text-gray-900 dark:text-gray-100">
                         Servicios aleatorios
                     </h2>
@@ -98,18 +113,16 @@ const Home: React.FC = () => {
                     </div>
                 </>
             )}
-            {userType === null &&(
-                <>
-                    <div className="flex flex-col items-center justify-center h-full text-center">
-                        <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                            Welcome to Services Finder
-                        </h1>
-                        <p className="text-lg text-gray-700 dark:text-gray-300">
-                            See the best services in your area
-                        </p>
-                    </div>
-                </>
-        )}
+            {userType === null && (
+                <div className="flex flex-col items-center justify-center h-full text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+                        Welcome to Services Finder
+                    </h1>
+                    <p className="text-lg text-gray-700 dark:text-gray-300">
+                        See the best services in your area
+                    </p>
+                </div>
+            )}
         </div>
     );
 };
