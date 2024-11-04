@@ -8,6 +8,7 @@ const serviceRoutes = require('./routes/serviceRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const postRoutes = require('./routes/postRoutes');
 const userRoutes = require('./routes/userRoutes');
+const jobOfferRoutes = require('./routes/jobOfferRoutes');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/api/', serviceRoutes);
 app.use('/api/', portfolioRoutes);
 app.use('/api/', postRoutes);
 app.use('/api/', userRoutes);
+app.use('/api/', jobOfferRoutes);
 app.use('/api/users', userRoutes);
 
 // Connect to MongoDB

@@ -46,7 +46,7 @@ exports.getJobOffersByClient = async (req, res) => {
 // Obtener una oferta de trabajo por ID
 exports.getJobOfferById = async (req, res) => {
   try {
-    const jobOffer = await JobOffer.findById(req.params.id).populate('client');
+    const jobOffer = await JobOffer.findById(req.params.jobOfferId).populate('client');
     if (!jobOffer) return res.status(404).json({ message: 'Oferta de trabajo no encontrada' });
     res.status(200).json(jobOffer);
   } catch (error) {
@@ -54,29 +54,43 @@ exports.getJobOfferById = async (req, res) => {
   }
 };
 
+
 // Actualizar una oferta de trabajo por ID
 exports.updateJobOffer = async (req, res) => {
   try {
-    const { title, description, category, budget, status } = req.body;
+    const updatedData = req.body;
     const updatedJobOffer = await JobOffer.findByIdAndUpdate(
-      req.params.id,
-      { title, description, category, budget, status },
+      req.params.jobOfferId,
+      { $set: updatedData },
       { new: true }
     );
-    if (!updatedJobOffer) return res.status(404).json({ message: 'Oferta de trabajo no encontrada' });
+
+    if (!updatedJobOffer) {
+      return res.status(404).json({ message: 'Oferta de trabajo no encontrada' });
+    }
+
     res.status(200).json(updatedJobOffer);
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar la oferta de trabajo', error });
   }
 };
 
+
 // Eliminar una oferta de trabajo por ID
 exports.deleteJobOffer = async (req, res) => {
   try {
-    const deletedJobOffer = await JobOffer.findByIdAndDelete(req.params.id);
-    if (!deletedJobOffer) return res.status(404).json({ message: 'Oferta de trabajo no encontrada' });
+    const jobOfferId = req.params.jobOfferId;
+    console.log(`ID recibido para eliminación: ${jobOfferId}`); // Para verificar el ID recibido
+
+    const deletedJobOffer = await JobOffer.findByIdAndDelete(jobOfferId);
+
+    if (!deletedJobOffer) {
+      return res.status(404).json({ message: 'Oferta de trabajo no encontrada' });
+    }
+
     res.status(200).json({ message: 'Oferta de trabajo eliminada correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al eliminar la oferta de trabajo', error });
   }
 };
+
