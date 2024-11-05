@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
     Home,
     User as UserIcon,
-    Search,
-    Settings,
     LogOut,
     PlusCircle,
     FilePlus as NewPostIcon,
@@ -23,8 +21,6 @@ import { OfferData } from "../types/offer";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
-    const [searchQuery, setSearchQuery] = useState<string>("");
-    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
     const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isModalOfferOpen, setIsModalOfferOpen] = useState<boolean>(false);
@@ -36,35 +32,9 @@ const Navbar: React.FC = () => {
         useAuth();
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen((prev) => !prev);
-    };
-
     const toggleOptions = () => {
         setIsOptionsOpen((prev) => !prev);
     };
-
-    const handleClickOutside = (event: MouseEvent) => {
-        if (
-            dropdownRef.current &&
-            !dropdownRef.current.contains(event.target as Node)
-        ) {
-            setIsDropdownOpen(false);
-        }
-        if (
-            optionsRef.current &&
-            !optionsRef.current.contains(event.target as Node)
-        ) {
-            setIsOptionsOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -138,7 +108,7 @@ const Navbar: React.FC = () => {
                                     <Link
                                         key={index}
                                         to={path}
-                                        className={`inline-flex items-center px-1 pt-1 text-sm font-medium ${
+                                        className={`inline-flex items-center px-1 pt-1 text-[16px] font-medium ${
                                             isActive
                                                 ? "text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400"
                                                 : "text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
@@ -149,18 +119,6 @@ const Navbar: React.FC = () => {
                             })}
                         </div>
                         <div className="relative w-full max-w-2xl mx-auto">
-                            <div className="relative">
-                                <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-gray-300" />
-                                <input
-                                    type="text"
-                                    value={searchQuery}
-                                    onChange={(e) =>
-                                        setSearchQuery(e.target.value)
-                                    }
-                                    placeholder="Search..."
-                                    className="w-full pl-4 pr-10 py-3 rounded-full border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-white"
-                                />
-                            </div>
                         </div>
                         <div className="flex items-center space-x-4 w-1/3 justify-end relative">
                             {user && (
@@ -172,12 +130,18 @@ const Navbar: React.FC = () => {
                                 {user ? (
                                     <div className="flex items-center space-x-4">
                                         {user.userType === "Cliente" && (
-                                            <BadgeDollarSignIcon
-                                                className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                            <button 
+                                                className="bg-gray-70 hover:bg-green-700 transition-all rounded-lg text-white flex items-center justify-center p-2"
                                                 onClick={openModalOffer}
-                                            />
+                                            >
+                                                <div className="flex items-center space-x-2">
+                                                    <BadgeDollarSignIcon
+                                                        className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                    />
+                                                    <span>Create Offer</span>
+                                                </div>
+                                            </button>
                                         )}
-
                                         {user.userType === "Proveedor" && (
                                             <>
                                                 <PlusCircle
@@ -196,7 +160,7 @@ const Navbar: React.FC = () => {
                                             <button
                                                 onClick={toggleOptions}
                                                 className="text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer mt-1">
-                                                <Settings />
+                                                <UserIcon />
                                             </button>
                                             <AnimatePresence>
                                                 {isOptionsOpen && (
@@ -272,43 +236,18 @@ const Navbar: React.FC = () => {
                                     </div>
                                 ) : (
                                     <>
-                                        <UserIcon
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                            onClick={toggleDropdown}
-                                        />
-                                        <AnimatePresence>
-                                            {isDropdownOpen && (
-                                                <motion.div
-                                                    initial={{
-                                                        opacity: 0,
-                                                        y: -10,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        y: 0,
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        y: -10,
-                                                    }}
-                                                    transition={{
-                                                        duration: 0.3,
-                                                        ease: "easeOut",
-                                                    }}
-                                                    className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg">
-                                                    <Link
-                                                        to="/login"
-                                                        className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                                        Login
-                                                    </Link>
-                                                    <Link
-                                                        to="/register"
-                                                        className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                                        Register
-                                                    </Link>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                    <div className="flex items-center space-x-4">
+                                        <Link
+                                            to="/login"
+                                            className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                            Login
+                                        </Link>
+                                        <Link
+                                            to="/register"
+                                            className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                            Register
+                                        </Link>
+                                    </div>
                                     </>
                                 )}
                             </div>

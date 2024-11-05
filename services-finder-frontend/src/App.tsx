@@ -8,8 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 const App: React.FC = () => {
     return (
         <Router>
-            <ToastContainer />
             <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300 ease-in-out">
+            <ToastContainer />
                 <Navbar />
                 <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
                     <AppRoutes />

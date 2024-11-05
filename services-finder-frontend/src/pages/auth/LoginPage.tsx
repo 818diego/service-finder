@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { User as UserType } from "../../types/users";
 import FormInput from "../../components/utils/FormInput";
@@ -17,34 +17,25 @@ const LoginPage: React.FC = () => {
         formState: { errors },
     } = useForm<UserType>();
     const [loading, setLoading] = useState(false);
-    const [redirecting, setRedirecting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const navigate = useNavigate();
     const { login } = useAuth();
+    const navigate = useNavigate();
 
     const onSubmit: SubmitHandler<UserType> = async (data) => {
         setLoading(true);
-        try {
+                try {
             const response = await loginUser(data);
             login(response.token);
             localStorage.setItem("token", response.token);
-
+        
             const decodedToken = jwtDecode(response.token);
             console.log("Decoded token:", decodedToken);
-
-            setLoading(false);
-            setRedirecting(true);
-            toast.success("Successfully logged in!", {
-                position: "top-center",
-                autoClose: 2000,
-                onClose: () => {
-                    setRedirecting(false);
-                    navigate("/");
-                },
-            });
+        
+            navigate("/"); 
+            toast.success("Successfully logged in!");
         } catch (error: unknown) {
             setLoading(false);
-
+        
             if (error instanceof Error) {
                 console.error(error.message);
                 toast.error(`Login failed: ${error.message}`, {
@@ -61,16 +52,12 @@ const LoginPage: React.FC = () => {
 
     return (
         <div className="flex items-center justify-center mt-32 bg-gray-100 dark:bg-gray-900">
-            <ToastContainer />
             <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 w-full max-w-md">
                 <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 text-center">
                     Welcome Back
                 </h1>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                     {loading && <div className="text-center">Loading...</div>}
-                    {redirecting && (
-                        <div className="text-center">Redirecting to home...</div>
-                    )}
                     <FormInput
                         label="Email"
                         type="email"

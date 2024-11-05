@@ -156,17 +156,19 @@ const RegisterForm: React.FC = () => {
                                 icon={Home}
                                 validationMessage="Address is required and should be at least 10 characters long"
                             />
-                            <FormInput
-                                label="Specialty (Optional)"
-                                type="text"
-                                placeholder="Enter your specialty"
-                                register={register("specialty", {
-                                    required: userType === "Proveedor",
-                                })}
-                                error={errors.specialty}
-                                icon={NotebookPen}
-                                validationMessage="Specialty is required for Proveedor"
-                            />
+                            {userType === "Proveedor" && (
+                                <FormInput
+                                    label="Specialty"
+                                    type="text"
+                                    placeholder="Enter your specialty"
+                                    register={register("specialty", {
+                                        required: true,
+                                    })}
+                                    error={errors.specialty}
+                                    icon={NotebookPen}
+                                    validationMessage="Specialty is required for Proveedor"
+                                />
+                            )}
                             <div className="flex justify-between space-x-4">
                                 <button
                                     type="button"

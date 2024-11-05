@@ -33,9 +33,6 @@ const DarkModeToggle: React.FC = () => {
             ) : (
                 <Moon className="h-6 w-6 text-gray-400" />
             )}
-            <span className="text-sm text-gray-700 dark:text-gray-300">
-                {isDarkMode ? "Light Mode" : "Dark Mode"}
-            </span>
         </div>
     );
 };
