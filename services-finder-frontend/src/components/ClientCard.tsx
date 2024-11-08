@@ -12,10 +12,10 @@ const WorkProposalCard: React.FC<WorkProposalCardProps> = ({ proposal }) => {
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 p-6 space-y-5 transform hover:shadow-xl">
             <div className="text-start space-y-2">
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 truncate max-h-12 overflow-hidden">
                     {title}
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm">
+                <p className="text-gray-600 dark:text-gray-400 leading-relaxed text-sm h-20 overflow-hidden">
                     {description}
                 </p>
             </div>
@@ -50,7 +50,7 @@ const WorkProposalCard: React.FC<WorkProposalCardProps> = ({ proposal }) => {
                 </div>
             )}
             <div className="flex justify-center mt-4">
-                <button className="flex items-center justify-center w-full max-w-[130px] space-x-2 bg-transparent text-green-600 dark:text-green-400 font-medium text-sm focus:outline-none hover:underline">
+                <button className="flex items-center justify-center w-full space-x-2 bg-transparent text-green-600 dark:text-green-400 font-medium text-sm focus:outline-none hover:underline">
                     <FaBriefcase className="text-lg" />
                     <span>Apply Now</span>
                 </button>
