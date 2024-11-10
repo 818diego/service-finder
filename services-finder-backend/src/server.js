@@ -4,7 +4,6 @@ require('dotenv').config();
 
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
-const serviceRoutes = require('./routes/serviceRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
 const postRoutes = require('./routes/postRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -18,7 +17,6 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/', serviceRoutes);
 app.use('/api/', portfolioRoutes);
 app.use('/api/', postRoutes);
 app.use('/api/', userRoutes);
