@@ -99,7 +99,7 @@ const Navbar: React.FC = () => {
                                 "/contact",
                             ].map((path, index) => {
                                 const labels = [
-                                    "Services",
+                                    "My Portfolios", // Cambiar a todo lo que tenga que ver con Services a portfolio
                                     "Category",
                                     "About",
                                     "Contact",
@@ -132,37 +132,6 @@ const Navbar: React.FC = () => {
                             <div className="relative" ref={dropdownRef}>
                                 {user ? (
                                     <div className="flex items-center space-x-4">
-                                        {user.userType === "Cliente" && (
-                                            <Tooltip text="Create Offer">
-                                                <button 
-                                                    className="bg-gray-700 hover:bg-green-700 transition-all rounded-lg text-white flex items-center justify-center p-2"
-                                                    onClick={openModalOffer}
-                                                >
-                                                    <div className="flex items-center space-x-2">
-                                                        <BadgeDollarSignIcon
-                                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                                        />
-                                                        <span>Create Offer</span>
-                                                    </div>
-                                                </button>
-                                            </Tooltip>
-                                        )}
-                                        {user.userType === "Proveedor" && (
-                                            <>
-                                                <Tooltip text="Add Service">
-                                                    <PlusCircle
-                                                        className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                                        onClick={openModal}
-                                                    />
-                                                </Tooltip>
-                                                <Tooltip text="New Post">
-                                                    <NewPostIcon
-                                                        className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                                        onClick={openNewPostModal}
-                                                    />
-                                                </Tooltip>
-                                            </>
-                                        )}
                                         <div
                                             className="relative"
                                             ref={optionsRef}>
@@ -197,16 +166,6 @@ const Navbar: React.FC = () => {
                                                         "Proveedor" ? (
                                                             <>
                                                                 <Link
-                                                                    to="/my-services"
-                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                                                    Services
-                                                                </Link>
-                                                                <Link
-                                                                    to="/my-posts"
-                                                                    className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                                                    Posts
-                                                                </Link>
-                                                                <Link
                                                                     to="/profile"
                                                                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
                                                                     Profile
@@ -224,6 +183,7 @@ const Navbar: React.FC = () => {
                                                                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
                                                                     Offers
                                                                 </Link>
+                                                                
                                                                 <Link
                                                                     to="/profile"
                                                                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
