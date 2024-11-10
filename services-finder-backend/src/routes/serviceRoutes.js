@@ -12,8 +12,8 @@ router.get('/portfolio/:portfolioId', authMiddleware, serviceController.getServi
 // Obtener un servicio por su ID
 router.get('/:serviceId', authMiddleware, serviceController.getServiceById);
 
-// Actualizar un servicio por su ID
-router.put('/:serviceId/update', authMiddleware, serviceController.updateService);
+// Actualizar parcialmente un servicio por su ID
+router.patch('/:serviceId/update', authMiddleware, serviceController.updateServiceById);
 
 // Eliminar un servicio por su ID
 router.delete('/:serviceId/delete', authMiddleware, serviceController.deleteService);

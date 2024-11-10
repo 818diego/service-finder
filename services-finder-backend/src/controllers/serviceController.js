@@ -30,27 +30,28 @@ exports.getServicesByPortfolio = async (req, res) => {
   }
 };
 
-// Obtener un servicio por ID
+
+// Obtener un servicio por su ID
 exports.getServiceById = async (req, res) => {
   try {
-    const service = await Service.findById(req.params.serviceId).populate('portfolio');
+    const { serviceId } = req.params;
+    const service = await Service.findById(serviceId).populate('portfolio'); // Carga también el portafolio asociado
     if (!service) return res.status(404).json({ message: 'Servicio no encontrado' });
+
     res.status(200).json(service);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener el servicio', error });
   }
 };
 
-// Actualizar un servicio por ID
-exports.updateService = async (req, res) => {
+exports.updateServiceById = async (req, res) => {
   try {
-    const { title, description, images } = req.body;
-    const updatedService = await Service.findByIdAndUpdate(
-      req.params.serviceId,
-      { title, description, images },
-      { new: true }
-    );
+    const { serviceId } = req.params;
+    const updates = req.body; // Obtenemos los campos a actualizar desde el cuerpo de la solicitud
+
+    const updatedService = await Service.findByIdAndUpdate(serviceId, updates, { new: true });
     if (!updatedService) return res.status(404).json({ message: 'Servicio no encontrado' });
+    
     res.status(200).json(updatedService);
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar el servicio', error });
