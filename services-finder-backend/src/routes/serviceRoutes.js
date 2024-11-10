@@ -1,21 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const postController = require('../controllers/postController');
-const authMiddleware = require('../middleware/auth');
+const serviceController = require('../controllers/serviceController');
+const authMiddleware = require('../middleware/auth'); // Middleware de autenticación
 
-// Ruta para agregar posts existentes a un portfolio específico
-router.put('/post/portfolio/:portfolioId/add-create-posts', authMiddleware, postController.createPost);
+// Crear un nuevo servicio en un portafolio específico
+router.post('/portfolio/:portfolioId/create', authMiddleware, serviceController.createService);
 
-// Ruta para obtener todos los posts de un portfolio específico
-router.get('/post/portfolio/:portfolioId/posts', authMiddleware, postController.getPostsByPortfolio);
+// Obtener todos los servicios de un portafolio específico
+router.get('/portfolio/:portfolioId', authMiddleware, serviceController.getServicesByPortfolio);
 
-// Ruta para obtener un post específico por su ID
-router.get('/post/:postId', authMiddleware, postController.getPostById);
+// Obtener un servicio por su ID
+router.get('/:serviceId', authMiddleware, serviceController.getServiceById);
 
-// Ruta para actualizar un post específico por su ID
-router.patch('/post/:postId/update', authMiddleware, postController.updatePost);
+// Actualizar un servicio por su ID
+router.put('/:serviceId/update', authMiddleware, serviceController.updateService);
 
-// Ruta para eliminar un post específico por su ID
-router.delete('/post/:postId/delete', authMiddleware, postController.deletePost);
+// Eliminar un servicio por su ID
+router.delete('/:serviceId/delete', authMiddleware, serviceController.deleteService);
 
 module.exports = router;

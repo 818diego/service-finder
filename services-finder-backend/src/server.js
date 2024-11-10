@@ -5,7 +5,7 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const portfolioRoutes = require('./routes/portfolioRoutes');
-const postRoutes = require('./routes/postRoutes');
+const serviceRoutes = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const jobOfferRoutes = require('./routes/jobOfferRoutes');
 
@@ -17,11 +17,10 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
-app.use('/api/', portfolioRoutes);
-app.use('/api/', postRoutes);
-app.use('/api/', userRoutes);
-app.use('/api/', jobOfferRoutes);
-app.use('/api/users', userRoutes);
+app.use('/api/portfolios', portfolioRoutes); // Prefijo específico para los portafolios
+app.use('/api/services', serviceRoutes); // Prefijo específico para los servicios
+app.use('/api/users', userRoutes); // Prefijo específico para los usuarios
+app.use('/api/job-offers', jobOfferRoutes); // Prefijo específico para las ofertas de trabajo
 
 // Connect to MongoDB
 connectDB();
@@ -31,4 +30,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-

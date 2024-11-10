@@ -43,21 +43,22 @@ exports.getPortfolioById = async (req, res) => {
   }
 };
 
-// Actualizar un portafolio por ID
-exports.updatePortfolio = async (req, res) => {
+
+// Actualizar parcialmente un portafolio específico por su ID
+exports.updatePortfolioById = async (req, res) => {
   try {
-    const { title, description, price, duration, category } = req.body;
-    const updatedPortfolio = await Portfolio.findByIdAndUpdate(
-      req.params.id,
-      { title, description, price, duration, category },
-      { new: true }
-    );
+    const { id } = req.params;
+    const updates = req.body; // Obtenemos solo los campos que se enviaron en el body
+
+    const updatedPortfolio = await Portfolio.findByIdAndUpdate(id, updates, { new: true });
     if (!updatedPortfolio) return res.status(404).json({ message: 'Portafolio no encontrado' });
+    
     res.status(200).json(updatedPortfolio);
   } catch (error) {
     res.status(500).json({ message: 'Error al actualizar el portafolio', error });
   }
 };
+
 
 // Eliminar un portafolio por ID
 exports.deletePortfolio = async (req, res) => {
@@ -67,5 +68,16 @@ exports.deletePortfolio = async (req, res) => {
     res.status(200).json({ message: 'Portafolio eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ message: 'Error al eliminar el portafolio', error });
+  }
+};
+
+// Obtener todos los portafolios de un proveedor específico (por ID de proveedor)
+exports.getAllPortfoliosByProviderId = async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    const portfolios = await Portfolio.find({ provider: providerId }).populate('provider');
+    res.status(200).json(portfolios);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los portafolios del proveedor', error });
   }
 };
