@@ -3,7 +3,7 @@ const Portfolio = require('../models/Portfolio');
 // Crear un nuevo portafolio
 exports.createPortfolio = async (req, res) => {
   try {
-    const { title, description, price, duration, category } = req.body;
+    const { title, description, price, duration, category, image } = req.body;
     const provider = req.user.userId; // ID del proveedor autenticado
 
     const newPortfolio = new Portfolio({
@@ -13,6 +13,7 @@ exports.createPortfolio = async (req, res) => {
       price,
       duration,
       category,
+      image,
     });
 
     const savedPortfolio = await newPortfolio.save();
