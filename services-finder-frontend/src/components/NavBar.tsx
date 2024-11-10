@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";  
 import {
     Home,
     User as UserIcon,
@@ -18,6 +18,7 @@ import ConfirmLogoutModal from "./utils/ConfirmLogoutModal";
 import ModalOffer from "./MyOfferPage/ModalOffer";
 import { createOffer } from "../services/offersFetch";
 import { OfferData } from "../types/offer";
+import Tooltip from "./Tooltip";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
@@ -77,7 +78,6 @@ const Navbar: React.FC = () => {
 
     const openModalOffer = () => setIsModalOfferOpen(true);
     const closeModalOffer = () => setIsModalOfferOpen(false);
-
     return (
         <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 w-full">
             <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,10 +85,12 @@ const Navbar: React.FC = () => {
                     <div className="hidden md:flex items-center space-x-8 w-full">
                         <div className="flex items-center space-x-8 w-1/3">
                             <div className="flex-shrink-0">
-                                <Home
-                                    className="h-6 w-6 text-indigo-600 dark:text-indigo-400 cursor-pointer"
-                                    onClick={() => navigate("/")}
-                                />
+                                <Tooltip text="Home">
+                                    <Home
+                                        className="h-6 w-6 text-indigo-600 dark:text-indigo-400 cursor-pointer"
+                                        onClick={() => navigate("/")}
+                                    />
+                                </Tooltip>
                             </div>
                             {[
                                 "/services",
@@ -119,6 +121,7 @@ const Navbar: React.FC = () => {
                             })}
                         </div>
                         <div className="relative w-full max-w-2xl mx-auto">
+                            {/* You can add a search bar or other elements here */}
                         </div>
                         <div className="flex items-center space-x-4 w-1/3 justify-end relative">
                             {user && (
@@ -130,38 +133,46 @@ const Navbar: React.FC = () => {
                                 {user ? (
                                     <div className="flex items-center space-x-4">
                                         {user.userType === "Cliente" && (
-                                            <button 
-                                                className="bg-gray-70 hover:bg-green-700 transition-all rounded-lg text-white flex items-center justify-center p-2"
-                                                onClick={openModalOffer}
-                                            >
-                                                <div className="flex items-center space-x-2">
-                                                    <BadgeDollarSignIcon
-                                                        className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                                    />
-                                                    <span>Create Offer</span>
-                                                </div>
-                                            </button>
+                                            <Tooltip text="Create Offer">
+                                                <button 
+                                                    className="bg-gray-700 hover:bg-green-700 transition-all rounded-lg text-white flex items-center justify-center p-2"
+                                                    onClick={openModalOffer}
+                                                >
+                                                    <div className="flex items-center space-x-2">
+                                                        <BadgeDollarSignIcon
+                                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                        />
+                                                        <span>Create Offer</span>
+                                                    </div>
+                                                </button>
+                                            </Tooltip>
                                         )}
                                         {user.userType === "Proveedor" && (
                                             <>
-                                                <PlusCircle
-                                                    className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                                    onClick={openModal}
-                                                />
-                                                <NewPostIcon
-                                                    className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
-                                                    onClick={openNewPostModal}
-                                                />
+                                                <Tooltip text="Add Service">
+                                                    <PlusCircle
+                                                        className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                        onClick={openModal}
+                                                    />
+                                                </Tooltip>
+                                                <Tooltip text="New Post">
+                                                    <NewPostIcon
+                                                        className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 transition-colors duration-300 ease-in-out cursor-pointer"
+                                                        onClick={openNewPostModal}
+                                                    />
+                                                </Tooltip>
                                             </>
                                         )}
                                         <div
                                             className="relative"
                                             ref={optionsRef}>
-                                            <button
-                                                onClick={toggleOptions}
-                                                className="text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer mt-1">
-                                                <UserIcon />
-                                            </button>
+                                            <Tooltip text="Provider Options">
+                                                <button
+                                                    onClick={toggleOptions}
+                                                    className="text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer mt-1">
+                                                    <UserIcon />
+                                                </button>
+                                            </Tooltip>
                                             <AnimatePresence>
                                                 {isOptionsOpen && (
                                                     <motion.div
@@ -229,25 +240,31 @@ const Navbar: React.FC = () => {
                                                 )}
                                             </AnimatePresence>
                                         </div>
-                                        <LogOut
-                                            className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 cursor-pointer"
-                                            onClick={openLogoutModal}
-                                        />
+                                        <Tooltip text="Logout">
+                                            <LogOut
+                                                className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400 cursor-pointer"
+                                                onClick={openLogoutModal}
+                                            />
+                                        </Tooltip>
                                     </div>
                                 ) : (
                                     <>
-                                    <div className="flex items-center space-x-4">
-                                        <Link
-                                            to="/login"
-                                            className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                            Login
-                                        </Link>
-                                        <Link
-                                            to="/register"
-                                            className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                            Register
-                                        </Link>
-                                    </div>
+                                        <div className="flex items-center space-x-4">
+                                            <Tooltip text="Login">
+                                                <Link
+                                                    to="/login"
+                                                    className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                    Login
+                                                </Link>
+                                            </Tooltip>
+                                            <Tooltip text="Register">
+                                                <Link
+                                                    to="/register"
+                                                    className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
+                                                    Register
+                                                </Link>
+                                            </Tooltip>
+                                        </div>
                                     </>
                                 )}
                             </div>
@@ -257,6 +274,7 @@ const Navbar: React.FC = () => {
                 </div>
             </div>
 
+            {/* Modals */}
             <Modal
                 isOpen={isModalOpen}
                 onClose={closeModal}

@@ -32,7 +32,9 @@ const LoginPage: React.FC = () => {
             console.log("Decoded token:", decodedToken);
         
             navigate("/"); 
-            toast.success("Successfully logged in!");
+            toast.success("Successfully logged in!",{
+                position: "top-center",
+            });
         } catch (error: unknown) {
             setLoading(false);
         
