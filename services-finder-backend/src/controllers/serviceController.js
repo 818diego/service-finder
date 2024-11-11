@@ -65,14 +65,47 @@ exports.getServiceById = async (req, res) => {
 exports.updateServiceById = async (req, res) => {
   try {
     const { serviceId } = req.params;
-    const updates = req.body; // Obtenemos los campos a actualizar desde el cuerpo de la solicitud
+    const updates = { ...req.body }; // Copiamos los datos de `req.body` para procesarlos
 
+    // Si se envía un archivo de imagen en la solicitud, subimos la imagen a Cloudinary
+    if (req.file) {
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'service-images' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file.buffer); // Enviamos el buffer de la imagen a Cloudinary
+      });
+
+      // Si `updates.imageIndex` está en la solicitud, reemplazamos una imagen específica
+      if (updates.imageIndex !== undefined) {
+        const index = parseInt(updates.imageIndex);
+        if (!isNaN(index)) {
+          const service = await Service.findById(serviceId);
+          if (service && service.images[index]) {
+            service.images[index] = result.secure_url; // Reemplazamos la imagen en el índice especificado
+            updates.images = service.images;
+          } else {
+            return res.status(400).json({ message: 'Índice de imagen inválido' });
+          }
+        }
+      } else {
+        // Si no se especifica un índice, agregamos la imagen al array `images`
+        updates.$push = { images: result.secure_url };
+      }
+    }
+
+    // Actualizamos el servicio en la base de datos
     const updatedService = await Service.findByIdAndUpdate(serviceId, updates, { new: true });
     if (!updatedService) return res.status(404).json({ message: 'Servicio no encontrado' });
-    
+
     res.status(200).json(updatedService);
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el servicio', error });
+    console.error("Error al actualizar el servicio:", error);
+    res.status(500).json({ message: 'Error al actualizar el servicio', error: error.message });
   }
 };
 

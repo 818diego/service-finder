@@ -65,32 +65,54 @@ exports.getPortfolioById = async (req, res) => {
   }
 };
 
+
 exports.updatePortfolioById = async (req, res) => {
   try {
     const { id } = req.params;
-    
-    // Validar si el ID es un ObjectId válido
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'ID de portafolio inválido' });
+    const updates = { ...req.body };
+
+    // Si hay un archivo de imagen en la solicitud, sube la imagen a Cloudinary
+    if (req.file) {
+      const result = await cloudinary.uploader.upload_stream(
+        { folder: 'portfolio-images' },
+        (error, result) => {
+          if (error) {
+            return res.status(500).json({ message: 'Error al subir la imagen a Cloudinary', error: error.message });
+          }
+          updates.image = result.secure_url; // Actualiza el campo de imagen con la nueva URL
+
+          // Actualiza el portafolio con los datos de `updates`, incluyendo la nueva imagen si está presente
+          Portfolio.findByIdAndUpdate(id, updates, { new: true })
+            .then(updatedPortfolio => {
+              if (!updatedPortfolio) {
+                return res.status(404).json({ message: 'Portafolio no encontrado' });
+              }
+              res.status(200).json(updatedPortfolio);
+            })
+            .catch(err => {
+              console.error("Error al actualizar el portafolio:", err);
+              res.status(500).json({ message: 'Error al actualizar el portafolio', error: err.message });
+            });
+        }
+      );
+      // Envía el buffer de la imagen a Cloudinary
+      result.end(req.file.buffer);
+    } else {
+      // Si no hay imagen, actualiza solo los otros campos
+      const updatedPortfolio = await Portfolio.findByIdAndUpdate(id, updates, { new: true });
+      
+      if (!updatedPortfolio) {
+        return res.status(404).json({ message: 'Portafolio no encontrado' });
+      }
+
+      res.status(200).json(updatedPortfolio);
     }
-
-    const updates = req.body;
-    console.log("ID del portafolio:", id);
-    console.log("Datos para actualizar:", updates);
-
-    const updatedPortfolio = await Portfolio.findByIdAndUpdate(id, updates, { new: true });
-    
-    if (!updatedPortfolio) {
-      return res.status(404).json({ message: 'Portafolio no encontrado' });
-    }
-
-    console.log("Portafolio actualizado:", updatedPortfolio);
-    res.status(200).json(updatedPortfolio);
   } catch (error) {
-    console.error("Error en la actualización del portafolio:", error);
+    console.error("Error al actualizar el portafolio:", error);
     res.status(500).json({ message: 'Error al actualizar el portafolio', error: error.message });
   }
 };
+
 
 // Eliminar un portafolio por ID
 exports.deletePortfolio = async (req, res) => {
