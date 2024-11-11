@@ -1,11 +1,30 @@
 const Portfolio = require('../models/Portfolio');
+const cloudinary = require('../../cloudinaryConfig');
 
-// Crear un nuevo portafolio
+
 exports.createPortfolio = async (req, res) => {
   try {
-    const { title, description, price, duration, category, image } = req.body;
+    const { title, description, price, duration, category } = req.body;
     const provider = req.user.userId; // ID del proveedor autenticado
+    // Verifica que cloudinary esté configurado
+    if (!cloudinary.uploader || typeof cloudinary.uploader.upload !== 'function') {
+      console.error('Cloudinary no está configurado correctamente.');
+    }
+    // Verificar si req.file existe
+    if (!req.file) {
+      return res.status(400).json({ message: 'La imagen es requerida' });
+    }
 
+    // Subir la imagen a Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'portfolio-images', // Carpeta en Cloudinary
+    });
+
+    if (!result.secure_url) {
+      return res.status(500).json({ message: 'Error al subir la imagen a Cloudinary' });
+    }
+
+    // Crear el portafolio con la URL de la imagen en Cloudinary
     const newPortfolio = new Portfolio({
       provider,
       title,
@@ -13,13 +32,14 @@ exports.createPortfolio = async (req, res) => {
       price,
       duration,
       category,
-      image,
+      image: result.secure_url, // URL de la imagen en Cloudinary
     });
 
     const savedPortfolio = await newPortfolio.save();
     res.status(201).json(savedPortfolio);
   } catch (error) {
-    res.status(500).json({ message: 'Error al crear el portafolio', error });
+    console.error('Error al crear el portafolio:', error); // Muestra el error en la consola
+    res.status(500).json({ message: 'Error al crear el portafolio', error: error.message });
   }
 };
 

@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const portfolioController = require('../controllers/portfolioController');
 const authMiddleware = require('../middleware/auth'); // Middleware de autenticación
+const upload = require('../middleware/cloudinaryUpload'); // Middleware de subida de archivos
 
 // Crear un nuevo portafolio
-router.post('/create', authMiddleware, portfolioController.createPortfolio);
+router.post('/create', authMiddleware, upload.single('image'), portfolioController.createPortfolio);
 
 // Obtener todos los portafolios
 router.get('/list', authMiddleware, portfolioController.getAllPortfolios);
