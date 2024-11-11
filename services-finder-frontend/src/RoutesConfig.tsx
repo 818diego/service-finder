@@ -13,8 +13,7 @@ import RegisterPage from "./pages/auth/RegisterPage";
 
 // Import pages accounts
 import ProfilePage from "./pages/accounts/proveedor/ProfilePage";
-import MyServicesPage from "./pages/accounts/proveedor/MyServicesPage";
-import MyPostPage from "./pages/accounts/proveedor/MyPostPage";
+import MyPortfoliosPage from "./pages/accounts/proveedor/MyPortfoliosPage";
 import MyChatsPage from "./pages/accounts/proveedor/MyChatsPage";
 
 // Import pages cliente
@@ -33,8 +32,7 @@ export const AppRoutes: React.FC = () => (
 
         {/* Options for a Provider */}
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/my-services" element={<MyServicesPage />} />
-        <Route path="/my-posts" element={<MyPostPage />} />
+        <Route path="/my-portfolios" element={<MyPortfoliosPage />} />
         <Route path="/chats" element={<MyChatsPage />} />
 
         {/* Options for a Cliente */}

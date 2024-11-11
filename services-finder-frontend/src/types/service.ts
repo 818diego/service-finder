@@ -1,23 +1,19 @@
-// Interfaz para la estructura del servicio que devuelve el servidor
 export interface Service {
-    _id: string;
-    id: number;
     title: string;
     description: string;
     price: number;
-    duration: string;
-    category: string;
-    provider: {
-        username: string;
-    };
+    images: string[];
     portfolio: string;
+    _id: string;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
 }
 
-// Interfaz para el objeto de datos que se enviará al crear un servicio
-export interface CreateServiceData {
+export interface ServiceForm {
     title: string;
     description: string;
     price: number;
-    duration: string;
+    images?: File[];
     category: string;
 }

@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import ServiceCard from "../components/ServiceCard";
 import WorkProposalCard from "../components/ClientCard";
-import { popularServices, randomServices, Service } from "../data/services";
+import { popularServices, randomServices } from "../data/services";
 import { getAllOffers } from "../services/offersFetch";
 
 const Home: React.FC = () => {
@@ -44,14 +43,6 @@ const Home: React.FC = () => {
         fetchOffersData();
     }, [userType]);
 
-    const handleCardClick = (providerId: number) => {
-        console.log(`Redirigiendo a la página del proveedor con ID: ${providerId}`);
-    };
-
-    const handleHireClick = (providerId: number) => {
-        console.log(`Contratando servicio del proveedor con ID: ${providerId}`);
-    };
-
     return (
         <div className="container mx-auto px-4 py-8">
             {userType === "Proveedor" && (
@@ -72,21 +63,8 @@ const Home: React.FC = () => {
                         Servicios de la comunidad
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {popularServices.map((service: Service) => (
-                            <ServiceCard
-                                key={service.id}
-                                image={service.image}
-                                provider={service.provider}
-                                rating={service.rating}
-                                specialty={service.specialty}
-                                service={service.service}
-                                description={service.description}
-                                tools={service.tools}
-                                exampleImages={service.exampleImages}
-                                price={service.price}
-                                onDetailsClick={() => handleCardClick(service.id)}
-                                onHireClick={() => handleHireClick(service.id)}
-                            />
+                        {popularServices.map(() => (
+                            <div> ola</div>
                         ))}
                     </div>
 
@@ -94,21 +72,8 @@ const Home: React.FC = () => {
                         Servicios aleatorios
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {randomServices.map((service: Service) => (
-                            <ServiceCard
-                                key={service.id}
-                                image={service.image}
-                                provider={service.provider}
-                                rating={service.rating}
-                                specialty={service.specialty}
-                                service={service.service}
-                                description={service.description}
-                                tools={service.tools}
-                                exampleImages={service.exampleImages}
-                                price={service.price}
-                                onDetailsClick={() => handleCardClick(service.id)}
-                                onHireClick={() => handleHireClick(service.id)}
-                            />
+                        {randomServices.map(() => (
+                            <div> ola</div>
                         ))}
                     </div>
                 </>

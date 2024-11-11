@@ -1,31 +1,16 @@
 import React, { useState, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";  
-import {
-    Home,
-    User as UserIcon,
-    LogOut,
-    PlusCircle,
-    FilePlus as NewPostIcon,
-    BadgeDollarSignIcon,
-} from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, User as UserIcon, LogOut } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Context/AuthContext";
 import { User } from "../types/users";
-import Modal from "../components/Modals/Modal";
-import ModalPost from "../components/Modals/ModalPost";
 import ConfirmLogoutModal from "./utils/ConfirmLogoutModal";
-import ModalOffer from "./MyOfferPage/ModalOffer";
-import { createOffer } from "../services/offersFetch";
-import { OfferData } from "../types/offer";
 import Tooltip from "./Tooltip";
 
 const Navbar: React.FC = () => {
     const location = useLocation();
     const [isOptionsOpen, setIsOptionsOpen] = useState<boolean>(false);
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [isModalOfferOpen, setIsModalOfferOpen] = useState<boolean>(false);
-    const [isPostModalOpen, setIsPostModalOpen] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const optionsRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
@@ -46,38 +31,30 @@ const Navbar: React.FC = () => {
         navigate("/");
     };
 
-    const handlePostSubmit = () => {
-        //api.createPost(data);
-    };
-
-    const handleCreateOffer = async (offerData: OfferData) => {
-        try {
-            const token = localStorage.getItem("token");
-            if (token) {
-                const createdOffer = await createOffer(token, offerData);
-                console.log("Oferta creada:", createdOffer);
-                setIsModalOpen(false);
-            } else {
-                console.error("Token is null");
-            }
-            setIsModalOpen(false);
-            // Aquí puedes actualizar la lista de ofertas o mostrar un mensaje de éxito.
-        } catch (error) {
-            console.error("Error al crear la oferta:", error);
-        }
-    };
-
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
-
-    const openNewPostModal = () => setIsPostModalOpen(true);
-    const closeNewPostModal = () => setIsPostModalOpen(false);
-
     const closeLogoutModal = () => setIsLogoutModalOpen(false);
     const openLogoutModal = () => setIsLogoutModalOpen(true);
 
-    const openModalOffer = () => setIsModalOfferOpen(true);
-    const closeModalOffer = () => setIsModalOfferOpen(false);
+    // Definir los enlaces de navegación de forma condicional
+    const navigationLinks = () => {
+        const baseLinks = [
+            { path: "/category", label: "Category" },
+            { path: "/about", label: "About" },
+            { path: "/contact", label: "Contact" },
+        ];
+
+        if (user?.userType === "Proveedor") {
+            return [
+                { path: "/my-portfolios", label: "Mis portfolios" },
+                ...baseLinks,
+            ];
+        } else if (user?.userType === "Cliente") {
+            return [{ path: "/services", label: "Services" }, ...baseLinks];
+        } else {
+            // Opcional: enlaces para usuarios no autenticados o con otros tipos
+            return baseLinks;
+        }
+    };
+
     return (
         <nav className="bg-white dark:bg-gray-800 shadow-md sticky top-0 z-50 w-full">
             <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
@@ -92,36 +69,25 @@ const Navbar: React.FC = () => {
                                     />
                                 </Tooltip>
                             </div>
-                            {[
-                                "/services",
-                                "/category",
-                                "/about",
-                                "/contact",
-                            ].map((path, index) => {
-                                const labels = [
-                                    "My Portfolios", // Cambiar a todo lo que tenga que ver con Services a portfolio
-                                    "Category",
-                                    "About",
-                                    "Contact",
-                                ];
-                                const isActive = location.pathname === path;
-
+                            {navigationLinks().map((link, index) => {
+                                const isActive =
+                                    location.pathname === link.path;
                                 return (
                                     <Link
                                         key={index}
-                                        to={path}
+                                        to={link.path}
                                         className={`inline-flex items-center px-1 pt-1 text-[16px] font-medium ${
                                             isActive
                                                 ? "text-indigo-600 border-b-2 border-indigo-600 dark:text-indigo-400"
                                                 : "text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                                         } transition-all duration-300 ease-in-out`}>
-                                        {labels[index]}
+                                        {link.label}
                                     </Link>
                                 );
                             })}
                         </div>
                         <div className="relative w-full max-w-2xl mx-auto">
-                            {/* You can add a search bar or other elements here */}
+                            {/* Aqui vamos a agregar la barra de buscador despues */}
                         </div>
                         <div className="flex items-center space-x-4 w-1/3 justify-end relative">
                             {user && (
@@ -183,7 +149,7 @@ const Navbar: React.FC = () => {
                                                                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
                                                                     Offers
                                                                 </Link>
-                                                                
+
                                                                 <Link
                                                                     to="/profile"
                                                                     className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
@@ -234,30 +200,10 @@ const Navbar: React.FC = () => {
                 </div>
             </div>
 
-            {/* Modals */}
-            <Modal
-                isOpen={isModalOpen}
-                onClose={closeModal}
-                onSubmit={handlePostSubmit}
-            />
-
-            <ModalPost
-                isOpen={isPostModalOpen}
-                onClose={closeNewPostModal}
-                onSubmit={handlePostSubmit}
-                // portfolioId={""}
-            />
-
             <ConfirmLogoutModal
                 isOpen={isLogoutModalOpen}
                 onClose={closeLogoutModal}
                 onConfirm={handleLogout}
-            />
-
-            <ModalOffer
-                isOpen={isModalOfferOpen}
-                onClose={closeModalOffer}
-                onConfirm={handleCreateOffer}
             />
         </nav>
     );
