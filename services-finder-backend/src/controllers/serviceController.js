@@ -15,10 +15,17 @@ exports.createService = async (req, res) => {
     // Subir cada imagen a Cloudinary y almacenar las URLs en un arreglo
     const imageUrls = [];
     for (const file of files) {
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: 'service-images',
+      const result = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'service-images' },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(file.buffer); // Enviar el buffer de la imagen a Cloudinary
       });
-      imageUrls.push(result.secure_url);
+      imageUrls.push(result.secure_url); // Agregar la URL de la imagen a `imageUrls`
     }
 
     // Crear el servicio con las URLs de las imágenes en Cloudinary
