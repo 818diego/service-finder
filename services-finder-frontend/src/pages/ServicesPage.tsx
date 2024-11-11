@@ -1,33 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { fetchServices } from "../services/serviceFetch";
-import { Service } from "../types/service";
+import React from "react";
 
 const ServicesPage: React.FC = () => {
-    const [services, setServices] = useState<Service[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        const getServices = async () => {
-            try {
-                const data = await fetchServices();
-                setServices(data);
-            } catch (error) {
-                if (error instanceof Error) {
-                    setError(error.message);
-                } else {
-                    setError("An unknown error occurred");
-                }
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getServices();
-    }, []);
-
-    if (loading) return <p>Cargando servicios...</p>;
-    if (error) return <p>Error: {error}</p>;
 
     return (
         <div className="overflow-hidden transition-colors duration-300 ease-in-out">
@@ -35,17 +8,6 @@ const ServicesPage: React.FC = () => {
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
                     Estos son tus portafolios que pueden ver los clientes. 
                 </h1>
-            </div>
-            <div className="px-4 py-5 sm:px-6">
-                {services.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        
-                    </div>
-                ) : (
-                    <p className="text-sm text-gray-500 dark:text-gray-300">
-                        No hay servicios disponibles.
-                    </p>
-                )}
             </div>
         </div>
     );

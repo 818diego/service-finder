@@ -1,14 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ChangeEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
-import { FaPlus } from "react-icons/fa";
+import { FaTimes, FaCheck, FaLock, FaUpload } from "react-icons/fa";
 
 interface ModalServiceProps {
     isOpen: boolean;
     onClose: () => void;
     mode: "create" | "edit" | "delete";
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSubmit: (data: any) => void;
+    onSubmit: (data: FormData) => void;
+    portfolioName?: string;
+    portfolioId: string;
+    provider: {
+        id: string;
+        username: string;
+    };
     initialData?: {
         title: string;
         description: string;
@@ -17,7 +22,6 @@ interface ModalServiceProps {
         category?: string;
         images?: string[];
     };
-    serviceId?: string;
 }
 
 const ModalService: React.FC<ModalServiceProps> = ({
@@ -25,6 +29,9 @@ const ModalService: React.FC<ModalServiceProps> = ({
     onClose,
     mode,
     onSubmit,
+    portfolioName,
+    portfolioId,
+    provider,
     initialData,
 }) => {
     const [title, setTitle] = useState(initialData?.title || "");
@@ -34,87 +41,54 @@ const ModalService: React.FC<ModalServiceProps> = ({
     const [price, setPrice] = useState<number | "">(initialData?.price || "");
     const [duration, setDuration] = useState(initialData?.duration || "");
     const [category, setCategory] = useState(initialData?.category || "");
-    const [imageUrls, setImageUrls] = useState<string[]>(
-        initialData?.images || [""]
-    );
-
-    const resetForm = () => {
-        setTitle("");
-        setDescription("");
-        setPrice("");
-        setDuration("");
-        setCategory("");
-        setImageUrls([""]);
-    };
+    const [images, setImages] = useState<FileList | null>(null);
+    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
     useEffect(() => {
-        if (mode === "edit" && initialData) {
-            setTitle(initialData.title);
-            setDescription(initialData.description);
-            setPrice(initialData.price || "");
-            setDuration(initialData.duration || "");
-            setCategory(initialData.category || "");
-        } else if (mode === "create") {
-            resetForm();
+        if (isOpen && mode === "create") {
+            console.log("Provider:", provider);
         }
-    }, [initialData, mode]);
+    }, [isOpen, mode, portfolioId, provider]);
 
-    const handleAddImageUrl = () => {
-        setImageUrls([...imageUrls, ""]);
-    };
+    const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            setImages(e.target.files);
 
-    const handleImageUrlChange = (index: number, url: string) => {
-        const newImageUrls = [...imageUrls];
-        newImageUrls[index] = url;
-        setImageUrls(newImageUrls);
+            // Generate previews for each selected image
+            const newPreviews = Array.from(e.target.files).map((file) =>
+                URL.createObjectURL(file)
+            );
+            setImagePreviews((prevPreviews) => [
+                ...prevPreviews,
+                ...newPreviews,
+            ]);
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
         if (price && price < 0) {
-            toast.error("Price cannot be negative.");
+            toast.error("El precio no puede ser negativo.");
             return;
         }
 
-        const isValidUrl = (url: string) => {
-            try {
-                new URL(url);
-                return true;
-            } catch {
-                return false;
-            }
-        };
+        const formData = new FormData();
+        formData.append("title", title);
+        formData.append("description", description);
+        formData.append("portfolioId", portfolioId);
+        formData.append("price", String(price));
 
-        const validUrls = imageUrls.filter(
-            (url) => url.trim() !== "" && isValidUrl(url)
-        );
-        if (mode === "create" && validUrls.length === 0) {
-            toast.error("At least one valid image URL is required.");
-            return;
+        if (duration) formData.append("duration", duration);
+        if (category) formData.append("category", category);
+
+        if (images) {
+            Array.from(images).forEach((file) => {
+                formData.append("images", file);
+            });
         }
 
-        const data = {
-            title,
-            description,
-            ...(mode === "create" ? { images: validUrls } : {}),
-            ...(mode !== "create"
-                ? { price: Number(price), duration, category }
-                : {}),
-        };
-        onSubmit(data);
-        resetForm();
-        onClose();
-    };
-
-    const handleDelete = () => {
-        onSubmit({
-            title: "",
-            description: "",
-            price: 0,
-            duration: "",
-            category: "",
-        });
+        onSubmit(formData);
         onClose();
     };
 
@@ -137,144 +111,191 @@ const ModalService: React.FC<ModalServiceProps> = ({
                             stiffness: 300,
                             damping: 25,
                         }}>
-                        {mode === "delete" ? (
-                            <>
-                                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                                    Confirm Delete
-                                </h2>
-                                <p className="mt-4 text-gray-600 dark:text-gray-300">
-                                    Are you sure you want to delete this
-                                    service?
-                                </p>
-                                <div className="flex justify-end space-x-2 mt-4">
-                                    <button
-                                        type="button"
-                                        onClick={onClose}
-                                        className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500">
-                                        Cancel
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={handleDelete}
-                                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500">
-                                        Delete
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                                    {mode === "create"
-                                        ? "New Post"
-                                        : "Edit Service"}
-                                </h2>
-                                <form
-                                    onSubmit={handleSubmit}
-                                    className="space-y-4 mt-4">
+                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
+                            {mode === "create"
+                                ? "Crear Servicio"
+                                : "Editar Servicio"}
+                        </h2>
+                        <form
+                            onSubmit={handleSubmit}
+                            className="space-y-4 mt-4">
+                            {/* Provider display as disabled input with lock icon */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Proveedor
+                                </label>
+                                <div className="relative">
                                     <input
                                         type="text"
-                                        value={title}
-                                        onChange={(e) =>
-                                            setTitle(e.target.value)
-                                        }
-                                        placeholder="Title"
-                                        className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                        required
+                                        value={provider.username}
+                                        readOnly
+                                        disabled
+                                        className="w-full px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 dark:text-white focus:outline-none cursor-not-allowed"
                                     />
-                                    <textarea
-                                        value={description}
-                                        onChange={(e) =>
-                                            setDescription(e.target.value)
-                                        }
-                                        placeholder="Description"
-                                        className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                        required
-                                    />
-                                    {mode === "create" ? (
-                                        <>
-                                            {imageUrls.map((url, index) => (
-                                                <div
-                                                    key={index}
-                                                    className="space-y-2">
-                                                    <input
-                                                        type="text"
-                                                        value={url}
-                                                        onChange={(e) =>
-                                                            handleImageUrlChange(
-                                                                index,
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder={`Image URL ${
-                                                            index + 1
-                                                        }`}
-                                                        className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                    />
-                                                </div>
-                                            ))}
-                                            <div className="flex justify-center mt-2">
-                                                <button
-                                                    type="button"
-                                                    onClick={handleAddImageUrl}
-                                                    className="flex justify-center items-center bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-400 transition-all duration-300 transform hover:scale-105 w-8 h-8">
-                                                    <FaPlus />
-                                                </button>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <input
-                                                type="number"
-                                                value={price}
-                                                onChange={(e) =>
-                                                    setPrice(
-                                                        Number(
-                                                            e.target.value
-                                                        ) || ""
-                                                    )
-                                                }
-                                                placeholder="Price"
-                                                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                required
-                                            />
-                                            <input
-                                                type="text"
-                                                value={duration}
-                                                onChange={(e) =>
-                                                    setDuration(e.target.value)
-                                                }
-                                                placeholder="Duration"
-                                                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                required
-                                            />
-                                            <input
-                                                type="text"
-                                                value={category}
-                                                onChange={(e) =>
-                                                    setCategory(e.target.value)
-                                                }
-                                                placeholder="Category"
-                                                className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                                required
-                                            />
-                                        </>
-                                    )}
-                                    <div className="flex justify-end space-x-2 mt-4">
-                                        <button
-                                            type="button"
-                                            onClick={onClose}
-                                            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500">
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400">
-                                            Submit
-                                        </button>
+                                    <FaLock className="absolute right-3 top-3 text-gray-500" />
+                                </div>
+                            </div>
+
+                            {/* Portfolio name display as disabled input with lock icon */}
+                            {mode === "create" && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Portfolio
+                                    </label>
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            value={portfolioName}
+                                            readOnly
+                                            disabled
+                                            className="w-full px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 dark:text-white focus:outline-none cursor-not-allowed"
+                                            placeholder="Portfolio seleccionado"
+                                        />
+                                        <FaLock className="absolute right-3 top-3 text-gray-500" />
                                     </div>
-                                </form>
-                            </>
-                        )}
+                                </div>
+                            )}
+
+                            {/* Title */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Título
+                                </label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    placeholder="Título"
+                                    className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    required
+                                />
+                            </div>
+
+                            {/* Description */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Descripción
+                                </label>
+                                <textarea
+                                    value={description}
+                                    onChange={(e) =>
+                                        setDescription(e.target.value)
+                                    }
+                                    placeholder="Descripción"
+                                    className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    required
+                                />
+                            </div>
+
+                            {/* Price */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Precio
+                                </label>
+                                <input
+                                    type="number"
+                                    value={price}
+                                    onChange={(e) =>
+                                        setPrice(
+                                            e.target.value === ""
+                                                ? ""
+                                                : Number(e.target.value)
+                                        )
+                                    }
+                                    placeholder="Precio"
+                                    className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    required
+                                />
+                            </div>
+
+                            {/* Additional fields for edit mode */}
+                            {mode === "edit" && (
+                                <>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Duración
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={duration}
+                                            onChange={(e) =>
+                                                setDuration(e.target.value)
+                                            }
+                                            placeholder="Duración"
+                                            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Categoría
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={category}
+                                            onChange={(e) =>
+                                                setCategory(e.target.value)
+                                            }
+                                            placeholder="Categoría"
+                                            className="w-full px-4 py-2 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                            required
+                                        />
+                                    </div>
+                                </>
+                            )}
+
+                            {/* Image upload with multiple previews */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    {mode === "create"
+                                        ? "Subir Imágenes"
+                                        : "Actualizar Imágenes"}
+                                </label>
+                                <div className="mt-1 flex items-center">
+                                    <label
+                                        htmlFor="file-upload"
+                                        className="ml-5 rounded-md font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 cursor-pointer flex items-center">
+                                        <FaUpload className="mr-2" />
+                                        <span>Seleccionar Imágenes</span>
+                                        <input
+                                            id="file-upload"
+                                            name="file-upload"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                            multiple
+                                            className="sr-only"
+                                        />
+                                    </label>
+                                </div>
+                                <div className="mt-2 flex flex-wrap gap-2">
+                                    {imagePreviews.map((src, index) => (
+                                        <img
+                                            key={index}
+                                            src={src}
+                                            alt={`Preview ${index + 1}`}
+                                            className="w-16 h-16 object-cover rounded-md"
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Action buttons */}
+                            <div className="flex justify-end space-x-2 mt-4">
+                                <button
+                                    type="button"
+                                    onClick={onClose}
+                                    className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 flex items-center">
+                                    <FaTimes className="mr-2" /> Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400 flex items-center">
+                                    <FaCheck className="mr-2" />{" "}
+                                    {mode === "create" ? "Crear" : "Actualizar"}
+                                </button>
+                            </div>
+                        </form>
                     </motion.div>
                 </motion.div>
             )}

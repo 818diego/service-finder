@@ -1,28 +1,33 @@
-import { Service } from "../types/service";
+import { Service, ServiceForm } from "../types/service";
 
-export const fetchServices = async (): Promise<Service[]> => {
-    const response = await fetch("http://localhost:3000/api/services/list");
-    if (!response.ok) {
-        throw new Error("Error al obtener los servicios");
+export const createService = async (
+    data: ServiceForm,
+    token: string
+): Promise<Service> => {
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("description", data.description);
+    formData.append("portfolio", data.portfolio);
+    formData.append("price", data.price.toString());
+    formData.append("category", data.category);
+
+    // Añadir imágenes si existen
+    if (data.images) {
+        data.images.forEach((file) => formData.append("images", file));
     }
-    return response.json();
-};
 
-export const fetchUserServices = async (userId: string, token: string) => {
-    const response = await fetch(
-        `http://localhost:3000/api/services/user/${userId}/services`,
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/json",
-            },
-        }
-    );
+    const response = await fetch(`http://localhost:3000/api/services/create`, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+    });
 
     if (!response.ok) {
         const errorData = await response.text();
         throw new Error(
-            `Error fetching services: ${response.status} - ${errorData}`
+            `Error creating service: ${response.status} - ${errorData}`
         );
     }
 

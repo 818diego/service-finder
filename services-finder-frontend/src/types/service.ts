@@ -13,6 +13,7 @@ export interface Service {
 export interface ServiceForm {
     title: string;
     description: string;
+    portfolio: string;
     price: number;
     images?: File[];
     category: string;

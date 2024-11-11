@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Edit, Trash2, Clock, Folder, User } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
-import ModalServicesAll from "./ModalServicesAll";
+import ModalService from "./ModalService";
 
 interface PortfolioCardProps {
     title: string;
@@ -13,7 +13,7 @@ interface PortfolioCardProps {
         username: string;
     };
     image: string;
-    onServiceClick: () => void;
+    portfolioId: string;
     onEditClick: () => void;
     onDeleteClick: () => void;
 }
@@ -25,29 +25,30 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
     category,
     provider,
     image,
-    onServiceClick,
+    portfolioId,
     onEditClick,
     onDeleteClick,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleImageClick = () => {
-        setIsModalOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setIsModalOpen(false);
-    };
+    const handleOpenModal = () => setIsModalOpen(true);
+    const handleCloseModal = () => setIsModalOpen(false);
+    
 
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 relative">
             {/* Modal */}
-            {isModalOpen && (
-                <ModalServicesAll
-                    onClose={handleCloseModal}
-                    providerUsername={provider.username}
-                />
-            )}
+            <ModalService
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                mode="create"
+                onSubmit={(data) => {
+                    console.log("Form submitted:", data);
+                }}
+                portfolioName={title}
+                portfolioId={portfolioId}
+                provider={provider}
+            />
 
             {/* Image section */}
             <div className="relative">
@@ -55,7 +56,6 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                     src={image}
                     alt={`${title} by ${provider.username}`}
                     className="object-cover w-full h-48 rounded-t-lg cursor-pointer"
-                    onClick={handleImageClick}
                 />
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                     <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm flex items-center">
@@ -104,7 +104,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
             {/* Action button */}
             <div className="px-6 py-4 mb-2">
                 <CustomButton
-                    onClick={onServiceClick}
+                    onClick={handleOpenModal}
                     label={
                         <>
                             <FaPlus className="mr-2" /> Agregar servicio
