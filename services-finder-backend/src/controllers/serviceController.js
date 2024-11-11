@@ -1,22 +1,40 @@
 const Service = require('../models/Service');
 
-// Crear un nuevo servicio en un portafolio específico
+const cloudinary = require('../../cloudinaryConfig');
+
 exports.createService = async (req, res) => {
   try {
-    const { title, description, images } = req.body;
-    const portfolio = req.params.portfolioId;
+    const { title, description, portfolio, price } = req.body;
+    const files = req.files; // Para manejar múltiples imágenes
+    
+    // Verificar que al menos una imagen esté presente
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: 'Al menos una imagen es requerida' });
+    }
 
+    // Subir cada imagen a Cloudinary y almacenar las URLs en un arreglo
+    const imageUrls = [];
+    for (const file of files) {
+      const result = await cloudinary.uploader.upload(file.path, {
+        folder: 'service-images',
+      });
+      imageUrls.push(result.secure_url);
+    }
+
+    // Crear el servicio con las URLs de las imágenes en Cloudinary
     const newService = new Service({
       title,
       description,
-      images,
       portfolio,
+      price,
+      images: imageUrls, // URLs de las imágenes subidas
     });
 
     const savedService = await newService.save();
     res.status(201).json(savedService);
   } catch (error) {
-    res.status(500).json({ message: 'Error al crear el servicio', error });
+    console.error('Error al crear el servicio:', error);
+    res.status(500).json({ message: 'Error al crear el servicio', error: error.message });
   }
 };
 

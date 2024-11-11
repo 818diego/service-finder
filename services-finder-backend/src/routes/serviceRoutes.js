@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const serviceController = require('../controllers/serviceController');
 const authMiddleware = require('../middleware/auth'); // Middleware de autenticación
+const upload = require('../middleware/cloudinaryUpload'); // Middleware de subida de archivos
 
 // Crear un nuevo servicio en un portafolio específico
-router.post('/portfolio/:portfolioId/create', authMiddleware, serviceController.createService);
+router.post('/create', authMiddleware, upload.array('images'), serviceController.createService);
 
 // Obtener todos los servicios de un portafolio específico
 router.get('/portfolio/:portfolioId', authMiddleware, serviceController.getServicesByPortfolio);
