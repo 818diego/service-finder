@@ -1,5 +1,6 @@
 const Portfolio = require('../models/Portfolio');
 const cloudinary = require('../../cloudinaryConfig');
+const mongoose = require('mongoose');
 
 
 exports.createPortfolio = async (req, res) => {
@@ -64,22 +65,32 @@ exports.getPortfolioById = async (req, res) => {
   }
 };
 
-
-// Actualizar parcialmente un portafolio específico por su ID
 exports.updatePortfolioById = async (req, res) => {
   try {
     const { id } = req.params;
-    const updates = req.body; // Obtenemos solo los campos que se enviaron en el body
+    
+    // Validar si el ID es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: 'ID de portafolio inválido' });
+    }
+
+    const updates = req.body;
+    console.log("ID del portafolio:", id);
+    console.log("Datos para actualizar:", updates);
 
     const updatedPortfolio = await Portfolio.findByIdAndUpdate(id, updates, { new: true });
-    if (!updatedPortfolio) return res.status(404).json({ message: 'Portafolio no encontrado' });
     
+    if (!updatedPortfolio) {
+      return res.status(404).json({ message: 'Portafolio no encontrado' });
+    }
+
+    console.log("Portafolio actualizado:", updatedPortfolio);
     res.status(200).json(updatedPortfolio);
   } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar el portafolio', error });
+    console.error("Error en la actualización del portafolio:", error);
+    res.status(500).json({ message: 'Error al actualizar el portafolio', error: error.message });
   }
 };
-
 
 // Eliminar un portafolio por ID
 exports.deletePortfolio = async (req, res) => {
