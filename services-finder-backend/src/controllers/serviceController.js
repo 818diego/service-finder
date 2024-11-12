@@ -55,7 +55,6 @@ exports.getServicesByPortfolio = async (req, res) => {
   }
 };
 
-
 // Obtener un servicio por su ID
 exports.getServiceById = async (req, res) => {
   try {
@@ -72,9 +71,25 @@ exports.getServiceById = async (req, res) => {
 exports.updateServiceById = async (req, res) => {
   try {
     const { serviceId } = req.params;
-    const updates = { ...req.body }; // Copiamos los datos de `req.body` para procesarlos
+    const { removeImageIndex } = req.body;
+    const updates = { ...req.body };
 
-    // Si se envía un archivo de imagen en la solicitud, subimos la imagen a Cloudinary
+    // Si `removeImageIndex` está definido, intentamos eliminar la imagen en ese índice
+    if (removeImageIndex !== undefined) {
+      const index = parseInt(removeImageIndex);
+      if (!isNaN(index)) {
+        const service = await Service.findById(serviceId);
+        if (service && service.images[index]) {
+          // Eliminamos la imagen del array `images` en el índice especificado
+          service.images.splice(index, 1);
+          updates.images = service.images;
+        } else {
+          return res.status(400).json({ message: 'Índice de imagen inválido' });
+        }
+      }
+    }
+
+    // Si se envía un archivo de imagen, subimos la nueva imagen a Cloudinary
     if (req.file) {
       const result = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -84,23 +99,22 @@ exports.updateServiceById = async (req, res) => {
             else resolve(result);
           }
         );
-        stream.end(req.file.buffer); // Enviamos el buffer de la imagen a Cloudinary
+        stream.end(req.file.buffer);
       });
 
-      // Si `updates.imageIndex` está en la solicitud, reemplazamos una imagen específica
+      // Reemplazamos o agregamos la imagen según la presencia de `imageIndex`
       if (updates.imageIndex !== undefined) {
         const index = parseInt(updates.imageIndex);
         if (!isNaN(index)) {
           const service = await Service.findById(serviceId);
           if (service && service.images[index]) {
-            service.images[index] = result.secure_url; // Reemplazamos la imagen en el índice especificado
+            service.images[index] = result.secure_url;
             updates.images = service.images;
           } else {
             return res.status(400).json({ message: 'Índice de imagen inválido' });
           }
         }
       } else {
-        // Si no se especifica un índice, agregamos la imagen al array `images`
         updates.$push = { images: result.secure_url };
       }
     }
