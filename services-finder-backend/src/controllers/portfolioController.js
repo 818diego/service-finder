@@ -1,5 +1,6 @@
 const Portfolio = require('../models/Portfolio');
 const cloudinary = require('../../cloudinaryConfig');
+const User = require('../models/User');
 const mongoose = require('mongoose');
 
 
@@ -37,6 +38,9 @@ exports.createPortfolio = async (req, res) => {
     });
 
     const savedPortfolio = await newPortfolio.save();
+
+    await User.findByIdAndUpdate(provider, { $push: { portfolios: savedPortfolio._id } });
+
     res.status(201).json(savedPortfolio);
   } catch (error) {
     console.error('Error al crear el portafolio:', error);
@@ -64,7 +68,6 @@ exports.getPortfolioById = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener el portafolio', error });
   }
 };
-
 
 exports.updatePortfolioById = async (req, res) => {
   try {
@@ -112,7 +115,6 @@ exports.updatePortfolioById = async (req, res) => {
     res.status(500).json({ message: 'Error al actualizar el portafolio', error: error.message });
   }
 };
-
 
 // Eliminar un portafolio por ID
 exports.deletePortfolio = async (req, res) => {

@@ -17,4 +17,5 @@ export interface ServiceForm {
     price: number;
     images?: File[];
     category: string;
+    removeImageIndexes?: number[];
 }

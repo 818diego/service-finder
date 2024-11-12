@@ -10,7 +10,7 @@ import { Portfolio } from "../../../types/portfolio";
 import PortfolioCard from "../../../components/MyPortfoliosPage/PortfolioCard";
 import ModalPortfolio, {
     PortfolioForm,
-} from "../../../components/MyPortfoliosPage/ModalPortfolio";
+} from "../../../components/MyPortfoliosPage/Modals/ModalPortfolio";
 import { toast } from "react-toastify";
 
 const MyServicesPage: React.FC = () => {
@@ -30,11 +30,7 @@ const MyServicesPage: React.FC = () => {
             return;
         }
 
-        interface DecodedToken {
-            userId: string;
-        }
-
-        const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token);
+        const decodedToken = jwtDecode<{ userId: string }>(token);
         const userId = decodedToken?.userId;
 
         if (!userId) {
@@ -56,15 +52,13 @@ const MyServicesPage: React.FC = () => {
     }, [token]);
 
     const handleCreatePortfolio = async (newPortfolio: PortfolioForm) => {
+        if (!token) {
+            console.error("No token found");
+            return;
+        }
+
         try {
-            if (!token) {
-                console.error("No token found");
-                return;
-            }
-
-            // Log para ver los datos que se están enviando al backend
             console.log("Datos enviados:", newPortfolio);
-
             const createdPortfolio = await createPortfolio(token, newPortfolio);
             setPortfolios((prevPortfolios) => [
                 ...prevPortfolios,
@@ -79,13 +73,9 @@ const MyServicesPage: React.FC = () => {
     };
 
     const handleEditPortfolio = async (updatedPortfolio: PortfolioForm) => {
-        if (!editingPortfolio) return;
+        if (!editingPortfolio || !token) return;
 
         try {
-            if (!token) {
-                console.error("No token found");
-                return;
-            }
             const updated = await updatePortfolio(
                 token,
                 editingPortfolio._id,
@@ -106,13 +96,9 @@ const MyServicesPage: React.FC = () => {
     };
 
     const handleDeletePortfolio = async () => {
-        if (!editingPortfolio) return;
+        if (!editingPortfolio || !token) return;
 
         try {
-            if (!token) {
-                console.error("No token found");
-                return;
-            }
             const success = await deletePortfolio(token, editingPortfolio._id);
             if (!success) {
                 throw new Error("Error deleting portfolio");
@@ -167,7 +153,8 @@ const MyServicesPage: React.FC = () => {
                         Mis Portfolios
                     </h1>
                     <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-300">
-                        Aquí puedes ver y administrar tus portafolios y agregarle Servicios a cada uno.
+                        Aquí puedes ver y administrar tus portafolios y
+                        agregarle Servicios a cada uno.
                     </p>
                 </div>
                 <button
@@ -180,12 +167,7 @@ const MyServicesPage: React.FC = () => {
                 {portfolios.map((portfolio) => (
                     <PortfolioCard
                         key={portfolio._id}
-                        title={portfolio.title}
-                        description={portfolio.description}
-                        duration={portfolio.duration}
-                        category={portfolio.category}
-                        provider={portfolio.provider}
-                        image={portfolio.image}
+                        portfolio={portfolio} // Pasar el objeto portfolio completo
                         onServiceClick={() => openCreateModal()}
                         onEditClick={() => openEditModal(portfolio)}
                         onDeleteClick={() => openDeleteModal(portfolio)}

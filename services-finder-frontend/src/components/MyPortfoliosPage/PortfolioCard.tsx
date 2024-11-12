@@ -1,66 +1,90 @@
 import React, { useState } from "react";
 import { Edit, Trash2, Clock, Folder, User } from "lucide-react";
 import { FaPlus } from "react-icons/fa";
-import ModalService from "./ModalService";
+import ModalService from "./Modals/ModalService";
+import ModalServiceAll from "./Modals/ModalServicesAll";
+import { createService } from "../../services/serviceFetch";
+import { ServiceForm } from "../../types/service";
+import { Portfolio } from "../../types/portfolio";
+import { useAuth } from "../../Context/AuthContext";
 
 interface PortfolioCardProps {
-    title: string;
-    description: string;
-    duration: string;
-    category: string;
-    provider: {
-        id: string;
-        username: string;
-    };
-    image: string;
-    portfolioId: string;
+    portfolio: Portfolio;
     onEditClick: () => void;
     onDeleteClick: () => void;
+    onServiceClick: (serviceId: string) => void;
 }
 
 const PortfolioCard: React.FC<PortfolioCardProps> = ({
-    title,
-    description,
-    duration,
-    category,
-    provider,
-    image,
-    portfolioId,
+    portfolio,
     onEditClick,
     onDeleteClick,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalServicesOpen, setIsModalServicesOpen] = useState(false);
+    const { user } = useAuth();
 
-    const handleOpenModal = () => setIsModalOpen(true);
+    const handleOpenModal = () => {
+        setIsModalOpen(true);
+    };
     const handleCloseModal = () => setIsModalOpen(false);
-    
+
+    const handleSubmit = async (formData: FormData) => {
+        if (!user) {
+            console.error("User is not authenticated");
+            return;
+        }
+
+        const data: ServiceForm = {
+            title: formData.get("title") as string,
+            description: formData.get("description") as string,
+            portfolio: portfolio._id,
+            price: Number(formData.get("price")),
+            category: formData.get("category") as string,
+            images: formData.getAll("images") as File[],
+        };
+
+        try {
+            const service = await createService(
+                data,
+                localStorage.getItem("authToken") || ""
+            );
+            console.log("Service created:", service);
+            handleCloseModal();
+        } catch (error) {
+            console.error("Failed to create service:", error);
+        }
+    };
+
+    const handleOpenModalServicesAll = () => {
+        setIsModalServicesOpen(true);
+    };
+    const handleCloseModalServicesAll = () => setIsModalServicesOpen(false);
 
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 relative">
-            {/* Modal */}
             <ModalService
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 mode="create"
-                onSubmit={(data) => {
-                    console.log("Form submitted:", data);
-                }}
-                portfolioName={title}
-                portfolioId={portfolioId}
-                provider={provider}
+                onSubmit={handleSubmit}
+                portfolioName={portfolio.title}
+                portfolioId={portfolio._id}
+                provider={portfolio.provider}
             />
 
             {/* Image section */}
             <div className="relative">
                 <img
-                    src={image}
-                    alt={`${title} by ${provider.username}`}
+                    src={portfolio.image}
+                    alt={`${portfolio.title} by ${portfolio.provider.username}`}
                     className="object-cover w-full h-48 rounded-t-lg cursor-pointer"
+                    onClick={() => handleOpenModalServicesAll()}
                 />
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                     <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm flex items-center">
                         <User className="w-5 h-5 inline mr-1" />
-                        {provider.username}
+                        {portfolio.provider.username}
                     </div>
                 </div>
                 <button
@@ -80,10 +104,10 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
             {/* Title and description */}
             <div className="px-6 py-4 min-h-[180px]">
                 <h2 className="font-bold text-xl mb-2 text-gray-900 dark:text-gray-100 text-center">
-                    {title}
+                    {portfolio.title}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 mt-2 text-justify">
-                    {description}
+                    {portfolio.description}
                 </p>
             </div>
 
@@ -92,11 +116,11 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
                     <div className="flex items-center space-x-2">
                         <Clock className="w-5 h-5" />
-                        <span>{duration}</span>
+                        <span>{portfolio.duration}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Folder className="w-5 h-5" />
-                        <span>{category}</span>
+                        <span>{portfolio.category}</span>
                     </div>
                 </div>
             </div>
@@ -112,6 +136,14 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                     }
                 />
             </div>
+
+            <ModalServiceAll
+                isOpen={isModalServicesOpen}
+                onClose={() => handleCloseModalServicesAll()}
+                providerUsername={portfolio.provider.username}
+                portfolioId={portfolio._id}
+            />
+            
         </div>
     );
 };

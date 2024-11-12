@@ -1,12 +1,12 @@
 const Service = require('../models/Service');
-
+const Portfolio = require('../models/Portfolio');
 const cloudinary = require('../../cloudinaryConfig');
 
 exports.createService = async (req, res) => {
   try {
     const { title, description, portfolio, price } = req.body;
     const files = req.files; // Para manejar múltiples imágenes
-    
+
     // Verificar que al menos una imagen esté presente
     if (!files || files.length === 0) {
       return res.status(400).json({ message: 'Al menos una imagen es requerida' });
@@ -38,6 +38,9 @@ exports.createService = async (req, res) => {
     });
 
     const savedService = await newService.save();
+
+    await Portfolio.findByIdAndUpdate(portfolio, { $push: { services: savedService._id } });
+
     res.status(201).json(savedService);
   } catch (error) {
     console.error('Error al crear el servicio:', error);
@@ -48,7 +51,7 @@ exports.createService = async (req, res) => {
 // Obtener todos los servicios de un portafolio específico
 exports.getServicesByPortfolio = async (req, res) => {
   try {
-    const services = await Service.find({ portfolio: req.params.portfolioId }).populate('portfolio');
+    const services = await Service.find({ portfolio: req.params.portfolioId });
     res.status(200).json(services);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener los servicios', error });
