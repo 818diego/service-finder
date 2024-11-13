@@ -3,7 +3,11 @@ export default {
   darkMode: 'class',
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      blur: {
+        'xs': '2px', // Define un nivel de desenfoque muy ligero
+      }
+    }
   },
   plugins: [],
 };

@@ -72,10 +72,13 @@ export const updateService = async (
         data.images.forEach((file) => formData.append("images", file));
     }
 
-    // Añadir los índices de imágenes a eliminar
-    data.removeImageIndexes?.forEach((index) => {
-        formData.append("removeImageIndex", index.toString());
-    });
+    // Añadir las URLs de imágenes a eliminar si existen
+    if (data.removeImageUrls && data.removeImageUrls.length > 0) {
+        formData.append(
+            "removeImageUrls",
+            JSON.stringify(data.removeImageUrls)
+        );
+    }
 
     const response = await fetch(
         `http://localhost:3000/api/services/${serviceId}/update`,
@@ -98,3 +101,24 @@ export const updateService = async (
     return await response.json();
 };
 
+export const deleteService = async (
+    serviceId: string,
+    token: string
+): Promise<void> => {
+    const response = await fetch(
+        `http://localhost:3000/api/services/${serviceId}/delete`,
+        {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(
+            `Error deleting service: ${response.status} - ${errorData}`
+        );
+    }
+};

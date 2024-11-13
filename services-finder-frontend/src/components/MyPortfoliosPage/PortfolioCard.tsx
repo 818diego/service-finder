@@ -29,7 +29,11 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
     };
     const handleCloseModal = () => setIsModalOpen(false);
 
-    const handleSubmit = async (formData: FormData) => {
+    const handleSubmit = async (formData: FormData | null) => {
+        if (!formData) {
+            console.error("Form data is null");
+            return;
+        }
         if (!user) {
             console.error("User is not authenticated");
             return;
@@ -70,17 +74,23 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 onSubmit={handleSubmit}
                 portfolioName={portfolio.title}
                 portfolioId={portfolio._id}
-                provider={portfolio.provider}
+                className="modal-fade-in modal-scale-in"
             />
 
-            {/* Image section */}
-            <div className="relative">
+            <div className="relative group">
                 <img
                     src={portfolio.image}
                     alt={`${portfolio.title} by ${portfolio.provider.username}`}
-                    className="object-cover w-full h-48 rounded-t-lg cursor-pointer"
-                    onClick={() => handleOpenModalServicesAll()}
+                    className="object-cover w-full h-48 rounded-t-lg cursor-pointer transition duration-300 group-hover:blur-sm"
                 />
+                <div
+                    className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition duration-300 rounded-t-lg cursor-pointer"
+                    onClick={() => handleOpenModalServicesAll()} // Añadido onClick aquí
+                >
+                    <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition duration-300">
+                        Ver servicios
+                    </span>
+                </div>
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                     <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm flex items-center">
                         <User className="w-5 h-5 inline mr-1" />
@@ -101,7 +111,6 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 </button>
             </div>
 
-            {/* Title and description */}
             <div className="px-6 py-4 min-h-[180px]">
                 <h2 className="font-bold text-xl mb-2 text-gray-900 dark:text-gray-100 text-center">
                     {portfolio.title}
@@ -111,7 +120,6 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 </p>
             </div>
 
-            {/* Additional details */}
             <div className="px-6 py-4">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
                     <div className="flex items-center space-x-2">
@@ -125,7 +133,6 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 </div>
             </div>
 
-            {/* Action button */}
             <div className="px-6 py-4 mb-2">
                 <CustomButton
                     onClick={handleOpenModal}
@@ -142,13 +149,12 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 onClose={() => handleCloseModalServicesAll()}
                 providerUsername={portfolio.provider.username}
                 portfolioId={portfolio._id}
+                className="modal-fade-in modal-scale-in"
             />
-            
         </div>
     );
 };
 
-// Custom button component
 const CustomButton: React.FC<{
     onClick: () => void;
     label: React.ReactNode;

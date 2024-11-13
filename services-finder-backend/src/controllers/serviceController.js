@@ -74,55 +74,38 @@ exports.getServiceById = async (req, res) => {
 exports.updateServiceById = async (req, res) => {
   try {
     const { serviceId } = req.params;
-    const { removeImageIndex } = req.body;
+    const { removeImageUrls } = req.body;
     const updates = { ...req.body };
 
-    // Si `removeImageIndex` está definido, intentamos eliminar la imagen en ese índice
-    if (removeImageIndex !== undefined) {
-      const index = parseInt(removeImageIndex);
-      if (!isNaN(index)) {
-        const service = await Service.findById(serviceId);
-        if (service && service.images[index]) {
-          // Eliminamos la imagen del array `images` en el índice especificado
-          service.images.splice(index, 1);
-          updates.images = service.images;
-        } else {
-          return res.status(400).json({ message: 'Índice de imagen inválido' });
-        }
-      }
-    }
-
-    // Si se envía un archivo de imagen, subimos la nueva imagen a Cloudinary
-    if (req.file) {
-      const result = await new Promise((resolve, reject) => {
-        const stream = cloudinary.uploader.upload_stream(
-          { folder: 'service-images' },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result);
-          }
-        );
-        stream.end(req.file.buffer);
-      });
-
-      // Reemplazamos o agregamos la imagen según la presencia de `imageIndex`
-      if (updates.imageIndex !== undefined) {
-        const index = parseInt(updates.imageIndex);
-        if (!isNaN(index)) {
-          const service = await Service.findById(serviceId);
-          if (service && service.images[index]) {
-            service.images[index] = result.secure_url;
-            updates.images = service.images;
-          } else {
-            return res.status(400).json({ message: 'Índice de imagen inválido' });
-          }
-        }
+    if (removeImageUrls) {
+      const urlsToRemove = JSON.parse(removeImageUrls);
+      const service = await Service.findById(serviceId);
+      if (service) {
+        service.images = service.images.filter((url) => !urlsToRemove.includes(url));
+        updates.images = service.images;
       } else {
-        updates.$push = { images: result.secure_url };
+        return res.status(400).json({ message: 'URLs de imagen inválidas' });
       }
     }
 
-    // Actualizamos el servicio en la base de datos
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = [];
+      for (const file of req.files) {
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: 'service-images' },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            }
+          );
+          stream.end(file.buffer);
+        });
+        uploadedImages.push(result.secure_url);
+      }
+      updates.$push = { images: { $each: uploadedImages } };
+    }
+
     const updatedService = await Service.findByIdAndUpdate(serviceId, updates, { new: true });
     if (!updatedService) return res.status(404).json({ message: 'Servicio no encontrado' });
 

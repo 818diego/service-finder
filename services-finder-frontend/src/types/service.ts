@@ -15,7 +15,8 @@ export interface ServiceForm {
     description: string;
     portfolio: string;
     price: number;
-    images?: File[];
     category: string;
-    removeImageIndexes?: number[];
+    images?: File[];
+    removeImageUrls?: string[];
 }
+
