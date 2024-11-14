@@ -127,3 +127,26 @@ export const deletePortfolio = async (token: string, portfolioId: string) => {
         throw error;
     }
 };
+
+export const fetchAllPortfolios = async (token: string) => {
+    try {
+        const response = await fetch(
+            "http://localhost:3000/api/portfolios/list",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error("Error fetching portfolios");
+        }
+
+        const data = await response.json();
+        return data as Portfolio[];
+    } catch (error) {
+        console.error("Error fetching portfolios:", error);
+        throw error;
+    }
+};

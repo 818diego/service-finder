@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import ServicesPage from "./pages/ServicesPage";
 import CategoryPage from "./pages/CategoryPage";
 
 // Import pages auth
@@ -24,7 +23,6 @@ export const AppRoutes: React.FC = () => (
         <Route path="/" element={<HomePage />} />
         <Route path="/about" element={<AboutPage />} />
         <Route path="/contact" element={<ContactPage />} />
-        <Route path="/services" element={<ServicesPage />} />
         <Route path="/category" element={<CategoryPage />} />
         {/* Authentication Routing here */}
         <Route path="/login" element={<LoginPage />} />

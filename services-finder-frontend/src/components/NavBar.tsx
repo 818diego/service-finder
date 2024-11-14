@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Home, User as UserIcon, LogOut } from "lucide-react";
+import { LogIn, UserPlus } from "lucide-react";
 import DarkModeToggle from "./DarkModeToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../Context/AuthContext";
@@ -34,7 +35,6 @@ const Navbar: React.FC = () => {
     const closeLogoutModal = () => setIsLogoutModalOpen(false);
     const openLogoutModal = () => setIsLogoutModalOpen(true);
 
-    // Definir los enlaces de navegación de forma condicional
     const navigationLinks = () => {
         const baseLinks = [
             { path: "/category", label: "Category" },
@@ -48,9 +48,10 @@ const Navbar: React.FC = () => {
                 ...baseLinks,
             ];
         } else if (user?.userType === "Cliente") {
+            // Aquí se puede agregar un nuevo link pra el cliente, pero
+            // por ahora no hay nada que mostrar, el services no existe
             return [{ path: "/services", label: "Services" }, ...baseLinks];
         } else {
-            // Opcional: enlaces para usuarios no autenticados o con otros tipos
             return baseLinks;
         }
     };
@@ -179,15 +180,17 @@ const Navbar: React.FC = () => {
                                             <Tooltip text="Login">
                                                 <Link
                                                     to="/login"
-                                                    className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                                    Login
+                                                    className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out flex items-center space-x-2">
+                                                    <LogIn className="w-4 h-4" />
+                                                    <span>Login</span>
                                                 </Link>
                                             </Tooltip>
                                             <Tooltip text="Register">
                                                 <Link
                                                     to="/register"
-                                                    className="block px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                                    Register
+                                                    className="px-4 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-300 ease-in-out flex items-center space-x-2">
+                                                    <UserPlus className="w-4 h-4" />
+                                                    <span>Register</span>
                                                 </Link>
                                             </Tooltip>
                                         </div>

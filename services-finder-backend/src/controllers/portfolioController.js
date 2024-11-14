@@ -48,12 +48,15 @@ exports.createPortfolio = async (req, res) => {
   }
 };
 
-// Obtener todos los portafolios
+// Obtener todos los portafolios existentes
 exports.getAllPortfolios = async (req, res) => {
   try {
-    const portfolios = await Portfolio.find().populate('provider');
+    // Consulta a la base de datos para obtener todos los portafolios
+    const portfolios = await Portfolio.find();
+    // Responder con los portafolios obtenidos
     res.status(200).json(portfolios);
   } catch (error) {
+    // Manejo de errores
     res.status(500).json({ message: 'Error al obtener los portafolios', error });
   }
 };
