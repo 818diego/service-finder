@@ -1,8 +1,8 @@
 import { ChatResponse } from "../types/chats";
 
-//Crear un chat
+// Crear un chat
 export const createChat = async (
-    portfolioId: string,
+    serviceId: string,
     initialMessage: string,
     token: string
 ) => {
@@ -13,7 +13,7 @@ export const createChat = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ portfolioId, initialMessage }), // Enviar initialMessage en el cuerpo
+            body: JSON.stringify({ serviceId, initialMessage }),
         });
 
         if (!response.ok) {
@@ -206,4 +206,4 @@ export const deleteChat = async (chatId: string, token: string) => {
         console.error("Error deleting chat:", error);
         throw error;
     }
-}
+};

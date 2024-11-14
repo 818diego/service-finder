@@ -3,6 +3,7 @@ import { Search } from "lucide-react";
 import { ChatResponse, ChatMessage } from "../../types/chats";
 import { jwtDecode } from "jwt-decode";
 import { fetchUserChats } from "../../services/chatsFetch";
+import { useSocket } from "../../Context/SocketContext";
 
 interface ChatListProps {
     onSelectChat: (id: string) => void; // Cambiamos para pasar solo el id
@@ -18,6 +19,11 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
     const [chats, setChats] = useState<ChatResponse[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [userInfo, setUserInfo] = useState<DecodedToken | null>(null);
+    const [unreadMessages, setUnreadMessages] = useState<{
+        [key: string]: number;
+    }>({});
+    const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+    const { socket } = useSocket();
 
     const getUserInfoFromToken = (): DecodedToken | null => {
         const token = localStorage.getItem("authToken");
@@ -40,8 +46,48 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
                 .catch((error) =>
                     console.error("Error al obtener los chats:", error)
                 );
+
+            if (socket) {
+                socket.on("receiveMessage", (data) => {
+                    setUnreadMessages((prev) => ({
+                        ...prev,
+                        [data.chatId]: (prev[data.chatId] || 0) + 1,
+                    }));
+                    setChats((prevChats) =>
+                        prevChats.map((chat) =>
+                            chat._id === data.chatId
+                                ? {
+                                      ...chat,
+                                      messages: [
+                                          ...chat.messages,
+                                          {
+                                              _id: data.message._id,
+                                              text: data.message.text,
+                                              sentBy: data.senderId,
+                                              time: data.message.time,
+                                          },
+                                      ],
+                                  }
+                                : chat
+                        )
+                    );
+                });
+
+                return () => {
+                    socket.off("receiveMessage");
+                };
+            }
         }
-    }, []);
+    }, [socket]);
+
+    const handleSelectChat = (id: string) => {
+        onSelectChat(id);
+        setSelectedChatId(id);
+        setUnreadMessages((prev) => ({
+            ...prev,
+            [id]: 0, // Reset unread messages count when chat is opened
+        }));
+    };
 
     const filteredChats = chats.filter((chat) => {
         const displayName =
@@ -86,18 +132,13 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
                 {filteredChats.map((chat) => {
                     const { displayName, lastMessageText, time } =
                         getChatDisplayData(chat);
+                    const unreadCount = unreadMessages[chat._id] || 0;
                     return (
                         <div
                             key={chat._id}
-                            onClick={() => {
-                                console.log(
-                                    "Chat seleccionado con ID:",
-                                    chat._id
-                                );
-                                onSelectChat(chat._id); // Pasamos solo el id del chat
-                            }}
+                            onClick={() => handleSelectChat(chat._id)}
                             className="flex items-center gap-3 p-3 cursor-pointer transition-colors rounded-md mx-2
-                                       hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm">
+                                       hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm relative">
                             <img
                                 src="/src/assets/images/1.jpg"
                                 alt={displayName}
@@ -114,6 +155,11 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
                             <span className="text-xs text-gray-400 dark:text-gray-500">
                                 {time}
                             </span>
+                            {unreadCount > 0 && chat._id !== selectedChatId && (
+                                <span className="absolute top-2 right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                                    {unreadCount}
+                                </span>
+                            )}
                         </div>
                     );
                 })}

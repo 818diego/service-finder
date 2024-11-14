@@ -126,3 +126,14 @@ exports.deleteService = async (req, res) => {
     res.status(500).json({ message: 'Error al eliminar el servicio', error });
   }
 };
+
+// Obtener todos los servicios existentes
+exports.getAllServices = async (req, res) => {
+  try {
+    const services = await Service.find();
+    res.status(200).json(services);
+  } catch (error) {
+    console.error("Error en la consulta:", error);
+    res.status(500).json({ message: 'Error al obtener los servicios', error });
+  }
+};

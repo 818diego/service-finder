@@ -23,4 +23,8 @@ router.patch('/:serviceId/update', authMiddleware, upload.array('images'), servi
 // Eliminar un servicio por su ID
 router.delete('/:serviceId/delete', authMiddleware, serviceController.deleteService);
 
+// Cambia '/all' por '/' para obtener todos los servicios
+router.get('/', authMiddleware, serviceController.getAllServices);
+
+
 module.exports = router;

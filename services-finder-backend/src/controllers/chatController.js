@@ -1,20 +1,19 @@
 const jwt = require("jsonwebtoken");
 const Chat = require("../models/Chat");
-const Portfolio = require("../models/Portfolio");
 const User = require("../models/User");
 const mongoose = require("mongoose");
+const Service = require("../models/Service");
+const Portfolio = require("../models/Portfolio");
 
 exports.createChat = async (req, res) => {
-  const { portfolioId, initialMessage } = req.body;
+  const { serviceId, initialMessage } = req.body;
 
   try {
-    // Verifica que `portfolioId` y `initialMessage` existan en el body
-    if (!portfolioId || !initialMessage) {
-      console.log("Faltan datos necesarios en la solicitud."); // Depuración
+    if (!serviceId || !initialMessage) {
+      console.log("Faltan datos necesarios en la solicitud.");
       return res.status(400).json({ message: "Faltan datos necesarios en la solicitud." });
     }
 
-    // Extrae el token para obtener userId y userType
     const token = req.headers.authorization.split(" ")[1];
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const { userId, userType } = decodedToken;
@@ -23,25 +22,39 @@ exports.createChat = async (req, res) => {
 
     if (userType === "Cliente") {
       clientId = userId;
-      const portfolio = await Portfolio.findById(portfolioId);
+      const service = await Service.findById(serviceId);
+      if (!service) {
+        console.log("Servicio no encontrado para el ID:", serviceId);
+        return res.status(404).json({ message: "Servicio no encontrado" });
+      }
+
+      // Obtener el `portfolio` al que pertenece el servicio
+      const portfolio = await Portfolio.findById(service.portfolio);
       if (!portfolio) {
-        console.log("Portafolio no encontrado para el ID:", portfolioId); // Depuración
+        console.log("Portafolio no encontrado para el servicio");
         return res.status(404).json({ message: "Portafolio no encontrado" });
       }
+
+      // Obtener el `providerId` desde el `portfolio`
       providerId = portfolio.provider;
+      if (!providerId) {
+        console.log("No se encontró el proveedor para este portafolio.");
+        return res.status(404).json({ message: "Proveedor no encontrado para el servicio." });
+      }
+
     } else if (userType === "Proveedor") {
-      console.log("Los proveedores no pueden iniciar un chat."); // Depuración
+      console.log("Los proveedores no pueden iniciar un chat.");
       return res.status(403).json({ message: "Solo los clientes pueden iniciar un chat." });
     } else {
-      console.log("Tipo de usuario no válido:", userType); // Depuración
+      console.log("Tipo de usuario no válido:", userType);
       return res.status(400).json({ message: "Tipo de usuario no válido" });
     }
 
-    // Crear un nuevo chat en estado `pending` con el primer mensaje del cliente
+    // Crear el chat
     const chat = new Chat({
       clientId,
       providerId,
-      portfolioId,
+      serviceId,
       messages: [
         {
           text: initialMessage,
@@ -53,7 +66,7 @@ exports.createChat = async (req, res) => {
       status: "pending",
     });
     await chat.save();
-    console.log("Nuevo chat creado:", chat._id); // Depuración
+    console.log("Nuevo chat creado:", chat._id);
 
     // Emitir evento de WebSocket al proveedor
     const io = req.app.get("socketio");
@@ -62,7 +75,7 @@ exports.createChat = async (req, res) => {
         chatId: chat._id,
         clientId,
         providerId,
-        portfolioId,
+        serviceId,
         initialMessage,
       });
     } else {
@@ -71,10 +84,11 @@ exports.createChat = async (req, res) => {
 
     res.status(201).json(chat);
   } catch (error) {
-    console.error("Error en la creación del chat:", error); // Depuración
+    console.error("Error en la creación del chat:", error);
     res.status(500).json({ message: "Error al crear el chat" });
   }
 };
+
 
 // Para que el proveedor pueda aceptar o rechazar un chat
 exports.updateChatStatus = async (req, res) => {
@@ -123,8 +137,12 @@ exports.updateChatStatus = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   const { chatId, text } = req.body;
-  const userId = req.user._id;
-  const userType = req.user.userType; // Get the userType from the decoded token
+  const userId = req.user.userId;
+  const userType = req.user.userType;
+
+  if (!userId) {
+    return res.status(400).json({ message: "El ID del usuario no está definido" });
+  }
 
   try {
     const chat = await Chat.findById(chatId);
@@ -136,26 +154,27 @@ exports.sendMessage = async (req, res) => {
       return res.status(403).json({ message: "El chat aún no ha sido aceptado por el proveedor." });
     }
 
+    // Crear el nuevo mensaje con `sentBy`
     const newMessage = {
       text,
-      sentBy: userId,
+      sentBy: userId, // Asegúrate de que `userId` esté definido antes de asignarlo
       time: new Date(),
     };
 
     chat.messages.push(newMessage);
 
-    // Set the unread status based on userType
+    // Configurar el estado de no leído basado en `userType`
     if (userType === "Cliente") {
-      chat.unreadByProvider = true; // Message is unread for the provider
+      chat.unreadByProvider = true;
     } else if (userType === "Proveedor") {
-      chat.unreadByClient = true; // Message is unread for the client
+      chat.unreadByClient = true;
     }
 
     await chat.save();
 
     res.status(201).json(newMessage);
   } catch (error) {
-    console.error(error);
+    console.error("Error al enviar mensaje:", error);
     res.status(500).json({ message: "Error al enviar mensaje" });
   }
 };
@@ -170,6 +189,16 @@ exports.getUserStatus = async (req, res) => {
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Emitir el estado del usuario a través de Socket.IO
+    const io = req.app.get("socketio");
+    if (io) {
+      io.emit("userStatus", {
+        userId: user._id.toString(),
+        isOnline: user.isOnline,
+        lastSeen: user.isOnline ? null : user.lastSeen,
+      });
     }
 
     // Enviar el estado del usuario
@@ -266,7 +295,6 @@ exports.deleteChat = async (req, res) => {
 
   try {
     const chat = await Chat.findById(chatId);
-    console.log("Chat found:", chat);
 
     if (!chat) {
       return res.status(404).json({ message: "Chat no encontrado" });

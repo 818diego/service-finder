@@ -1,42 +1,41 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface ChatMessageProps {
     text: string;
     time: string;
-    sentByUser: boolean;
+    sentBy: "Cliente" | "Proveedor";
     chatStatus: "pending" | "accepted" | "rejected";
-    senderRole: "provider" | "client";
-    currentUserRole: "provider" | "client";
+    currentUserType: "Proveedor" | "Cliente";
+    isStatusMessage?: boolean;
+    statusMessageStyle?: string;
 }
 
 const ChatMessage: React.FC<ChatMessageProps> = ({
     text,
     time,
-    senderRole,
-    currentUserRole,
+    sentBy,
+    currentUserType,
+    isStatusMessage = false,
+    statusMessageStyle = "",
 }) => {
-    const [animate, setAnimate] = useState(true);
-
-    useEffect(() => {
-        setAnimate(true);
-        const timer = setTimeout(() => setAnimate(false), 300);
-        return () => clearTimeout(timer);
-    }, [text, time]);
-
-    // Determine if the message is sent by the current user
-    const isCurrentUser = senderRole === currentUserRole;
+    // Determina si el mensaje fue enviado por el usuario actual
+    const isCurrentUser = sentBy === currentUserType;
 
     return (
         <div
-            className={`w-fit max-w-[70%] p-3 transition-opacity duration-300 rounded-2xl mb-2 shadow-sm ${
-                isCurrentUser
-                    ? "ml-auto bg-gradient-to-r from-blue-500 to-blue-700 text-white"
-                    : "bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-            } ${animate ? "fade-in" : ""}`}>
-            <p>{text}</p>
-            <span className="text-xs text-gray-400 dark:text-gray-300 block mt-1 text-right">
-                {time}
-            </span>
+            className={`w-fit max-w-[70%] p-4 transition-opacity duration-300 rounded-2xl mb-2 ${
+                isStatusMessage
+                    ? `mx-auto text-center ${statusMessageStyle}`
+                    : isCurrentUser
+                    ? "ml-auto bg-blue-500 text-white"
+                    : "mr-auto bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+            }`}>
+            <p className="text-sm leading-relaxed">{text}</p>
+            {!isStatusMessage && (
+                <span className="text-xs text-gray-400 dark:text-gray-300 block mt-2 text-right">
+                    {time}
+                </span>
+            )}
         </div>
     );
 };

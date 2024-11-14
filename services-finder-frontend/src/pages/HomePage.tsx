@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Portfolio } from "../types/portfolio";
 import PortfolioCardClient from "../components/ClientComponents/PortfolioCardClient";
 import { createChat } from "../services/chatsFetch";
+import { fetchAllService } from "../services/serviceFetch";
+import { Service } from "../types/service";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
         null
     );
-    const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+    const [services, setServices] = useState<Service[]>([]);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -34,66 +35,53 @@ const Home: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        const fetchPortfolios = async () => {
+        const fetchServices = async () => {
             const token = localStorage.getItem("token");
             if (token && userType === "Cliente") {
                 try {
-                    const response = await fetch(
-                        "http://localhost:3000/api/portfolios/list",
-                        {
-                            headers: {
-                                Authorization: `Bearer ${token}`,
-                            },
-                        }
-                    );
-
-                    if (!response.ok) {
-                        throw new Error("Error fetching portfolios");
-                    }
-
-                    const data = await response.json();
-                    setPortfolios(data as Portfolio[]);
+                    const services = await fetchAllService(token);
+                    setServices(services as Service[]);
                 } catch (error) {
-                    console.error("Error fetching portfolios:", error);
-                    setError("Error loading portfolios.");
+                    console.error("Error fetching services:", error);
+                    setError("Error loading services.");
                 }
             }
         };
 
-        fetchPortfolios();
+        fetchServices();
     }, [userType]);
 
     const handleSendProposalClick = async (
-        portfolioId: string,
+        serviceId: string,
         initialMessage: string
     ) => {
+        console.log("serviceId recibido:", serviceId); // Debug
+        console.log("Mensaje inicial recibido:", initialMessage); // Debug
+
         const token = localStorage.getItem("token");
         if (!token) {
             console.error("No token found");
             return;
         }
-    
+
         try {
             const payload = JSON.parse(atob(token.split(".")[1]));
             if (payload.userType !== "Cliente") {
                 console.error("Unauthorized: User is not a Cliente");
                 return;
             }
-    
-            const response = await createChat(
-                portfolioId,
-                initialMessage,
-                token
-            );
-    
+
+            const response = await createChat(serviceId, initialMessage, token);
+
             console.log("Chat creado:", response);
         } catch (error) {
-            console.error("Error al decodificar el token o crear el chat:", error);
+            console.error(
+                "Error al decodificar el token o crear el chat:",
+                error
+            );
         }
     };
-    
-    
-    
+
     return (
         <div className="container mx-auto px-4 py-8">
             {userType === "Proveedor" && (
@@ -112,12 +100,15 @@ const Home: React.FC = () => {
                         <p className="text-red-500">{error}</p>
                     ) : (
                         <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                            {portfolios.map((portfolio) => (
+                            {services.map((portfolio) => (
                                 <PortfolioCardClient
                                     key={portfolio._id}
-                                    portfolio={portfolio}
-                                    onSendProposalClick={
-                                        handleSendProposalClick
+                                    service={portfolio}
+                                    onSendProposalClick={(initialMessage) =>
+                                        handleSendProposalClick(
+                                            portfolio._id,
+                                            initialMessage
+                                        )
                                     }
                                 />
                             ))}

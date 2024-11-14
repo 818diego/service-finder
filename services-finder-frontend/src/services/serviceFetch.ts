@@ -122,3 +122,20 @@ export const deleteService = async (
         );
     }
 };
+
+export const fetchAllService = async (token: string): Promise<Service[]> => {
+    const response = await fetch(`http://localhost:3000/api/services/`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(
+            `Error fetching services: ${response.status} - ${errorData}`
+        );
+    }
+
+    return await response.json();
+};

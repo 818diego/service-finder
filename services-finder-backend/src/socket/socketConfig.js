@@ -46,12 +46,16 @@ const configureSocket = (server) => {
 
     socket.on("sendMessage", ({ chatId, message }) => {
       console.log(`User ${socket.user.userId} sent a message in chat ${chatId}`);
-      io.to(chatId).emit("receiveMessage", {
-        message,
-        senderId: socket.user.userId,
-        senderType: socket.user.userType,
+      // Usar socket.to(chatId).emit para excluir al remitente
+      socket.to(chatId).emit("receiveMessage", {
+          chatId,
+          message,
+          senderId: socket.user.userId,
+          senderType: socket.user.userType,
       });
-    });
+  });
+  
+  
 
     socket.on("disconnect", async () => {
       console.log("User disconnected:", socket.user.userId);

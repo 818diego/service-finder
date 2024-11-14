@@ -1,3 +1,4 @@
+// src/App.tsx
 import React from "react";
 import {
     BrowserRouter as Router,
@@ -9,10 +10,11 @@ import { AppRoutes } from "./RoutesConfig";
 import Navbar from "./components/NavBar";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { SocketProvider } from "./Context/SocketContext";
 
 const AppContent: React.FC = () => {
     const location = useLocation();
-    const isChatPage = location.pathname === "/chats";
+    const isChatPage = location.pathname.startsWith("/chats");
     const isHomePage = location.pathname === "/";
 
     return (
@@ -37,9 +39,11 @@ const AppContent: React.FC = () => {
 const App: React.FC = () => {
     return (
         <Router>
-            <Routes>
-                <Route path="*" element={<AppContent />} />
-            </Routes>
+            <SocketProvider>
+                <Routes>
+                    <Route path="*" element={<AppContent />} />
+                </Routes>
+            </SocketProvider>
         </Router>
     );
 };

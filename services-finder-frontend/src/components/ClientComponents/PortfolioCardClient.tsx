@@ -1,59 +1,51 @@
 import React, { useState } from "react";
-import { Clock, Folder } from "lucide-react";
-import { Portfolio } from "../../types/portfolio";
+import { DollarSign, Folder } from "lucide-react";
 import ProposalModal from "./ProposalModal";
+import { Service } from "../../types/service";
 
 interface PortfolioCardClientProps {
-    portfolio: Portfolio;
-    onSendProposalClick: (
-        portfolioId: string,
-        initialMessage: string
-    ) => void;
+    service: Service;
+    onSendProposalClick: (initialMessage: string) => void;
 }
 
 const PortfolioCardClient: React.FC<PortfolioCardClientProps> = ({
-    portfolio,
+    service,
     onSendProposalClick,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleProposalSubmit = (initialMessage: string) => {
-        onSendProposalClick(
-            portfolio._id,
-            initialMessage // Pasamos solo dos argumentos
-        );
+        onSendProposalClick(initialMessage);
     };
-    
-    
 
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 relative">
             <div className="relative group">
                 <img
-                    src={portfolio.image}
-                    alt={`Imagen del portafolio ${portfolio.title} por ${portfolio.provider.username}`}
+                    src={service.images[0]}
+                    alt={`Imagen del portafolio ${service.title} por ${service}`}
                     className="object-cover w-full h-48 rounded-t-lg"
                 />
             </div>
 
             <div className="px-6 py-4 min-h-[180px]">
                 <h2 className="font-bold text-xl mb-2 text-gray-900 dark:text-gray-100 text-center">
-                    {portfolio.title}
+                    {service.title}
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400 mt-2 text-justify">
-                    {portfolio.description}
+                    {service.description}
                 </p>
             </div>
 
             <div className="px-6 py-4">
                 <div className="flex justify-between items-center text-sm text-muted-foreground">
                     <div className="flex items-center space-x-2">
-                        <Clock className="w-5 h-5" />
-                        <span>{portfolio.duration}</span>
+                        <DollarSign className="w-5 h-5" />
+                        <span>{service.price}</span>
                     </div>
                     <div className="flex items-center space-x-2">
                         <Folder className="w-5 h-5" />
-                        <span>{portfolio.category}</span>
+                        <span>{service.portfolio}</span>
                     </div>
                 </div>
             </div>
@@ -68,8 +60,7 @@ const PortfolioCardClient: React.FC<PortfolioCardClientProps> = ({
             <ProposalModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onSubmit={handleProposalSubmit}
-                portfolioId={portfolio._id}
+                onSubmit={handleProposalSubmit} // Asegúrate de que `handleProposalSubmit` esté configurado correctamente
             />
         </div>
     );
