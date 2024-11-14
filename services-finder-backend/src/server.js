@@ -21,7 +21,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Adjust based on frontend URL
+  origin: 'http://152.53.55.46:5173', // Cambia esto a la IP pública y puerto del frontend
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
 }));
 app.use(express.json());
@@ -45,6 +45,6 @@ app.use((err, req, res, next) => {
 
 // Start server
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });
