@@ -1,5 +1,7 @@
+// server.js
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -8,25 +10,41 @@ const portfolioRoutes = require('./routes/portfolioRoutes');
 const serviceRoutes = require('./routes/serviceRoutes');
 const userRoutes = require('./routes/userRoutes');
 const jobOfferRoutes = require('./routes/jobOfferRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const configureSocket = require('./socket/socketConfig');
 
 const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/portfolios', portfolioRoutes); // Prefijo específico para los portafolios
-app.use('/api/services', serviceRoutes); // Prefijo específico para los servicios
-app.use('/api/users', userRoutes); // Prefijo específico para los usuarios
-app.use('/api/job-offers', jobOfferRoutes); // Prefijo específico para las ofertas de trabajo
+const server = http.createServer(app);
 
 // Connect to MongoDB
 connectDB();
 
+// Middleware
+app.use(cors({
+  origin: 'http://localhost:5173', // Adjust based on frontend URL
+  methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
+}));
+app.use(express.json());
+
+// API routes
+app.use('/api/auth', authRoutes);
+app.use('/api/portfolios', portfolioRoutes);
+app.use('/api/services', serviceRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/job-offers', jobOfferRoutes);
+app.use('/api/chats', chatRoutes);
+
+// Configure Socket.IO with the HTTP server
+configureSocket(server);
+
+// Global error handler (optional but recommended)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Server Error' });
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

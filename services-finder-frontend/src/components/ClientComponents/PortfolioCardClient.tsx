@@ -1,16 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
 import { Clock, Folder } from "lucide-react";
 import { Portfolio } from "../../types/portfolio";
+import ProposalModal from "./ProposalModal";
 
 interface PortfolioCardClientProps {
     portfolio: Portfolio;
-    onSendProposalClick: () => void;
+    onSendProposalClick: (
+        portfolioId: string,
+        initialMessage: string
+    ) => void;
 }
 
 const PortfolioCardClient: React.FC<PortfolioCardClientProps> = ({
     portfolio,
     onSendProposalClick,
 }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleProposalSubmit = (initialMessage: string) => {
+        onSendProposalClick(
+            portfolio._id,
+            initialMessage // Pasamos solo dos argumentos
+        );
+    };
+    
+    
+
     return (
         <div className="max-w-md rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 relative">
             <div className="relative group">
@@ -45,10 +60,17 @@ const PortfolioCardClient: React.FC<PortfolioCardClientProps> = ({
 
             <div className="px-6 py-4 mb-2">
                 <CustomButton
-                    onClick={onSendProposalClick}
+                    onClick={() => setIsModalOpen(true)}
                     label="Enviar Propuesta"
                 />
             </div>
+
+            <ProposalModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleProposalSubmit}
+                portfolioId={portfolio._id}
+            />
         </div>
     );
 };

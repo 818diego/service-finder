@@ -9,7 +9,12 @@ const auth = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = { userId: decoded.userId, username: decoded.username, userType: decoded.userType };
+    req.user = {
+      userId: decoded.userId,
+      username: decoded.username,
+      userType: decoded.userType
+    };
+    req.user = decoded;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Token no es válido' });

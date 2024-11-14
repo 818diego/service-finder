@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema({
   specialty: { type: String },
   password: { type: String, required: true },
   services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service' }],
-  portfolios: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Portfolio' }]
+  portfolios: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Portfolio' }],
+  isOnline: { type: Boolean, default: false },
+  lastSeen: { type: Date, default: null },
 }, { timestamps: true });
 
 userSchema.pre('save', async function (next) {

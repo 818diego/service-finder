@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Portfolio } from "../types/portfolio";
 import PortfolioCardClient from "../components/ClientComponents/PortfolioCardClient";
+import { createChat } from "../services/chatsFetch";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
@@ -62,11 +63,37 @@ const Home: React.FC = () => {
         fetchPortfolios();
     }, [userType]);
 
-    const handleSendProposal = (portfolioId: string) => {
-        console.log("Sending proposal for portfolio:", portfolioId);
-        // Implement your proposal sending logic here
+    const handleSendProposalClick = async (
+        portfolioId: string,
+        initialMessage: string
+    ) => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.error("No token found");
+            return;
+        }
+    
+        try {
+            const payload = JSON.parse(atob(token.split(".")[1]));
+            if (payload.userType !== "Cliente") {
+                console.error("Unauthorized: User is not a Cliente");
+                return;
+            }
+    
+            const response = await createChat(
+                portfolioId,
+                initialMessage,
+                token
+            );
+    
+            console.log("Chat creado:", response);
+        } catch (error) {
+            console.error("Error al decodificar el token o crear el chat:", error);
+        }
     };
-
+    
+    
+    
     return (
         <div className="container mx-auto px-4 py-8">
             {userType === "Proveedor" && (
@@ -89,8 +116,8 @@ const Home: React.FC = () => {
                                 <PortfolioCardClient
                                     key={portfolio._id}
                                     portfolio={portfolio}
-                                    onSendProposalClick={() =>
-                                        handleSendProposal(portfolio._id)
+                                    onSendProposalClick={
+                                        handleSendProposalClick
                                     }
                                 />
                             ))}

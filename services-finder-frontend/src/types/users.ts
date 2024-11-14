@@ -1,4 +1,6 @@
 export interface User {
+    profileImage?: string | File;
+    _id?: string;
     username: string;
     firstName: string;
     lastName: string;
