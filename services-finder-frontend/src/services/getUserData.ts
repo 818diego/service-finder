@@ -11,7 +11,7 @@ export const getUserData = async (): Promise<string> => {
 
     try {
         const userResponse = await fetch(
-            `http://localhost:3000/api/users/${userId}`,
+            `http://node2.frokie.it/api/users/${userId}`,
             {
                 method: "GET",
                 headers: {

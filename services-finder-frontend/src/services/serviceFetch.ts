@@ -15,7 +15,7 @@ export const createService = async (
         data.images.forEach((file) => formData.append("images", file));
     }
 
-    const response = await fetch(`http://localhost:3000/api/services/create`, {
+    const response = await fetch(`http://node2.frokie.it/api/services/create`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -38,7 +38,7 @@ export const fetchServices = async (
     token: string
 ): Promise<Service[]> => {
     const response = await fetch(
-        `http://localhost:3000/api/services/portfolio/${portfolioId}`,
+        `http://node2.frokie.it/api/services/portfolio/${portfolioId}`,
         {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -81,7 +81,7 @@ export const updateService = async (
     }
 
     const response = await fetch(
-        `http://localhost:3000/api/services/${serviceId}/update`,
+        `http://node2.frokie.it/api/services/${serviceId}/update`,
         {
             method: "PATCH",
             headers: {
@@ -106,7 +106,7 @@ export const deleteService = async (
     token: string
 ): Promise<void> => {
     const response = await fetch(
-        `http://localhost:3000/api/services/${serviceId}/delete`,
+        `http://node2.frokie.it/api/services/${serviceId}/delete`,
         {
             method: "DELETE",
             headers: {
@@ -124,7 +124,7 @@ export const deleteService = async (
 };
 
 export const fetchAllService = async (token: string): Promise<Service[]> => {
-    const response = await fetch(`http://localhost:3000/api/services/`, {
+    const response = await fetch(`http://node2.frokie.it/api/services/`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

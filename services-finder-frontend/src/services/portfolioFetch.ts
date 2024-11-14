@@ -5,7 +5,7 @@ export const fetchUserPortfolios = async (
     token: string
 ): Promise<Portfolio[]> => {
     const response = await fetch(
-        `http://localhost:3000/api/portfolios/provider/${userId}`,
+        `http://node2.frokie.it/api/portfolios/provider/${userId}`,
         {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ export const createPortfolio = async (
         }
 
         const response = await fetch(
-            "http://localhost:3000/api/portfolios/create",
+            "http://node2.frokie.it/api/portfolios/create",
             {
                 method: "POST",
                 headers: {
@@ -83,7 +83,7 @@ export const updatePortfolio = async (
         }
 
         const response = await fetch(
-            `http://localhost:3000/api/portfolios/${portfolioId}/update`,
+            `http://node2.frokie.it/api/portfolios/${portfolioId}/update`,
             {
                 method: "PATCH",
                 headers: {
@@ -108,7 +108,7 @@ export const updatePortfolio = async (
 export const deletePortfolio = async (token: string, portfolioId: string) => {
     try {
         const response = await fetch(
-            `http://localhost:3000/api/portfolios/${portfolioId}/delete`,
+            `http://node2.frokie.it/api/portfolios/${portfolioId}/delete`,
             {
                 method: "DELETE",
                 headers: {
@@ -131,7 +131,7 @@ export const deletePortfolio = async (token: string, portfolioId: string) => {
 export const fetchAllPortfolios = async (token: string) => {
     try {
         const response = await fetch(
-            "http://localhost:3000/api/portfolios/list",
+            "http://node2.frokie.it/api/portfolios/list",
             {
                 headers: {
                     Authorization: `Bearer ${token}`,

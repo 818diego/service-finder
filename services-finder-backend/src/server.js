@@ -21,7 +21,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: 'http://152.53.55.46:5173', // Cambia esto a la IP pública y puerto del frontend
+  origin: 'http://152.53.55.46:5173',
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
 }));
 app.use(express.json());
