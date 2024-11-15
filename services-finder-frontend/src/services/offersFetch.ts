@@ -1,5 +1,8 @@
 import { OfferData } from "../types/offer";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
+// Obtener ofertas por ID de cliente
 export const getOffersByClientId = async (token: string) => {
     try {
         const payload = JSON.parse(atob(token.split(".")[1]));
@@ -7,7 +10,7 @@ export const getOffersByClientId = async (token: string) => {
         console.log("clientId:", clientId);
 
         const response = await fetch(
-            `http://localhost:3000/api/job-offers/client/${clientId}`,
+            `${API_URL}/api/job-offers/client/${clientId}`,
             {
                 method: "GET",
                 headers: {
@@ -29,19 +32,17 @@ export const getOffersByClientId = async (token: string) => {
     }
 };
 
+// Crear oferta
 export const createOffer = async (token: string, offerData: OfferData) => {
     try {
-        const response = await fetch(
-            "http://localhost:3000/api/job-offers/create",
-            {
-                method: "POST",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(offerData),
-            }
-        );
+        const response = await fetch(`${API_URL}/api/job-offers/create`, {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(offerData),
+        });
 
         if (!response.ok) {
             throw new Error("Error al crear la oferta");
@@ -55,6 +56,7 @@ export const createOffer = async (token: string, offerData: OfferData) => {
     }
 };
 
+// Actualizar oferta
 export const updateOffer = async (
     token: string,
     offerId: string,
@@ -62,7 +64,7 @@ export const updateOffer = async (
 ) => {
     try {
         const response = await fetch(
-            `http://localhost:3000/api/job-offers/${offerId}/update`,
+            `${API_URL}/api/job-offers/${offerId}/update`,
             {
                 method: "PATCH",
                 headers: {
@@ -85,10 +87,11 @@ export const updateOffer = async (
     }
 };
 
+// Eliminar oferta
 export const deleteOffer = async (token: string, offerId: string) => {
     try {
         const response = await fetch(
-            `http://localhost:3000/api/job-offers/${offerId}/delete`,
+            `${API_URL}/api/job-offers/${offerId}/delete`,
             {
                 method: "DELETE",
                 headers: {
@@ -110,18 +113,16 @@ export const deleteOffer = async (token: string, offerId: string) => {
     }
 };
 
+// Obtener todas las ofertas
 export const getAllOffers = async (token: string) => {
     try {
-        const response = await fetch(
-            "http://localhost:3000/api/job-offers/all",
-            {
-                method: "GET",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "application/json",
-                },
-            }
-        );
+        const response = await fetch(`${API_URL}/api/job-offers/all`, {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
 
         if (!response.ok) {
             throw new Error("Error al obtener las ofertas");

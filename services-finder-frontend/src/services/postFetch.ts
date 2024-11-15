@@ -1,5 +1,7 @@
 import { PostFormInput, PostResponse } from "../types/post";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const createPost = async (
     portfolioId: string,
     data: PostFormInput
@@ -11,10 +13,8 @@ export const createPost = async (
     }
 
     try {
-        console.log("Using portfolio ID:", portfolioId);
-
         const postResponse = await fetch(
-            `http://localhost:3000/api/post/portfolio/${portfolioId}/add-create-posts`,
+            `${API_URL}/api/post/portfolio/${portfolioId}/add-create-posts`,
             {
                 method: "PUT",
                 headers: {
@@ -26,11 +26,8 @@ export const createPost = async (
             }
         );
 
-        const contentType = postResponse.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            const result: PostResponse = await postResponse.json();
-            console.log("Post created successfully:", result);
-            return result;
+        if (postResponse.ok) {
+            return await postResponse.json();
         } else {
             const errorText = await postResponse.text();
             throw new Error(`Unexpected response format: ${errorText}`);
@@ -52,7 +49,7 @@ export const getPostsByPortfolioId = async (
 
     try {
         const postResponse = await fetch(
-            `http://localhost:3000/api/post/portfolio/${portfolioId}/posts`,
+            `${API_URL}/api/post/portfolio/${portfolioId}/posts`,
             {
                 method: "GET",
                 headers: {
@@ -62,11 +59,9 @@ export const getPostsByPortfolioId = async (
                 },
             }
         );
-        const contentType = postResponse.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            const result: PostResponse[] = await postResponse.json();
-            console.log("Posts retrieved successfully:", result);
-            return result;
+
+        if (postResponse.ok) {
+            return await postResponse.json();
         } else {
             const errorText = await postResponse.text();
             throw new Error(`Unexpected response format: ${errorText}`);
@@ -86,7 +81,7 @@ export const deletePost = async (postId: string): Promise<void> => {
 
     try {
         const postResponse = await fetch(
-            `http://localhost:3000/api/post/${postId}/delete`,
+            `${API_URL}/api/post/${postId}/delete`,
             {
                 method: "DELETE",
                 headers: {
@@ -96,6 +91,7 @@ export const deletePost = async (postId: string): Promise<void> => {
                 },
             }
         );
+
         if (!postResponse.ok) {
             const errorText = await postResponse.text();
             throw new Error(`Failed to delete post: ${errorText}`);
@@ -119,7 +115,7 @@ export const updatePost = async (
 
     try {
         const postResponse = await fetch(
-            `http://localhost:3000/api/post/${postId}/update`,
+            `${API_URL}/api/post/${postId}/update`,
             {
                 method: "PATCH",
                 headers: {
@@ -130,11 +126,9 @@ export const updatePost = async (
                 body: JSON.stringify(data),
             }
         );
-        const contentType = postResponse.headers.get("content-type");
-        if (contentType && contentType.includes("application/json")) {
-            const result: PostResponse = await postResponse.json();
-            console.log("Post updated successfully:", result);
-            return result;
+
+        if (postResponse.ok) {
+            return await postResponse.json();
         } else {
             const errorText = await postResponse.text();
             throw new Error(`Unexpected response format: ${errorText}`);

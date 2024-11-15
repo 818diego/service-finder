@@ -1,3 +1,5 @@
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const getUserData = async (): Promise<string> => {
     const token = localStorage.getItem("token");
 
@@ -11,7 +13,7 @@ export const getUserData = async (): Promise<string> => {
 
     try {
         const userResponse = await fetch(
-            `http://localhost:3000/api/users/${userId}`,
+            `${API_URL}/api/users/${userId}`,
             {
                 method: "GET",
                 headers: {
