@@ -108,7 +108,10 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
             ? lastMessage.text
             : "No hay mensajes";
         const time = lastMessage
-            ? new Date(lastMessage.time).toLocaleTimeString()
+            ? new Date(lastMessage.time).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit',
+              })
             : "";
 
         return { displayName, lastMessageText, time };
@@ -137,8 +140,12 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
                         <div
                             key={chat._id}
                             onClick={() => handleSelectChat(chat._id)}
-                            className="flex items-center gap-3 p-3 cursor-pointer transition-colors rounded-md mx-2
-                                       hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm relative">
+                            className={`flex items-center gap-3 p-3 cursor-pointer transition-colors rounded-md mx-2
+                                       hover:bg-gray-100 dark:hover:bg-gray-800 hover:shadow-sm relative ${
+                                           chat._id === selectedChatId
+                                               ? "bg-gray-200 dark:bg-gray-700"
+                                               : ""
+                                       }`}>
                             <img
                                 src="/src/assets/images/1.jpg"
                                 alt={displayName}

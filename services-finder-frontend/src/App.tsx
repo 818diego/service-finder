@@ -8,19 +8,16 @@ import {
 } from "react-router-dom";
 import { AppRoutes } from "./RoutesConfig";
 import Navbar from "./components/NavBar";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { SocketProvider } from "./Context/SocketContext";
 
 const AppContent: React.FC = () => {
     const location = useLocation();
-    const isChatPage = location.pathname.startsWith("/chats");
+    const isChatPage = location.pathname === "/chats";
     const isHomePage = location.pathname === "/";
 
     return (
         <div
             className={`min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300 ease-in-out`}>
-            <ToastContainer />
             <Navbar />
             <div
                 className={

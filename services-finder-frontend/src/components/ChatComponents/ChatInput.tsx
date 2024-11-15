@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, KeyboardEvent } from "react";
 import {
     Plus,
     Send,
@@ -26,6 +26,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
     disabled,
 }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+
+    const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && !disabled) {
+            onSendMessage();
+        }
+    };
 
     return (
         <div className="bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 relative shadow-md">
@@ -83,6 +89,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-full px-4 py-2 focus:outline-none shadow-inner"
                 value={messageText}
                 onChange={onMessageChange}
+                onKeyPress={handleKeyPress}
                 disabled={disabled}
             />
             <button
