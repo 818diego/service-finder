@@ -2,7 +2,7 @@ import axios from "axios";
 import { User, RegisterResponse } from "../types/users";
 
 const apiClient = axios.create({
-    baseURL: "http://node2.frokie.it/api/auth",
+    baseURL: "http://node2.frokie.it:3000/api/auth",
     headers: {
         "Content-Type": "application/json",
     },

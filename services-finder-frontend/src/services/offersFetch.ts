@@ -7,7 +7,7 @@ export const getOffersByClientId = async (token: string) => {
         console.log("clientId:", clientId);
 
         const response = await fetch(
-            `http://node2.frokie.it/api/job-offers/client/${clientId}`,
+            `http://node2.frokie.it:3000/api/job-offers/client/${clientId}`,
             {
                 method: "GET",
                 headers: {
@@ -32,7 +32,7 @@ export const getOffersByClientId = async (token: string) => {
 export const createOffer = async (token: string, offerData: OfferData) => {
     try {
         const response = await fetch(
-            "http://node2.frokie.it/api/job-offers/create",
+            "http://node2.frokie.it:3000/api/job-offers/create",
             {
                 method: "POST",
                 headers: {
@@ -62,7 +62,7 @@ export const updateOffer = async (
 ) => {
     try {
         const response = await fetch(
-            `http://node2.frokie.it/api/job-offers/${offerId}/update`,
+            `http://node2.frokie.it:3000/api/job-offers/${offerId}/update`,
             {
                 method: "PATCH",
                 headers: {
@@ -88,7 +88,7 @@ export const updateOffer = async (
 export const deleteOffer = async (token: string, offerId: string) => {
     try {
         const response = await fetch(
-            `http://node2.frokie.it/api/job-offers/${offerId}/delete`,
+            `http://node2.frokie.it:3000/api/job-offers/${offerId}/delete`,
             {
                 method: "DELETE",
                 headers: {
@@ -113,7 +113,7 @@ export const deleteOffer = async (token: string, offerId: string) => {
 export const getAllOffers = async (token: string) => {
     try {
         const response = await fetch(
-            "http://node2.frokie.it/api/job-offers/all",
+            "http://node2.frokie.it:3000/api/job-offers/all",
             {
                 method: "GET",
                 headers: {

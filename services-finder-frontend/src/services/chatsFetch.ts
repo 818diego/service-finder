@@ -7,7 +7,7 @@ export const createChat = async (
     token: string
 ) => {
     try {
-        const response = await fetch("http://node2.frokie.it/api/chats/create", {
+        const response = await fetch("http://node2.frokie.it:3000/api/chats/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -39,7 +39,7 @@ export const fetchUserChats = async (): Promise<ChatResponse[]> => {
         }
 
         const response = await fetch(
-            `http://node2.frokie.it/api/chats/user-chats`,
+            `http://node2.frokie.it:3000/api/chats/user-chats`,
             {
                 method: "GET",
                 headers: {
@@ -71,7 +71,7 @@ export const getUserStatus = async (userId: string) => {
         }
 
         const response = await fetch(
-            `http://node2.frokie.it/api/chats/status/${userId}`,
+            `http://node2.frokie.it:3000/api/chats/status/${userId}`,
             {
                 method: "GET",
                 headers: {
@@ -101,7 +101,7 @@ export const fetchChatById = async (id: string): Promise<ChatResponse> => {
     console.log("Fetching chat with ID:", id); // Debug
     const token = localStorage.getItem("authToken");
 
-    const response = await fetch(`http://node2.frokie.it/api/chats/${id}`, {
+    const response = await fetch(`http://node2.frokie.it:3000/api/chats/${id}`, {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -125,7 +125,7 @@ export const sendMessage = async (
 ) => {
     try {
         const response = await fetch(
-            `http://node2.frokie.it/api/chats/send-message`,
+            `http://node2.frokie.it:3000/api/chats/send-message`,
             {
                 method: "POST",
                 headers: {
@@ -157,7 +157,7 @@ export const updateChatStatus = async (
 ) => {
     try {
         const response = await fetch(
-            `http://node2.frokie.it/api/chats/update-status/${chatId}`,
+            `http://node2.frokie.it:3000/api/chats/update-status/${chatId}`,
             {
                 method: "POST",
                 headers: {
@@ -185,7 +185,7 @@ export const updateChatStatus = async (
 export const deleteChat = async (chatId: string, token: string) => {
     try {
         const response = await fetch(
-            `http://node2.frokie.it/api/chats/delete/${chatId}`,
+            `http://node2.frokie.it:3000/api/chats/delete/${chatId}`,
             {
                 method: "DELETE",
                 headers: {

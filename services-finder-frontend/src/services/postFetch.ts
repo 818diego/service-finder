@@ -14,7 +14,7 @@ export const createPost = async (
         console.log("Using portfolio ID:", portfolioId);
 
         const postResponse = await fetch(
-            `http://node2.frokie.it/api/post/portfolio/${portfolioId}/add-create-posts`,
+            `http://node2.frokie.it:3000/api/post/portfolio/${portfolioId}/add-create-posts`,
             {
                 method: "PUT",
                 headers: {
@@ -52,7 +52,7 @@ export const getPostsByPortfolioId = async (
 
     try {
         const postResponse = await fetch(
-            `http://node2.frokie.it/api/post/portfolio/${portfolioId}/posts`,
+            `http://node2.frokie.it:3000/api/post/portfolio/${portfolioId}/posts`,
             {
                 method: "GET",
                 headers: {
@@ -86,7 +86,7 @@ export const deletePost = async (postId: string): Promise<void> => {
 
     try {
         const postResponse = await fetch(
-            `http://node2.frokie.it/api/post/${postId}/delete`,
+            `http://node2.frokie.it:3000/api/post/${postId}/delete`,
             {
                 method: "DELETE",
                 headers: {
@@ -119,7 +119,7 @@ export const updatePost = async (
 
     try {
         const postResponse = await fetch(
-            `http://node2.frokie.it/api/post/${postId}/update`,
+            `http://node2.frokie.it:3000/api/post/${postId}/update`,
             {
                 method: "PATCH",
                 headers: {
