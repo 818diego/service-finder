@@ -8,7 +8,7 @@ const configureSocket = (server) => {
 
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173", // Allow requests from your frontend
+      origin: "http://node2.frokie.it:5173", // Allow requests from your frontend
       methods: ["GET", "POST"],
     },
   });

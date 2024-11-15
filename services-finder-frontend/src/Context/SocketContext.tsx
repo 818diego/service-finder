@@ -43,7 +43,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 setUser(decoded);
 
                 // Inicializar Socket.IO client
-                socketRef.current = io("http://localhost:3000", {
+                socketRef.current = io("http://node2.frokie.it:3000", {
                     auth: { token },
                 });
 
