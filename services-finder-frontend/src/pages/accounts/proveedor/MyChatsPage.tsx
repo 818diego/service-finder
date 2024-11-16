@@ -98,6 +98,7 @@ const MyChatsPage: React.FC = () => {
             socket.off("receiveMessage", handleReceiveMessage);
             socket.off("userStatus", handleUserStatus);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         socket,
         selectedChat?._id,
@@ -233,27 +234,30 @@ const MyChatsPage: React.FC = () => {
     const closeConfirmModal = () => setShowConfirmModal(false);
 
     return (
-        <div className="flex justify-center items-center h-[85vh] bg-gray-100 dark:bg-gray-900 px-1">
-            <div className="flex h-full w-full bg-white dark:bg-gray-800 rounded-lg">
+        <div className="flex justify-center items-center w-full h-[85vh] bg-gray-100 dark:bg-gray-900 px-2 sm:px-4">
+            <div className="flex h-full w-[100%] max-w-8xl bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
                 <ChatList onSelectChat={handleSelectChat} />
-                <div className="flex-1 flex flex-col">
+                <div className="flex-1 flex flex-col min-w-0">
                     {selectedChat ? (
                         <>
                             <ChatHeader
                                 name={
-                                    selectedChat.clientId.username ||
-                                    selectedChat.providerId.username
+                                    userType === "Cliente"
+                                        ? selectedChat.providerId.username
+                                        : selectedChat.clientId.username
                                 }
                                 online={onlineStatus.online}
                                 lastSeen={onlineStatus.lastSeen}
                                 onDeleteChat={openConfirmModal}
                                 chatId={selectedChat._id}
                                 userId={
-                                    selectedChat.clientId._id !== currentUserId
-                                        ? selectedChat.clientId._id || ""
-                                        : selectedChat.providerId._id || ""
+                                    userType === "Cliente"
+                                        ? selectedChat.providerId._id || ""
+                                        : selectedChat.clientId._id || ""
                                 }
+                                isProvider={false}
                             />
+
                             {showConfirmModal && (
                                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                                     <div className="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
@@ -276,7 +280,8 @@ const MyChatsPage: React.FC = () => {
                                     </div>
                                 </div>
                             )}
-                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative">
+
+                            <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative max-w-full">
                                 {selectedChat.messages.map((msg) => {
                                     const sentBy =
                                         msg.sentBy === selectedChat.clientId._id
@@ -284,7 +289,10 @@ const MyChatsPage: React.FC = () => {
                                             : "Proveedor";
                                     const formattedTime = new Date(
                                         msg.time
-                                    ).toLocaleTimeString();
+                                    ).toLocaleTimeString([], {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                    });
                                     const isStatusMessage =
                                         msg.text.includes(
                                             "El proveedor ha aceptado el chat."
@@ -314,6 +322,7 @@ const MyChatsPage: React.FC = () => {
                                 })}
                                 <div ref={chatEndRef} />
                             </div>
+
                             {selectedChat.status === "pending" &&
                                 userType === "Cliente" && (
                                     <div className="p-4 bg-yellow-400 dark:bg-yellow-600 text-black dark:text-white rounded-lg shadow-lg text-center">
@@ -350,6 +359,7 @@ const MyChatsPage: React.FC = () => {
                                         </div>
                                     </div>
                                 )}
+
                             <ChatInput
                                 userType={userType}
                                 messageText={messageText}

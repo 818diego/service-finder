@@ -1,0 +1,18 @@
+.status-enter {
+    opacity: 0;
+    transform: scale(0.9);
+}
+.status-enter-active {
+    opacity: 1;
+    transform: scale(1);
+    transition: opacity 300ms, transform 300ms;
+}
+.status-exit {
+    opacity: 1;
+    transform: scale(1);
+}
+.status-exit-active {
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 300ms, transform 300ms;
+}

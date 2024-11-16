@@ -1,5 +1,7 @@
 import { ChatResponse } from "../types/chats";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 // Crear un chat
 export const createChat = async (
     serviceId: string,
@@ -7,7 +9,7 @@ export const createChat = async (
     token: string
 ) => {
     try {
-        const response = await fetch("http://node2.frokie.it:3000/api/chats/create", {
+        const response = await fetch(`${API_URL}/api/chats/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -29,7 +31,7 @@ export const createChat = async (
     }
 };
 
-//Obtener los chats del usuario
+// Obtener los chats del usuario
 export const fetchUserChats = async (): Promise<ChatResponse[]> => {
     try {
         const token = localStorage.getItem("authToken");
@@ -38,16 +40,13 @@ export const fetchUserChats = async (): Promise<ChatResponse[]> => {
             throw new Error("Token no encontrado. Por favor inicie sesión.");
         }
 
-        const response = await fetch(
-            `http://node2.frokie.it:3000/api/chats/user-chats`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        const response = await fetch(`${API_URL}/api/chats/user-chats`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
         if (!response.ok) {
             throw new Error("Error al obtener los chats del usuario");
@@ -61,7 +60,7 @@ export const fetchUserChats = async (): Promise<ChatResponse[]> => {
     }
 };
 
-//Obtener el Status de un usuario del chat
+// Obtener el Status de un usuario del chat
 export const getUserStatus = async (userId: string) => {
     try {
         const token = localStorage.getItem("authToken");
@@ -70,16 +69,13 @@ export const getUserStatus = async (userId: string) => {
             throw new Error("Token no encontrado. Por favor inicie sesión.");
         }
 
-        const response = await fetch(
-            `http://node2.frokie.it:3000/api/chats/status/${userId}`,
-            {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        const response = await fetch(`${API_URL}/api/chats/status/${userId}`, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => null);
@@ -96,12 +92,12 @@ export const getUserStatus = async (userId: string) => {
     }
 };
 
-//Obtener un chat por ID
+// Obtener un chat por ID
 export const fetchChatById = async (id: string): Promise<ChatResponse> => {
     console.log("Fetching chat with ID:", id); // Debug
     const token = localStorage.getItem("authToken");
 
-    const response = await fetch(`http://node2.frokie.it:3000/api/chats/${id}`, {
+    const response = await fetch(`${API_URL}/api/chats/${id}`, {
         headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -117,24 +113,21 @@ export const fetchChatById = async (id: string): Promise<ChatResponse> => {
     return chatData;
 };
 
-//Enviar un mensaje a un chat específico
+// Enviar un mensaje a un chat específico
 export const sendMessage = async (
     chatId: string,
     text: string,
     token: string
 ) => {
     try {
-        const response = await fetch(
-            `http://node2.frokie.it:3000/api/chats/send-message`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({ chatId, text }),
-            }
-        );
+        const response = await fetch(`${API_URL}/api/chats/send-message`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ chatId, text }),
+        });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => null);
@@ -149,7 +142,7 @@ export const sendMessage = async (
     }
 };
 
-//Actualizar el estado de un chat
+// Actualizar el estado de un chat
 export const updateChatStatus = async (
     chatId: string,
     action: "accept" | "reject",
@@ -157,7 +150,7 @@ export const updateChatStatus = async (
 ) => {
     try {
         const response = await fetch(
-            `http://node2.frokie.it:3000/api/chats/update-status/${chatId}`,
+            `${API_URL}/api/chats/update-status/${chatId}`,
             {
                 method: "POST",
                 headers: {
@@ -181,19 +174,16 @@ export const updateChatStatus = async (
     }
 };
 
-//Eliminar un chat por ID
+// Eliminar un chat por ID
 export const deleteChat = async (chatId: string, token: string) => {
     try {
-        const response = await fetch(
-            `http://node2.frokie.it:3000/api/chats/delete/${chatId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        );
+        const response = await fetch(`${API_URL}/api/chats/delete/${chatId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => null);

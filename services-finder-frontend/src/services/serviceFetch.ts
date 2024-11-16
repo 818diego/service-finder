@@ -1,5 +1,7 @@
 import { Service, ServiceForm } from "../types/service";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const createService = async (
     data: ServiceForm,
     token: string
@@ -15,7 +17,7 @@ export const createService = async (
         data.images.forEach((file) => formData.append("images", file));
     }
 
-    const response = await fetch(`http://node2.frokie.it:3000/api/services/create`, {
+    const response = await fetch(`${API_URL}/api/services/create`, {
         method: "POST",
         headers: {
             Authorization: `Bearer ${token}`,
@@ -38,7 +40,7 @@ export const fetchServices = async (
     token: string
 ): Promise<Service[]> => {
     const response = await fetch(
-        `http://node2.frokie.it:3000/api/services/portfolio/${portfolioId}`,
+        `${API_URL}/api/services/portfolio/${portfolioId}`,
         {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -72,7 +74,6 @@ export const updateService = async (
         data.images.forEach((file) => formData.append("images", file));
     }
 
-    // Añadir las URLs de imágenes a eliminar si existen
     if (data.removeImageUrls && data.removeImageUrls.length > 0) {
         formData.append(
             "removeImageUrls",
@@ -81,7 +82,7 @@ export const updateService = async (
     }
 
     const response = await fetch(
-        `http://node2.frokie.it:3000/api/services/${serviceId}/update`,
+        `${API_URL}/api/services/${serviceId}/update`,
         {
             method: "PATCH",
             headers: {
@@ -106,7 +107,7 @@ export const deleteService = async (
     token: string
 ): Promise<void> => {
     const response = await fetch(
-        `http://node2.frokie.it:3000/api/services/${serviceId}/delete`,
+        `${API_URL}/api/services/${serviceId}/delete`,
         {
             method: "DELETE",
             headers: {
@@ -124,7 +125,7 @@ export const deleteService = async (
 };
 
 export const fetchAllService = async (token: string): Promise<Service[]> => {
-    const response = await fetch(`http://node2.frokie.it:3000/api/services/`, {
+    const response = await fetch(`${API_URL}/api/services/`, {
         headers: {
             Authorization: `Bearer ${token}`,
         },

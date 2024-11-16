@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Trash2, ShieldAlert, Lock, Archive } from "lucide-react";
 import { useSocket } from "../../Context/SocketContext";
 import { getUserStatus } from "../../services/chatsFetch";
+import { CSSTransition } from "react-transition-group";
+import "./ChatHeader.css";
 
 interface ChatHeaderProps {
     name: string;
@@ -9,8 +11,9 @@ interface ChatHeaderProps {
     online: boolean;
     lastSeen: string;
     chatId: string;
-    userId: string; // Add userId prop
-    onDeleteChat: () => void; // Función para abrir el modal de confirmación desde el componente principal
+    userId: string;
+    isProvider: boolean;
+    onDeleteChat: () => void;
 }
 
 const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -18,7 +21,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     image,
     online,
     lastSeen,
-    userId, // Use userId prop
+    userId,
     onDeleteChat,
 }) => {
     const { socket } = useSocket();
@@ -28,7 +31,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     useEffect(() => {
         const fetchUserStatus = async () => {
             try {
-                const status = await getUserStatus(userId); // Use userId
+                const status = await getUserStatus(userId);
                 setIsOnline(status.isOnline);
                 setLastSeenTime(status.lastSeen);
             } catch (error) {
@@ -46,7 +49,6 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             lastSeen: string;
         }) => {
             if (data.userId === userId) {
-                // Use userId
                 setIsOnline(data.isOnline);
                 setLastSeenTime(data.lastSeen);
             }
@@ -57,7 +59,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         return () => {
             socket.off("userStatus", handleUserStatus);
         };
-    }, [socket, userId]); // Use userId
+    }, [socket, userId]);
 
     return (
         <div>
@@ -65,7 +67,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
             <div className="bg-white dark:bg-gray-800 p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 shadow-md">
                 <div className="flex items-center gap-3">
                     <img
-                        src={image}
+                        src={image || "src/assets/images/perfil.png"}
                         alt={name}
                         className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700"
                     />
@@ -73,21 +75,29 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
                             {name}
                         </h2>
-                        <p
-                            className="text-sm"
-                            style={{ color: isOnline ? "green" : "gray" }}>
-                            {isOnline
-                                ? "En línea"
-                                : `Última vez: ${
-                                      lastSeenTime || "Desconocido"
-                                  }`}
-                        </p>
+                        <CSSTransition
+                            in={isOnline}
+                            timeout={300}
+                            classNames="status"
+                            unmountOnExit>
+                            <p
+                                className="text-sm"
+                                style={{ color: isOnline ? "green" : "gray" }}>
+                                {isOnline
+                                    ? "En línea"
+                                    : `Última vez: ${
+                                          lastSeenTime
+                                              ? lastSeenTime
+                                              : "Desconocido"
+                                      }`}
+                            </p>
+                        </CSSTransition>
                     </div>
                 </div>
                 <div className="flex gap-2">
                     {/* Botón para abrir el modal de confirmación */}
                     <button
-                        onClick={onDeleteChat} // Llama a la función pasada como prop
+                        onClick={onDeleteChat}
                         className="p-2 bg-red-500 text-white rounded-full transition-colors hover:bg-red-600">
                         <Trash2 className="h-5 w-5" />
                     </button>

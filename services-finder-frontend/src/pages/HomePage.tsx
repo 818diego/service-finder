@@ -117,12 +117,13 @@ const Home: React.FC = () => {
                 </div>
             )}
             {userType === null && (
-                <div className="flex flex-col items-center justify-center h-full text-center">
-                    <h1 className="text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-3">
+                <div className="flex flex-col items-center justify-center text-center">
+                    <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-200 mb-4">
                         Bienvenido a Services Finder
                     </h1>
-                    <p className="text-md text-gray-600 dark:text-gray-400">
-                        Descubre los mejores servicios en tu área
+                    <p className="text-xl text-gray-600 dark:text-gray-400">
+                        Descubre los mejores servicios en tu área con solo unos
+                        clics
                     </p>
                 </div>
             )}

@@ -1,13 +1,16 @@
 import axios from "axios";
 import { User, RegisterResponse } from "../types/users";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const apiClient = axios.create({
-    baseURL: "http://node2.frokie.it:3000/api/auth",
+    baseURL: `${API_URL}/api/auth`,
     headers: {
         "Content-Type": "application/json",
     },
 });
 
+// Registrar usuario
 export const registerUser = async (data: User): Promise<RegisterResponse> => {
     try {
         const response = await apiClient.post<RegisterResponse>(
@@ -23,6 +26,7 @@ export const registerUser = async (data: User): Promise<RegisterResponse> => {
     }
 };
 
+// Iniciar sesión de usuario
 export const loginUser = async (data: User): Promise<RegisterResponse> => {
     try {
         const response = await apiClient.post<RegisterResponse>("/login", data);
