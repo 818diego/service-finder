@@ -5,7 +5,7 @@ export default {
   theme: {
     extend: {
       blur: {
-        'xs': '2px', // Define un nivel de desenfoque muy ligero
+        'xs': '2px',
       }
     }
   },
