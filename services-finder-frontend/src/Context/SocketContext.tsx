@@ -9,6 +9,7 @@ import { io, Socket } from "socket.io-client";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 interface DecodedToken {
     _id: string;
@@ -45,7 +46,8 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 setUser(decoded);
 
                 // Inicializar Socket.IO client
-                socketRef.current = io("http://node2.frokie.it:3000", {
+                socketRef.current = io(VITE_API_URL, {
+                    // Update this line
                     auth: { token },
                 });
 
