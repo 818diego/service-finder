@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import ModalOffers from "../../../components/MyOfferPage/ModalOffers";
+import ModalOffer from "../../../components/MyOfferPage/ModalOffers";
 import OfferCard from "../../../components/MyOfferPage/OfferCard";
-import { OfferData, OfferResponse } from "../../../types/offer";
+import { Offer, OfferForm } from "../../../types/offer";
 import {
     createOffer,
     getOffersByClientId,
@@ -15,90 +15,117 @@ const OffersPage: React.FC = () => {
     const [modalMode, setModalMode] = useState<"create" | "edit" | "delete">(
         "create"
     );
-    const [selectedOffer, setSelectedOffer] = useState<OfferResponse | null>(
-        null
-    );
-    const [offers, setOffers] = useState<OfferResponse[]>([]);
+    const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+    const [offers, setOffers] = useState<Offer[]>([]);
     const token = localStorage.getItem("token") || "";
 
+    /**
+     * Obtener las ofertas del cliente al cargar la página
+     */
     const fetchOffers = async () => {
         try {
-            const offers = await getOffersByClientId(token);
-            setOffers(offers);
-            console.log("Ofertas obtenidas:", offers);
+            const fetchedOffers = await getOffersByClientId(token);
+            setOffers(fetchedOffers);
+            console.log("Ofertas obtenidas:", fetchedOffers);
         } catch (error) {
             console.error("Error al obtener ofertas:", error);
+            toast.error("Error al obtener las ofertas");
         }
     };
 
     useEffect(() => {
-        fetchOffers();
+        if (token) {
+            fetchOffers();
+        }
     }, [token]);
 
+    /**
+     * Abrir el modal en modo creación
+     */
     const openCreateModal = () => {
         setModalMode("create");
         setSelectedOffer(null);
         setIsModalOpen(true);
     };
 
-    const openEditModal = (offer: OfferResponse) => {
+    /**
+     * Abrir el modal en modo edición con la oferta seleccionada
+     * @param offer - Oferta a editar
+     */
+    const openEditModal = (offer: Offer) => {
         setModalMode("edit");
         setSelectedOffer(offer);
         setIsModalOpen(true);
     };
 
-    const openDeleteModal = (offer: OfferResponse) => {
+    /**
+     * Abrir el modal en modo eliminación con la oferta seleccionada
+     * @param offer - Oferta a eliminar
+     */
+    const openDeleteModal = (offer: Offer) => {
         setModalMode("delete");
         setSelectedOffer(offer);
         setIsModalOpen(true);
     };
 
-    const handleConfirm = async (
-        offerData: OfferData,
-        resetForm: () => void
-    ) => {
+    /**
+     * Manejar la confirmación de creación o edición de una oferta
+     * @param offerData - Datos de la oferta
+     */
+    const handleConfirm = async (offerData: OfferForm) => {
         if (modalMode === "create") {
             try {
-                const response = await createOffer(token, offerData);
-                console.log("Offer created:", response);
+                const newOffer = await createOffer(token, offerData);
+                console.log("Oferta creada:", newOffer);
                 toast.success("Oferta creada exitosamente");
-                resetForm();
+                setOffers((prevOffers) => [...prevOffers, newOffer]);
             } catch (error) {
                 console.error("Error al crear la oferta:", error);
+                toast.error("Error al crear la oferta");
             }
         } else if (modalMode === "edit" && selectedOffer) {
             try {
-                const offerId = selectedOffer._id;
-                const response = await updateOffer(token, offerId, offerData);
-                console.log("Offer updated:", response);
+                const updatedOffer = await updateOffer(
+                    token,
+                    selectedOffer._id,
+                    offerData
+                );
+                console.log("Oferta actualizada:", updatedOffer);
                 toast.success("Oferta actualizada exitosamente");
+                setOffers((prevOffers) =>
+                    prevOffers.map((offer) =>
+                        offer._id === selectedOffer._id ? updatedOffer : offer
+                    )
+                );
             } catch (error) {
-                console.error("Error updating offer:", error);
+                console.error("Error al actualizar la oferta:", error);
                 toast.error("Error al actualizar la oferta");
             }
         }
         setIsModalOpen(false);
-        fetchOffers();
     };
 
+    /**
+     * Manejar la eliminación de una oferta
+     */
     const handleDelete = async () => {
         if (selectedOffer) {
             try {
                 await deleteOffer(token, selectedOffer._id);
-                console.log("Offer deleted:", selectedOffer);
+                console.log("Oferta eliminada:", selectedOffer);
                 toast.success("Oferta eliminada exitosamente");
+                setOffers((prevOffers) =>
+                    prevOffers.filter(
+                        (offer) => offer._id !== selectedOffer._id
+                    )
+                );
             } catch (error) {
                 console.error("Error al eliminar la oferta:", error);
                 toast.error("Error al eliminar la oferta");
             }
         }
         setIsModalOpen(false);
-        fetchOffers();
     };
-
-    function resetForm(): void {
-        throw new Error("Function not implemented.");
-    }
 
     return (
         <div className="space-y-5">
@@ -106,16 +133,17 @@ const OffersPage: React.FC = () => {
                 <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-                            Offers
+                            Ofertas
                         </h1>
                         <p className="mt-1 max-w-2xl text-sm text-gray-500 dark:text-gray-300">
-                            This is the Offers page for the services finder app.
+                            Esta es la página de Ofertas para la aplicación de
+                            búsqueda de servicios.
                         </p>
                     </div>
                     <button
                         onClick={openCreateModal}
-                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 ">
-                        Create Offer
+                        className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 dark:hover:bg-blue-700 transition duration-200 ease-in-out">
+                        Crear Oferta
                     </button>
                 </div>
             </div>
@@ -128,26 +156,19 @@ const OffersPage: React.FC = () => {
                         offer={offer}
                         onEdit={() => openEditModal(offer)}
                         onDelete={() => openDeleteModal(offer)}
+                        isEditable={true}
                     />
                 ))}
             </div>
 
             {/* Modal de Oferta */}
-            <ModalOffers
+            <ModalOffer
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onConfirm={(offerData) => handleConfirm(offerData, resetForm)}
+                onConfirm={handleConfirm}
                 onDelete={handleDelete}
                 mode={modalMode}
-                initialData={
-                    selectedOffer
-                        ? {
-                              ...selectedOffer,
-                              status: selectedOffer.status === "active",
-                          }
-                        : undefined
-                }
-                resetForm={resetForm}
+                initialData={selectedOffer || undefined}
             />
         </div>
     );

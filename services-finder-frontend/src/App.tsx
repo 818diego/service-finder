@@ -9,6 +9,8 @@ import {
 import { AppRoutes } from "./RoutesConfig";
 import Navbar from "./components/NavBar";
 import { SocketProvider } from "./Context/SocketContext";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const AppContent: React.FC = () => {
     const location = useLocation();
@@ -18,6 +20,7 @@ const AppContent: React.FC = () => {
     return (
         <div
             className={`min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 transition-colors duration-300 ease-in-out`}>
+            <ToastContainer />
             <Navbar />
             <div
                 className={

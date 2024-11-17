@@ -3,6 +3,10 @@ import PortfolioCardClient from "../components/ClientComponents/PortfolioCardCli
 import { createChat } from "../services/chatsFetch";
 import { fetchAllService } from "../services/serviceFetch";
 import { Service } from "../types/service";
+import OfferCard from "../components/MyOfferPage/OfferCard";
+import { Offer } from "../types/offer";
+import { getAllOffers } from "../services/offersFetch";
+import Modal from "../components/Modal";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
@@ -10,6 +14,9 @@ const Home: React.FC = () => {
     );
     const [services, setServices] = useState<Service[]>([]);
     const [error, setError] = useState<string | null>(null);
+    const [offers, setOffers] = useState<Offer[]>([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -51,6 +58,23 @@ const Home: React.FC = () => {
         fetchServices();
     }, [userType]);
 
+    useEffect(() => {
+        const fetchOffers = async () => {
+            const token = localStorage.getItem("token");
+            if (token && userType === "Proveedor") {
+                try {
+                    const offers = await getAllOffers(token);
+                    setOffers(offers);
+                } catch (error) {
+                    console.error("Error fetching offers:", error);
+                    setError("Error loading offers.");
+                }
+            }
+        };
+
+        fetchOffers();
+    }, [userType]);
+
     const handleSendProposalClick = async (
         serviceId: string,
         initialMessage: string
@@ -82,6 +106,23 @@ const Home: React.FC = () => {
         }
     };
 
+    const handleSendOfferClick = (offer: Offer) => {
+        setSelectedOffer(offer);
+        setIsModalOpen(true);
+    };
+
+    const handleModalClose = () => {
+        setIsModalOpen(false);
+        setSelectedOffer(null);
+    };
+
+    const handleModalSubmit = (message: string) => {
+        if (selectedOffer) {
+            handleSendProposalClick(selectedOffer._id, message);
+        }
+        handleModalClose();
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
             {userType === "Proveedor" && (
@@ -89,6 +130,22 @@ const Home: React.FC = () => {
                     <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                         Aquí son las ofertas de un cliente
                     </h2>
+                    {error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                            {offers.map((offer) => (
+                                <OfferCard
+                                    key={offer._id}
+                                    offer={offer}
+                                    isEditable={false}
+                                    sendOffer={() =>
+                                        handleSendOfferClick(offer)
+                                    } // Modify this line
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
             {userType === "Cliente" && (
@@ -126,6 +183,13 @@ const Home: React.FC = () => {
                         clics
                     </p>
                 </div>
+            )}
+            {isModalOpen && (
+                <Modal
+                    title="Escribe tu oferta para el cliente"
+                    onClose={handleModalClose}
+                    onSubmit={handleModalSubmit}
+                />
             )}
         </div>
     );
