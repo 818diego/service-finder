@@ -123,50 +123,54 @@ const Navbar: React.FC = () => {
                             </span>
                         )}
                         {/* Icono de notificaciones */}
-                        <div className="relative">
-                            <Tooltip text="Notifications">
-                                <button
-                                    onClick={toggleNotifications}
-                                    className="relative">
-                                    <Bell className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400 cursor-pointer" />
-                                    {notificationCount > 0 && (
-                                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                                            {notificationCount}
-                                        </span>
-                                    )}
-                                </button>
-                            </Tooltip>
-                            {/* Dropdown de notificaciones */}
-                            <AnimatePresence>
-                                {isNotificationsOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, y: -10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -10 }}
-                                        transition={{
-                                            duration: 0.3,
-                                            ease: "easeOut",
-                                        }}
-                                        className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-4 z-50">
-                                        {notifications.length > 0 ? (
-                                            notifications.map(
-                                                (notif, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="text-sm text-gray-700 dark:text-gray-300 mb-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
-                                                        {notif.message}
-                                                    </div>
-                                                )
-                                            )
-                                        ) : (
-                                            <p className="text-gray-500 dark:text-gray-400 text-sm text-center">
-                                                No hay notificaciones
-                                            </p>
+                        {user &&
+                            (user.userType === "Cliente" ||
+                                user.userType === "Proveedor") && (
+                                <div className="relative">
+                                    <Tooltip text="Notifications">
+                                        <button
+                                            onClick={toggleNotifications}
+                                            className="relative">
+                                            <Bell className="h-6 w-6 text-gray-400 dark:text-gray-300 hover:text-yellow-500 dark:hover:text-yellow-400 cursor-pointer" />
+                                            {notificationCount > 0 && (
+                                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
+                                                    {notificationCount}
+                                                </span>
+                                            )}
+                                        </button>
+                                    </Tooltip>
+                                    {/* Dropdown de notificaciones */}
+                                    <AnimatePresence>
+                                        {isNotificationsOpen && (
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                transition={{
+                                                    duration: 0.3,
+                                                    ease: "easeOut",
+                                                }}
+                                                className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg p-4 z-50">
+                                                {notifications.length > 0 ? (
+                                                    notifications.map(
+                                                        (notif, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="text-sm text-gray-700 dark:text-gray-300 mb-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                                                                {notif.message}
+                                                            </div>
+                                                        )
+                                                    )
+                                                ) : (
+                                                    <p className="text-gray-500 dark:text-gray-400 text-sm text-center">
+                                                        No hay notificaciones
+                                                    </p>
+                                                )}
+                                            </motion.div>
                                         )}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </div>
+                                    </AnimatePresence>
+                                </div>
+                            )}
                         <div className="relative" ref={dropdownRef}>
                             {user ? (
                                 <div className="flex items-center space-x-4">

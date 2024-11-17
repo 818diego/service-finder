@@ -45,7 +45,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 setUser(decoded);
 
                 // Inicializar Socket.IO client
-                socketRef.current = io("http://localhost:3000", {
+                socketRef.current = io(import.meta.env.VITE_API_URL, {
                     auth: { token },
                 });
 

@@ -1,19 +1,21 @@
-export interface OfferData {
+export interface OfferForm {
     title: string;
     description: string;
     category: string;
     budget: number;
-    status: boolean;
+    status: string;
     images: string[];
+    removeImageUrls?: string[];
+    files?: File[];
 }
 
-export interface OfferResponse {
+export interface Offer {
     client: string;
     title: string;
     description: string;
     category: string;
     budget: number;
-    status: string; // "Activo" o "No disponible"
+    status: string;
     images: string[];
     _id: string;
     createdAt: string;
