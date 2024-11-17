@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
-import PortfolioCardClient from "../components/ClientComponents/PortfolioCardClient";
-import { createChat } from "../services/chatsFetch";
-import { fetchAllService } from "../services/serviceFetch";
-import { Service } from "../types/service";
 import OfferCard from "../components/MyOfferPage/OfferCard";
 import { Offer } from "../types/offer";
 import { getAllOffers } from "../services/offersFetch";
-import Modal from "../components/Modal";
+import { fetchAllPortfolios } from "../services/portfolioFetch";
+import { Portfolio } from "../types/portfolio";
+import PortfolioCard from "../components/MyPortfoliosPage/PortfolioCard";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
         null
     );
-    const [services, setServices] = useState<Service[]>([]);
+    const [username, setUsername] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [offers, setOffers] = useState<Offer[]>([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+    const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -28,6 +25,7 @@ const Home: React.FC = () => {
                     payload.userType === "Cliente"
                 ) {
                     setUserType(payload.userType);
+                    setUsername(payload.username);
                 } else {
                     setUserType(null);
                 }
@@ -40,23 +38,6 @@ const Home: React.FC = () => {
             setUserType(null);
         }
     }, []);
-
-    useEffect(() => {
-        const fetchServices = async () => {
-            const token = localStorage.getItem("token");
-            if (token && userType === "Cliente") {
-                try {
-                    const services = await fetchAllService(token);
-                    setServices(services as Service[]);
-                } catch (error) {
-                    console.error("Error fetching services:", error);
-                    setError("Error loading services.");
-                }
-            }
-        };
-
-        fetchServices();
-    }, [userType]);
 
     useEffect(() => {
         const fetchOffers = async () => {
@@ -75,53 +56,22 @@ const Home: React.FC = () => {
         fetchOffers();
     }, [userType]);
 
-    const handleSendProposalClick = async (
-        serviceId: string,
-        initialMessage: string
-    ) => {
-        console.log("serviceId recibido:", serviceId); // Debug
-        console.log("Mensaje inicial recibido:", initialMessage); // Debug
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-            console.error("No token found");
-            return;
-        }
-
-        try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            if (payload.userType !== "Cliente") {
-                console.error("Unauthorized: User is not a Cliente");
-                return;
+    useEffect(() => {
+        const fetchPortfolios = async () => {
+            const token = localStorage.getItem("token");
+            if (token && userType === "Cliente") {
+                try {
+                    const portfolios = await fetchAllPortfolios(token);
+                    setPortfolios(portfolios as Portfolio[]);
+                } catch (error) {
+                    console.error("Error fetching portfolios:", error);
+                    setError("Error loading portfolios.");
+                }
             }
+        };
 
-            const response = await createChat(serviceId, initialMessage, token);
-
-            console.log("Chat creado:", response);
-        } catch (error) {
-            console.error(
-                "Error al decodificar el token o crear el chat:",
-                error
-            );
-        }
-    };
-
-    const handleSendOfferClick = (offer: Offer) => {
-        setSelectedOffer(offer);
-        setIsModalOpen(true);
-    };
-
-    const handleModalClose = () => {
-        setIsModalOpen(false);
-        setSelectedOffer(null);
-    };
-
-    const handleModalSubmit = (message: string) => {
-        if (selectedOffer) {
-            handleSendProposalClick(selectedOffer._id, message);
-        }
-        handleModalClose();
-    };
+        fetchPortfolios();
+    }, [userType]);
 
     return (
         <div className="container mx-auto px-4 py-8">
@@ -139,9 +89,6 @@ const Home: React.FC = () => {
                                     key={offer._id}
                                     offer={offer}
                                     isEditable={false}
-                                    sendOffer={() =>
-                                        handleSendOfferClick(offer)
-                                    } // Modify this line
                                 />
                             ))}
                         </div>
@@ -153,22 +100,25 @@ const Home: React.FC = () => {
                     <h2 className="text-3xl font-bold mb-6 text-gray-900 dark:text-gray-100">
                         Encuentra el servicio que necesitas
                     </h2>
+                    <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
+                        Bienvenido, {username}
+                    </p>
                     {error ? (
                         <p className="text-red-500">{error}</p>
                     ) : (
                         <div className="mt-4 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-                            {services.map((portfolio) => (
-                                <PortfolioCardClient
-                                    key={portfolio._id}
-                                    service={portfolio}
-                                    onSendProposalClick={(initialMessage) =>
-                                        handleSendProposalClick(
-                                            portfolio._id,
-                                            initialMessage
-                                        )
-                                    }
-                                />
-                            ))}
+                            {portfolios.map((portfolio) => {
+                                return (
+                                    <PortfolioCard
+                                        key={portfolio._id}
+                                        portfolio={portfolio}
+                                        providerUsername={
+                                            portfolio.provider?.username
+                                        }
+                                        isEditable={false}
+                                    />
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -183,13 +133,6 @@ const Home: React.FC = () => {
                         clics
                     </p>
                 </div>
-            )}
-            {isModalOpen && (
-                <Modal
-                    title="Escribe tu oferta para el cliente"
-                    onClose={handleModalClose}
-                    onSubmit={handleModalSubmit}
-                />
             )}
         </div>
     );

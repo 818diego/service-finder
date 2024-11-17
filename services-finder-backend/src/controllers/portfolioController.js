@@ -52,7 +52,7 @@ exports.createPortfolio = async (req, res) => {
 exports.getAllPortfolios = async (req, res) => {
   try {
     // Consulta a la base de datos para obtener todos los portafolios
-    const portfolios = await Portfolio.find();
+    const portfolios = await Portfolio.find().populate('provider');
     // Responder con los portafolios obtenidos
     res.status(200).json(portfolios);
   } catch (error) {
