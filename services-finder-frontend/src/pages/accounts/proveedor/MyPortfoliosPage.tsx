@@ -167,10 +167,11 @@ const MyServicesPage: React.FC = () => {
                 {portfolios.map((portfolio) => (
                     <PortfolioCard
                         key={portfolio._id}
-                        portfolio={portfolio} // Pasar el objeto portfolio completo
+                        portfolio={portfolio}
                         onServiceClick={() => openCreateModal()}
                         onEditClick={() => openEditModal(portfolio)}
                         onDeleteClick={() => openDeleteModal(portfolio)}
+                        isEditable={true}
                     />
                 ))}
             </div>

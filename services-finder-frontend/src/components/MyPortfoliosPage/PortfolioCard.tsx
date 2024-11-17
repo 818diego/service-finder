@@ -10,15 +10,19 @@ import { useAuth } from "../../Context/AuthContext";
 
 interface PortfolioCardProps {
     portfolio: Portfolio;
-    onEditClick: () => void;
-    onDeleteClick: () => void;
-    onServiceClick: (serviceId: string) => void;
+    providerUsername?: string;
+    onEditClick?: () => void;
+    onDeleteClick?: () => void;
+    onServiceClick?: (serviceId: string) => void;
+    isEditable: boolean;
 }
 
 const PortfolioCard: React.FC<PortfolioCardProps> = ({
     portfolio,
+    providerUsername,
     onEditClick,
     onDeleteClick,
+    isEditable,
 }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isModalServicesOpen, setIsModalServicesOpen] = useState(false);
@@ -80,13 +84,12 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
             <div className="relative group">
                 <img
                     src={portfolio.image}
-                    alt={`${portfolio.title} by ${portfolio.provider.username}`}
+                    alt={`${portfolio.title} by ${providerUsername}`}
                     className="object-cover w-full h-48 rounded-t-lg cursor-pointer transition duration-300 group-hover:blur-sm"
                 />
                 <div
                     className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-30 transition duration-300 rounded-t-lg cursor-pointer"
-                    onClick={() => handleOpenModalServicesAll()} // Añadido onClick aquí
-                >
+                    onClick={() => handleOpenModalServicesAll()}>
                     <span className="text-white text-lg font-bold opacity-0 group-hover:opacity-100 transition duration-300">
                         Ver servicios
                     </span>
@@ -94,21 +97,25 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
                     <div className="bg-black/50 text-white px-3 py-1 rounded-full text-sm backdrop-blur-sm flex items-center">
                         <User className="w-5 h-5 inline mr-1" />
-                        {portfolio.provider.username}
+                        {providerUsername}
                     </div>
                 </div>
-                <button
-                    onClick={onEditClick}
-                    className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition duration-200"
-                    aria-label="Editar Portafolio">
-                    <Edit size={16} />
-                </button>
-                <button
-                    onClick={onDeleteClick}
-                    className="absolute top-2 right-11 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition duration-200"
-                    aria-label="Eliminar Portafolio">
-                    <Trash2 size={16} />
-                </button>
+                {isEditable && (
+                    <>
+                        <button
+                            onClick={onEditClick}
+                            className="absolute top-2 right-2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition duration-200"
+                            aria-label="Editar Portafolio">
+                            <Edit size={16} />
+                        </button>
+                        <button
+                            onClick={onDeleteClick}
+                            className="absolute top-2 right-11 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition duration-200"
+                            aria-label="Eliminar Portafolio">
+                            <Trash2 size={16} />
+                        </button>
+                    </>
+                )}
             </div>
 
             <div className="px-6 py-4 min-h-[180px]">
@@ -134,14 +141,18 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
             </div>
 
             <div className="px-6 py-4 mb-2">
-                <CustomButton
-                    onClick={handleOpenModal}
-                    label={
-                        <>
-                            <FaPlus className="mr-2" /> Agregar servicio
-                        </>
-                    }
-                />
+                {isEditable ? (
+                    <CustomButton
+                        onClick={handleOpenModal}
+                        label={
+                            <>
+                                <FaPlus className="mr-2" /> Agregar servicio
+                            </>
+                        }
+                    />
+                ) : (
+                    <></>
+                )}
             </div>
 
             <ModalServiceAll
@@ -149,6 +160,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
                 onClose={() => handleCloseModalServicesAll()}
                 providerUsername={portfolio.provider.username}
                 portfolioId={portfolio._id}
+                userType={user?.userType || null} // Pass userType here
                 className="modal-fade-in modal-scale-in"
             />
         </div>

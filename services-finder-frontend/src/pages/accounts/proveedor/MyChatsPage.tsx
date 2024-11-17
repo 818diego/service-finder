@@ -1,4 +1,3 @@
-// src/pages/MyChatsPage.tsx
 import React, { useState, useEffect, useRef } from "react";
 import { jwtDecode } from "jwt-decode";
 import ChatHeader from "../../../components/ChatComponents/ChatHeader";
@@ -159,7 +158,7 @@ const MyChatsPage: React.FC = () => {
                     : "El proveedor ha rechazado el chat.";
             await sendMessage(selectedChat._id, message, token);
             if (action === "reject") {
-                setSelectedChat(null); // Deselect chat if rejected
+                setSelectedChat(null);
             }
         } catch (error) {
             console.error(`Error ${action}ing chat:`, error);

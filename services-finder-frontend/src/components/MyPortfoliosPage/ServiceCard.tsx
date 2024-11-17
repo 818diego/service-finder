@@ -1,19 +1,31 @@
 import React, { useState } from "react";
-import { Edit, Trash2, DollarSign, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+    Edit,
+    Trash2,
+    DollarSign,
+    ChevronLeft,
+    ChevronRight,
+} from "lucide-react";
 import { Service } from "../../types/service";
+import ProposalModal from "../ClientComponents/ProposalModal";
 
 interface ServiceCardProps {
     service: Service;
     onEdit: () => void;
     onDelete: () => void;
+    isEditable: boolean;
+    onSendProposalClick: (initialMessage: string) => void;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
     service,
     onEdit,
     onDelete,
+    isEditable,
+    onSendProposalClick,
 }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleNextImage = () => {
         setCurrentImageIndex((prevIndex) =>
@@ -27,6 +39,11 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         );
     };
 
+    const handleProposalSubmit = (initialMessage: string) => {
+        // Add this function
+        onSendProposalClick(initialMessage);
+    };
+
     return (
         <div className="max-w-sm rounded-lg overflow-hidden shadow-lg bg-white dark:bg-gray-800 transition duration-300 relative border border-gray-200 dark:border-gray-700 hover:shadow-xl flex flex-col justify-between">
             {/* Image section */}
@@ -35,9 +52,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                     <div className="relative">
                         <img
                             src={
-                                typeof service.images[currentImageIndex] === "string"
+                                typeof service.images[currentImageIndex] ===
+                                "string"
                                     ? service.images[currentImageIndex]
-                                    : URL.createObjectURL(service.images[currentImageIndex])
+                                    : URL.createObjectURL(
+                                          service.images[currentImageIndex]
+                                      )
                             }
                             alt={service.title}
                             className="object-cover w-full h-48 rounded-t-lg"
@@ -86,19 +106,35 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
 
             {/* Action buttons */}
             <div className="flex justify-evenly space-x-2 px-4 py-2 border-t border-gray-200 dark:border-gray-700">
-                <button
-                    onClick={onEdit}
-                    className="flex items-center px-4 py-2 text-blue-500 hover:underline hover:text-blue-700 transition duration-200">
-                    <Edit className="w-5 h-5 mr-1" />
-                    Editar
-                </button>
-                <button
-                    onClick={onDelete}
-                    className="flex items-center px-4 py-2 text-red-500 hover:underline hover:text-red-700 transition duration-200">
-                    <Trash2 className="w-5 h-5 mr-1" />
-                    Eliminar
-                </button>
+                {isEditable ? (
+                    <>
+                        <button
+                            onClick={onEdit}
+                            className="flex items-center px-4 py-2 text-blue-500 hover:underline hover:text-blue-700 transition duration-200">
+                            <Edit className="w-5 h-5 mr-1" />
+                            Editar
+                        </button>
+                        <button
+                            onClick={onDelete}
+                            className="flex items-center px-4 py-2 text-red-500 hover:underline hover:text-red-700 transition duration-200">
+                            <Trash2 className="w-5 h-5 mr-1" />
+                            Eliminar
+                        </button>
+                    </>
+                ) : (
+                    <button
+                        onClick={() => setIsModalOpen(true)} // Modify this line
+                        className="flex items-center px-4 py-2 text-green-500 hover:underline hover:text-green-700 transition duration-200">
+                        Enviar Propuesta
+                    </button>
+                )}
             </div>
+
+            <ProposalModal // Add this block
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                onSubmit={handleProposalSubmit}
+            />
         </div>
     );
 };
