@@ -4,12 +4,13 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const Service = require("../models/Service");
 const Portfolio = require("../models/Portfolio");
+const JobOffer = require("../models/JobOffer");
 
 exports.createChat = async (req, res) => {
-  const { serviceId, initialMessage } = req.body;
+  const { serviceId, jobOfferId, initialMessage } = req.body;
 
   try {
-    if (!serviceId || !initialMessage) {
+    if ((!serviceId && !jobOfferId) || !initialMessage) {
       console.log("Faltan datos necesarios en la solicitud.");
       return res.status(400).json({ message: "Faltan datos necesarios en la solicitud." });
     }
@@ -28,14 +29,12 @@ exports.createChat = async (req, res) => {
         return res.status(404).json({ message: "Servicio no encontrado" });
       }
 
-      // Obtener el `portfolio` al que pertenece el servicio
       const portfolio = await Portfolio.findById(service.portfolio);
       if (!portfolio) {
         console.log("Portafolio no encontrado para el servicio");
         return res.status(404).json({ message: "Portafolio no encontrado" });
       }
 
-      // Obtener el `providerId` desde el `portfolio`
       providerId = portfolio.provider;
       if (!providerId) {
         console.log("No se encontró el proveedor para este portafolio.");
@@ -43,39 +42,50 @@ exports.createChat = async (req, res) => {
       }
 
     } else if (userType === "Proveedor") {
-      console.log("Los proveedores no pueden iniciar un chat.");
-      return res.status(403).json({ message: "Solo los clientes pueden iniciar un chat." });
+      providerId = userId;
+      const jobOffer = await JobOffer.findById(jobOfferId);
+      if (!jobOffer) {
+        console.log("Oferta de trabajo no encontrada para el ID:", jobOfferId);
+        return res.status(404).json({ message: "Oferta de trabajo no encontrada" });
+      }
+
+      clientId = jobOffer.client;
+      if (!clientId) {
+        console.log("No se encontró el cliente para esta oferta de trabajo.");
+        return res.status(404).json({ message: "Cliente no encontrado para la oferta de trabajo." });
+      }
     } else {
       console.log("Tipo de usuario no válido:", userType);
       return res.status(400).json({ message: "Tipo de usuario no válido" });
     }
 
-    // Crear el chat
     const chat = new Chat({
       clientId,
       providerId,
-      serviceId,
+      serviceId: serviceId || undefined,
+      jobOfferId: jobOfferId || undefined,
       messages: [
         {
           text: initialMessage,
-          sentBy: clientId,
+          sentBy: userId,
           time: new Date(),
         },
       ],
-      unreadByProvider: true,
-      status: "pending",
+      unreadByProvider: userType === "Cliente",
+      unreadByClient: userType === "Proveedor",
+      status: userType === "Cliente" ? "pending" : "accepted",
     });
     await chat.save();
     console.log("Nuevo chat creado:", chat._id);
 
-    // Emitir evento de WebSocket al proveedor
     const io = req.app.get("socketio");
     if (io) {
-      io.to(providerId.toString()).emit("newChatRequest", {
+      io.to(clientId.toString()).emit("newChatRequest", {
         chatId: chat._id,
         clientId,
         providerId,
         serviceId,
+        jobOfferId,
         initialMessage,
       });
     } else {
@@ -88,7 +98,6 @@ exports.createChat = async (req, res) => {
     res.status(500).json({ message: "Error al crear el chat" });
   }
 };
-
 
 // Para que el proveedor pueda aceptar o rechazar un chat
 exports.updateChatStatus = async (req, res) => {

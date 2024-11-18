@@ -165,6 +165,7 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
 
             const response = await createChat(
                 selectedServiceForProposal._id,
+                selectedServiceForProposal._id,
                 initialMessage,
                 token
             );

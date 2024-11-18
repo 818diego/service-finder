@@ -40,6 +40,13 @@ const RegisterForm: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [passwordStrength, setPasswordStrength] = useState(0);
+    const [isTypingPassword, setIsTypingPassword] = useState(false);
+    const [passwordCriteria, setPasswordCriteria] = useState({
+        hasUpperCase: false,
+        hasLowerCase: false,
+        hasNumber: false,
+        hasSpecialChar: false,
+    });
 
     const userType = watch("userType");
     const password = watch("password");
@@ -51,13 +58,13 @@ const RegisterForm: React.FC = () => {
             await registerUser(data);
             setLoading(false);
             setSuccess(true);
-            toast.success("Registration successful!");
+            toast.success("¡Registro exitoso!");
         } catch (error: unknown) {
             setLoading(false);
             if (error instanceof Error) {
                 console.error(error.message);
             } else {
-                console.error("An unexpected error occurred");
+                console.error("Ocurrió un error inesperado");
             }
         }
     };
@@ -69,10 +76,12 @@ const RegisterForm: React.FC = () => {
             "password",
             "confirmPassword",
         ]);
-        if (isStep1Valid && passwordStrength >= 3) {
+        if (isStep1Valid && isPasswordValid()) {
             setStep(2);
         } else {
-            toast.error("Password must be strong (High security).");
+            toast.error(
+                "La contraseña debe cumplir con todos los requisitos de seguridad."
+            );
         }
     };
 
@@ -81,33 +90,50 @@ const RegisterForm: React.FC = () => {
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setPasswordStrength(zxcvbn(value).score);
+        setIsTypingPassword(value.length > 0);
+        setPasswordCriteria({
+            hasUpperCase: /[A-Z]/.test(value),
+            hasLowerCase: /[a-z]/.test(value),
+            hasNumber: /\d/.test(value),
+            hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+        });
+    };
+
+    const isPasswordValid = () => {
+        return (
+            passwordCriteria.hasUpperCase &&
+            passwordCriteria.hasLowerCase &&
+            passwordCriteria.hasNumber &&
+            passwordCriteria.hasSpecialChar &&
+            passwordStrength >= 3
+        );
     };
 
     const getPasswordStrengthLabel = () => {
         switch (passwordStrength) {
             case 0:
                 return {
-                    label: "Very Weak",
+                    label: "Muy débil",
                     icon: <ShieldOff className="h-5 w-5 text-red-500" />,
                 };
             case 1:
                 return {
-                    label: "Weak",
+                    label: "Débil",
                     icon: <ShieldAlert className="h-5 w-5 text-yellow-500" />,
                 };
             case 2:
                 return {
-                    label: "Medium",
+                    label: "Media",
                     icon: <Shield className="h-5 w-5 text-yellow-500" />,
                 };
             case 3:
                 return {
-                    label: "Strong",
+                    label: "Fuerte",
                     icon: <ShieldCheck className="h-5 w-5 text-green-500" />,
                 };
             case 4:
                 return {
-                    label: "Very Strong",
+                    label: "Muy fuerte",
                     icon: <ShieldCheck className="h-5 w-5 text-green-700" />,
                 };
             default:
@@ -136,34 +162,39 @@ const RegisterForm: React.FC = () => {
                         <span className="font-bold">2</span>
                     </div>
                 </div>
-                <p className="text-lg font-semibold">Step {step} of 2</p>
+                <p className="text-lg font-semibold">Paso {step} de 2</p>
             </div>
-            {loading && <div className="text-center">Loading...</div>}
+            {loading && <div className="text-center">Cargando...</div>}
             {!loading && !success && (
                 <>
                     {step === 1 && (
                         <div className="transition duration-500 transform space-y-4">
                             <FormInput
-                                label="Username"
+                                label="Nombre de usuario"
                                 type="text"
-                                placeholder="Enter your username"
+                                placeholder="Ingresa tu nombre de usuario"
                                 register={register("username", {
                                     required: true,
                                     minLength: 5,
                                 })}
                                 error={errors.username}
                                 icon={User}
-                                validationMessage="Username is required and should be at least 5 characters long"
+                                validationMessage="El nombre de usuario es obligatorio y debe tener al menos 5 caracteres"
                             />
+                            {errors.username && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.username.message}
+                                </p>
+                            )}
                             <FormInput
-                                label="Email"
+                                label="Correo electrónico"
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder="Ingresa tu correo electrónico"
                                 register={register("email", {
-                                    required: "Email is required",
                                     pattern: {
                                         value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                                        message: "Invalid email address",
+                                        message:
+                                            "Dirección de correo electrónico no válida",
                                     },
                                 })}
                                 error={errors.email}
@@ -171,14 +202,14 @@ const RegisterForm: React.FC = () => {
                                 validationMessage={
                                     errors.email
                                         ? errors.email.message
-                                        : "Valid email is required"
+                                        : "Se requiere un correo electrónico válido"
                                 }
                             />
                             <div className="relative">
                                 <FormInput
-                                    label="Password"
+                                    label="Contraseña"
                                     type={showPassword ? "text" : "password"}
-                                    placeholder="Enter your password"
+                                    placeholder="Ingresa tu contraseña"
                                     register={register("password", {
                                         required: true,
                                         minLength: 8,
@@ -186,7 +217,7 @@ const RegisterForm: React.FC = () => {
                                     })}
                                     error={errors.password}
                                     icon={Lock}
-                                    validationMessage="Password is required and should be at least 8 characters long"
+                                    validationMessage="La contraseña es obligatoria y debe tener al menos 8 caracteres"
                                 />
                                 <div
                                     className="absolute mt-6 inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
@@ -200,24 +231,103 @@ const RegisterForm: React.FC = () => {
                                     )}
                                 </div>
                             </div>
+                            {isTypingPassword && (
+                                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 relative transition-all duration-300">
+                                    <div
+                                        className={`h-2.5 rounded-full transition-all duration-300 ${
+                                            passwordStrength === 0
+                                                ? "bg-red-500"
+                                                : passwordStrength === 1
+                                                ? "bg-yellow-500"
+                                                : passwordStrength === 2
+                                                ? "bg-yellow-500"
+                                                : passwordStrength === 3
+                                                ? "bg-green-500"
+                                                : "bg-green-700"
+                                        }`}
+                                        style={{
+                                            width: `${
+                                                (passwordStrength + 1) * 20
+                                            }%`,
+                                        }}></div>
+                                </div>
+                            )}
+                            {isTypingPassword && (
+                                <div className="flex items-center justify-center mt-2">
+                                    {getPasswordStrengthLabel().icon}
+                                    <span className="ml-2 text-sm font-medium">
+                                        {getPasswordStrengthLabel().label}
+                                    </span>
+                                </div>
+                            )}
+                            {isTypingPassword && (
+                                <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
+                                    <div
+                                        className={
+                                            passwordCriteria.hasUpperCase
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }>
+                                        {passwordCriteria.hasUpperCase
+                                            ? "✔"
+                                            : "✘"}{" "}
+                                        Al menos una letra mayúscula
+                                    </div>
+                                    <div
+                                        className={
+                                            passwordCriteria.hasLowerCase
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }>
+                                        {passwordCriteria.hasLowerCase
+                                            ? "✔"
+                                            : "✘"}{" "}
+                                        Al menos una letra minúscula
+                                    </div>
+                                    <div
+                                        className={
+                                            passwordCriteria.hasNumber
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }>
+                                        {passwordCriteria.hasNumber ? "✔" : "✘"}{" "}
+                                        Al menos un número
+                                    </div>
+                                    <div
+                                        className={
+                                            passwordCriteria.hasSpecialChar
+                                                ? "text-green-500"
+                                                : "text-red-500"
+                                        }>
+                                        {passwordCriteria.hasSpecialChar
+                                            ? "✔"
+                                            : "✘"}{" "}
+                                        Al menos un carácter especial
+                                    </div>
+                                </div>
+                            )}
+                            {errors.password && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.password.message}
+                                </p>
+                            )}
                             <div className="relative">
                                 <FormInput
-                                    label="Confirm Password"
+                                    label="Confirmar contraseña"
                                     type={
                                         showConfirmPassword
                                             ? "text"
                                             : "password"
                                     }
-                                    placeholder="Confirm your password"
+                                    placeholder="Confirma tu contraseña"
                                     register={register("confirmPassword", {
                                         required: true,
                                         validate: (value) =>
                                             value === password ||
-                                            "Passwords do not match",
+                                            "Las contraseñas no coinciden",
                                     })}
                                     error={errors.confirmPassword}
                                     icon={Lock}
-                                    validationMessage="Passwords must match"
                                 />
                                 <div
                                     className="absolute mt-6 inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
@@ -233,36 +343,16 @@ const RegisterForm: React.FC = () => {
                                     )}
                                 </div>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2.5 mb-4 relative">
-                                <div
-                                    className={`h-2.5 rounded-full transition-all duration-300 ${
-                                        passwordStrength === 0
-                                            ? "bg-red-500"
-                                            : passwordStrength === 1
-                                            ? "bg-yellow-500"
-                                            : passwordStrength === 2
-                                            ? "bg-yellow-500"
-                                            : passwordStrength === 3
-                                            ? "bg-green-500"
-                                            : "bg-green-700"
-                                    }`}
-                                    style={{
-                                        width: `${
-                                            (passwordStrength + 1) * 20
-                                        }%`,
-                                    }}></div>
-                            </div>
-                            <div className="flex items-center justify-center mt-2">
-                                {getPasswordStrengthLabel().icon}
-                                <span className="ml-2 text-sm font-medium">
-                                    {getPasswordStrengthLabel().label}
-                                </span>
-                            </div>
+                            {errors.confirmPassword && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.confirmPassword.message}
+                                </p>
+                            )}
                             <button
                                 type="button"
                                 onClick={handleNextStep}
                                 className="w-full bg-blue-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-600 transition-colors duration-300 ease-in-out">
-                                Next
+                                Siguiente
                             </button>
                         </div>
                     )}
@@ -270,81 +360,106 @@ const RegisterForm: React.FC = () => {
                     {step === 2 && (
                         <div className="transition duration-500 transform space-y-4">
                             <FormInput
-                                label="First Name"
+                                label="Nombre"
                                 type="text"
-                                placeholder="Enter your first name"
+                                placeholder="Ingresa tu nombre"
                                 register={register("firstName", {
                                     required: true,
                                     minLength: 3,
                                 })}
                                 error={errors.firstName}
                                 icon={UserCheck}
-                                validationMessage="First name is required and should be at least 3 characters long"
+                                validationMessage="El nombre es obligatorio y debe tener al menos 3 caracteres"
                             />
+                            {errors.firstName && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.firstName.message}
+                                </p>
+                            )}
                             <FormInput
-                                label="Last Name"
+                                label="Apellido"
                                 type="text"
-                                placeholder="Enter your last name"
+                                placeholder="Ingresa tu apellido"
                                 register={register("lastName", {
                                     required: true,
                                     minLength: 3,
                                 })}
                                 error={errors.lastName}
                                 icon={UserCheck}
-                                validationMessage="Last name is required and should be at least 3 characters long"
+                                validationMessage="El apellido es obligatorio y debe tener al menos 3 caracteres"
                             />
+                            {errors.lastName && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.lastName.message}
+                                </p>
+                            )}
                             <FormInput
-                                label="User Type"
+                                label="Tipo de usuario"
                                 type="select"
-                                placeholder="Select user type"
+                                placeholder="Selecciona el tipo de usuario"
                                 register={register("userType", {
                                     required: true,
                                 })}
                                 error={errors.userType}
                                 icon={Briefcase}
-                                validationMessage="User type is required"
+                                validationMessage="El tipo de usuario es obligatorio"
                                 options={[
                                     "Selecciona una opción",
                                     "Proveedor",
                                     "Cliente",
                                 ]}
                             />
+                            {errors.userType && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.userType.message}
+                                </p>
+                            )}
                             <FormInput
-                                label="Address"
+                                label="Dirección"
                                 type="text"
-                                placeholder="Enter your address"
+                                placeholder="Ingresa tu dirección"
                                 register={register("address", {
                                     required: true,
                                     minLength: 10,
                                 })}
                                 error={errors.address}
                                 icon={Home}
-                                validationMessage="Address is required and should be at least 10 characters long"
+                                validationMessage="La dirección es obligatoria y debe tener al menos 10 caracteres"
                             />
+                            {errors.address && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.address.message}
+                                </p>
+                            )}
                             {userType === "Proveedor" && (
                                 <FormInput
-                                    label="Specialty"
+                                    label="Especialidad"
                                     type="text"
-                                    placeholder="Enter your specialty"
+                                    placeholder="Ingresa tu especialidad"
                                     register={register("specialty", {
                                         required: true,
                                     })}
                                     error={errors.specialty}
                                     icon={NotebookPen}
-                                    validationMessage="Specialty is required for Proveedor"
+                                    validationMessage="La especialidad es obligatoria para Proveedor"
                                 />
+                            )}
+                            {errors.specialty && (
+                                <p className="text-red-500 text-sm mt-1">
+                                    {errors.specialty.message}
+                                </p>
                             )}
                             <div className="flex justify-between space-x-4">
                                 <button
                                     type="button"
                                     onClick={handlePreviousStep}
                                     className="bg-gray-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-gray-600 transition-colors duration-300 ease-in-out">
-                                    Back
+                                    Atrás
                                 </button>
                                 <button
                                     type="submit"
                                     className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-sm hover:bg-blue-600 transition-colors duration-300 ease-in-out">
-                                    Register
+                                    Registrarse
                                 </button>
                             </div>
                         </div>
@@ -355,16 +470,14 @@ const RegisterForm: React.FC = () => {
                 <div
                     className="text-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
                     role="alert">
-                    <strong className="font-bold">
-                        Registration successful!
-                    </strong>
+                    <strong className="font-bold">¡Registro exitoso!</strong>
                     <span className="block sm:inline">
                         {" "}
-                        Do you want to{" "}
+                        ¿Quieres{" "}
                         <a
                             href="/login"
                             className="text-blue-500 underline font-bold">
-                            log in
+                            iniciar sesión
                         </a>
                         ?
                     </span>

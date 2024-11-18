@@ -5,6 +5,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Crear un chat
 export const createChat = async (
     serviceId: string,
+    jobOfferId: string,
     initialMessage: string,
     token: string
 ) => {
@@ -15,7 +16,7 @@ export const createChat = async (
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`,
             },
-            body: JSON.stringify({ serviceId, initialMessage }),
+            body: JSON.stringify({ serviceId, initialMessage, jobOfferId }),
         });
 
         if (!response.ok) {
