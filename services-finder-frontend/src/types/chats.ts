@@ -12,9 +12,9 @@ export interface ChatMessage {
 // Tipo para la respuesta del chat
 export interface ChatResponse {
     _id: string;
-    clientId: User; // ID del cliente como objeto User
-    providerId: User; // ID del proveedor como objeto User
-    jobOfferId: Offer; // Ensure this is typed as Offer
+    clientId: User;
+    providerId: User;
+    jobOfferId: Offer;
     portfolioId: string;
     messages: ChatMessage[];
     unreadByProvider: boolean;
