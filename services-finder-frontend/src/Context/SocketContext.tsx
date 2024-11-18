@@ -18,14 +18,12 @@ interface DecodedToken {
 interface SocketContextProps {
     socket: Socket | null;
     user: DecodedToken | null;
-    setUser: (user: DecodedToken | null) => void; // Método para actualizar el usuario
     emitNotification: (type: string, payload: Record<string, unknown>) => void;
 }
 
 const SocketContext = createContext<SocketContextProps>({
     socket: null,
     user: null,
-    setUser: () => {}, // Stub para evitar errores
     emitNotification: () => {},
 });
 
@@ -46,59 +44,58 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
             try {
                 const decoded: DecodedToken = jwtDecode(token);
                 setUser(decoded);
+
+                // Inicializar Socket.IO client
+                socketRef.current = io(import.meta.env.VITE_API_URL, {
+                    auth: { token },
+                });
+
+                socketRef.current.on("connect", () => {
+                    console.log("Conectado al servidor Socket.IO");
+                    socketRef.current?.emit("userStatus", {
+                        userId: decoded._id,
+                        isOnline: true,
+                        lastSeen: null,
+                    });
+                    console.log("Estado de usuario emitido: Online");
+                });
+
+                socketRef.current.on("disconnect", () => {
+                    console.log("Desconectado del servidor Socket.IO");
+                });
+
+                // Listener para recibir notificaciones
+                socketRef.current.on("notification", (data) => {
+                    console.log("Notificación recibida:", data);
+                    toast.info(`Tipo: ${data.type} - Mensaje: ${data.message}`);
+                });
+
+                // Emitir el estado offline antes de cerrar la ventana o pestaña
+                const handleBeforeUnload = () => {
+                    socketRef.current?.emit("userStatus", {
+                        userId: decoded._id,
+                        isOnline: false,
+                        lastSeen: new Date().toISOString(),
+                    });
+                    console.log("Estado de usuario emitido: Offline");
+                };
+                window.addEventListener("beforeunload", handleBeforeUnload);
+
+                // Cleanup
+                return () => {
+                    window.removeEventListener(
+                        "beforeunload",
+                        handleBeforeUnload
+                    );
+                    socketRef.current?.disconnect();
+                };
             } catch (error) {
                 console.error("Error al decodificar el token:", error);
             }
+        } else {
+            console.error("No se encontró el token de autenticación.");
         }
     }, []);
-
-    useEffect(() => {
-        if (user) {
-            const token = localStorage.getItem("authToken");
-
-            // Inicializar Socket.IO client solo si hay usuario
-            socketRef.current = io(import.meta.env.VITE_API_URL, {
-                auth: { token },
-            });
-
-            socketRef.current.on("connect", () => {
-                console.log("Conectado al servidor Socket.IO");
-                socketRef.current?.emit("userStatus", {
-                    userId: user._id,
-                    isOnline: true,
-                    lastSeen: null,
-                });
-                console.log("Estado de usuario emitido: Online");
-            });
-
-            socketRef.current.on("disconnect", () => {
-                console.log("Desconectado del servidor Socket.IO");
-            });
-
-            // Listener para recibir notificaciones
-            socketRef.current.on("notification", (data) => {
-                console.log("Notificación recibida:", data);
-                toast.info(`Tipo: ${data.type} - Mensaje: ${data.message}`);
-            });
-
-            // Emitir el estado offline antes de cerrar la ventana o pestaña
-            const handleBeforeUnload = () => {
-                socketRef.current?.emit("userStatus", {
-                    userId: user._id,
-                    isOnline: false,
-                    lastSeen: new Date().toISOString(),
-                });
-                console.log("Estado de usuario emitido: Offline");
-            };
-            window.addEventListener("beforeunload", handleBeforeUnload);
-
-            // Cleanup
-            return () => {
-                window.removeEventListener("beforeunload", handleBeforeUnload);
-                socketRef.current?.disconnect();
-            };
-        }
-    }, [user]); // Ejecutar solo si `user` cambia
 
     const emitNotification = (
         type: string,
@@ -114,12 +111,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
     return (
         <SocketContext.Provider
-            value={{
-                socket: socketRef.current,
-                user,
-                setUser,
-                emitNotification,
-            }}>
+            value={{ socket: socketRef.current, user, emitNotification }}>
             {children}
         </SocketContext.Provider>
     );
