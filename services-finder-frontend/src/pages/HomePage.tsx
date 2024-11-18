@@ -5,6 +5,8 @@ import { getAllOffers } from "../services/offersFetch";
 import { fetchAllPortfolios } from "../services/portfolioFetch";
 import { Portfolio } from "../types/portfolio";
 import PortfolioCard from "../components/MyPortfoliosPage/PortfolioCard";
+import { createChat } from "../services/chatsFetch";
+import ModalProposeProvider from "../components/ModalProposeProvider";
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
@@ -14,6 +16,9 @@ const Home: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [offers, setOffers] = useState<Offer[]>([]);
     const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+    const [initialMessage, setInitialMessage] = useState("");
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -73,6 +78,27 @@ const Home: React.FC = () => {
         fetchPortfolios();
     }, [userType]);
 
+    const handleSendOffer = (offer: Offer) => {
+        setSelectedOffer(offer);
+        setShowModal(true);
+    };
+
+    const handleCreateChat = async () => {
+        if (selectedOffer) {
+            const token = localStorage.getItem("token");
+            if (token) {
+                try {
+                    await createChat(selectedOffer._id, selectedOffer._id, initialMessage, token); // Ensure this uses _id and jobOfferId
+                    setShowModal(false);
+                    setInitialMessage("");
+                } catch (error) {
+                    console.error("Error creating chat:", error);
+                    setError("Error creating chat.");
+                }
+            }
+        }
+    };
+
     return (
         <div className="container mx-auto px-4 py-8">
             {userType === "Proveedor" && (
@@ -89,6 +115,7 @@ const Home: React.FC = () => {
                                     key={offer._id}
                                     offer={offer}
                                     isEditable={false}
+                                    sendOffer={() => handleSendOffer(offer)}
                                 />
                             ))}
                         </div>
@@ -134,6 +161,13 @@ const Home: React.FC = () => {
                     </p>
                 </div>
             )}
+            <ModalProposeProvider
+                showModal={showModal}
+                setShowModal={setShowModal}
+                initialMessage={initialMessage}
+                setInitialMessage={setInitialMessage}
+                handleCreateChat={handleCreateChat}
+            />
         </div>
     );
 };

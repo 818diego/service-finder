@@ -4,11 +4,12 @@ const Schema = mongoose.Schema;
 const chatSchema = new Schema({
   clientId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   providerId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  serviceId: { type: Schema.Types.ObjectId, ref: 'Service', required: true },
+  serviceId: { type: Schema.Types.ObjectId, ref: 'Service' },
+  jobOfferId: { type: Schema.Types.ObjectId, ref: 'JobOffer' },
   messages: [
     {
       text: { type: String, required: true },
-      sentBy: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // Hacer `sentBy` obligatorio
+      sentBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
       time: { type: Date, default: Date.now },
     },
   ],
