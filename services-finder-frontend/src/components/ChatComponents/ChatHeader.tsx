@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Trash2, ShieldAlert, Lock, Archive } from "lucide-react";
 import { useSocket } from "../../Context/SocketContext";
 import { getUserStatus } from "../../services/chatsFetch";
-import { CSSTransition } from "react-transition-group";
 import "./ChatHeader.css";
 
 interface ChatHeaderProps {
@@ -27,6 +26,8 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     const { socket } = useSocket();
     const [isOnline, setIsOnline] = useState(online);
     const [lastSeenTime, setLastSeenTime] = useState(lastSeen);
+    const headerRef = useRef<HTMLDivElement>(null);
+    const statusRef = useRef<HTMLParagraphElement>(null);
 
     useEffect(() => {
         const fetchUserStatus = async () => {
@@ -61,8 +62,14 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
         };
     }, [socket, userId]);
 
+    useEffect(() => {
+        if (headerRef.current) {
+            // Perform any operations with headerRef.current
+        }
+    }, []);
+
     return (
-        <div>
+        <div ref={headerRef}>
             {/* Header del chat con iconos y detalles */}
             <div className="bg-white dark:bg-gray-800 p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 shadow-md">
                 <div className="flex items-center gap-3">
@@ -75,23 +82,18 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                         <h2 className="font-semibold text-gray-800 dark:text-gray-100">
                             {name}
                         </h2>
-                        <CSSTransition
-                            in={isOnline}
-                            timeout={300}
-                            classNames="status"
-                            unmountOnExit>
-                            <p
-                                className="text-sm"
-                                style={{ color: isOnline ? "green" : "gray" }}>
-                                {isOnline
-                                    ? "En línea"
-                                    : `Última vez: ${
-                                          lastSeenTime
-                                              ? lastSeenTime
-                                              : "Desconocido"
-                                      }`}
-                            </p>
-                        </CSSTransition>
+                        <p
+                            ref={statusRef}
+                            className="text-sm"
+                            style={{ color: isOnline ? "green" : "gray" }}>
+                            {isOnline
+                                ? "En línea"
+                                : `Última vez: ${
+                                      lastSeenTime
+                                          ? lastSeenTime
+                                          : "Desconocido"
+                                  }`}
+                        </p>
                     </div>
                 </div>
                 <div className="flex gap-2">
