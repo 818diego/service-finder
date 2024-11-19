@@ -1,23 +1,41 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSocket } from "../../Context/SocketContext";
 
 interface ProposalModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (initialMessage: string) => void;
+    onSubmit: (initialMessage: string, jobOfferId: string) => void;
+    jobOfferId: string;
 }
 
 const ProposalModal: React.FC<ProposalModalProps> = ({
     isOpen,
     onClose,
     onSubmit,
+    jobOfferId,
 }) => {
     const [initialMessage, setInitialMessage] = useState("");
+    const { emitNotification, user } = useSocket();
 
     const handleSubmit = () => {
-        onSubmit(initialMessage);
+        onSubmit(initialMessage, jobOfferId);
         setInitialMessage("");
         onClose();
+    };
+
+    const handleSubmitWithNotification = () => {
+        handleSubmit();
+        if (user) {
+            emitNotification("sendJobProposal", {
+                message: `Nueva propuesta enviada por ${user.userType}`,
+                jobOfferId,
+                senderId: user._id,
+                proposal: {
+                    details: initialMessage,
+                },
+            });
+        }
     };
 
     return (
@@ -51,7 +69,7 @@ const ProposalModal: React.FC<ProposalModalProps> = ({
                                 Cancelar
                             </button>
                             <button
-                                onClick={handleSubmit}
+                                onClick={handleSubmitWithNotification}
                                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                                 Enviar
                             </button>

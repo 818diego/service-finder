@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -34,8 +33,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/job-offers', jobOfferRoutes);
 app.use('/api/chats', chatRoutes);
 
-// Configure Socket.IO with the HTTP server
-configureSocket(server);
+// Initialize Socket.IO
+const io = configureSocket(server);
+
+// Attach IO instance globally (if needed elsewhere)
+app.set('socketio', io);
 
 // Global error handler (optional but recommended)
 app.use((err, req, res, next) => {

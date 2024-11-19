@@ -91,27 +91,28 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                             </button>
                         </div>
                         <div className="max-h-64 overflow-auto scrollbar-hide">
-                            {localNotifications.length > 0 ? (
-                                localNotifications.map((notif, index) => (
-                                    <div
-                                        key={index}
-                                        onClick={() =>
-                                            handleNotificationClick(index)
-                                        }
-                                        className="flex items-center text-sm text-gray-800 dark:text-gray-200 mb-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                        {notif.isRead ? (
-                                            <MailOpen className="h-7 w-7 text-green-500 mr-2" />
-                                        ) : (
-                                            <Mail className="h-7 w-7 text-gray-500 mr-2" />
+                            {localNotifications.map((notif, index) => (
+                                <div
+                                    key={index}
+                                    onClick={() =>
+                                        handleNotificationClick(index)
+                                    }
+                                    className="flex items-center text-sm text-gray-800 dark:text-gray-200 mb-2 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
+                                    {notif.isRead ? (
+                                        <MailOpen className="h-7 w-7 text-green-500 mr-2" />
+                                    ) : (
+                                        <Mail className="h-7 w-7 text-gray-500 mr-2" />
+                                    )}
+                                    <div>
+                                        <p>{notif.message}</p>
+                                        {notif.type === "newJobOffer" && (
+                                            <p className="text-xs text-gray-500">
+                                                Oferta ID: {notif.message}
+                                            </p>
                                         )}
-                                        {notif.message}
                                     </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-500 dark:text-gray-400 text-sm text-center">
-                                    No notifications
-                                </p>
-                            )}
+                                </div>
+                            ))}
                         </div>
                     </motion.div>
                 )}

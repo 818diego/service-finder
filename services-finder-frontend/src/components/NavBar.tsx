@@ -11,12 +11,6 @@ import ConfirmLogoutModal from "./utils/ConfirmLogoutModal";
 import Tooltip from "./Tooltip";
 import NotificationDropdown from "./NotificationDropdown";
 
-interface Notification {
-    type: string;
-    message: string;
-    notification: string;
-}
-
 const Navbar: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();

@@ -134,6 +134,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onSubmit={handleProposalSubmit}
+                jobOfferId={service._id}
             />
         </div>
     );

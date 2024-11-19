@@ -16,6 +16,11 @@ const ModalProposeProvider: React.FC<ModalProposeProviderProps> = ({
     setInitialMessage,
     handleCreateChat,
 }) => {
+
+    const handleCreateChatWithNotification = () => {
+        handleCreateChat();
+    };
+
     return (
         <AnimatePresence>
             {showModal && (
@@ -47,7 +52,7 @@ const ModalProposeProvider: React.FC<ModalProposeProviderProps> = ({
                                 Cancelar
                             </button>
                             <button
-                                onClick={handleCreateChat}
+                                onClick={handleCreateChatWithNotification}
                                 className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
                                 Enviar
                             </button>
