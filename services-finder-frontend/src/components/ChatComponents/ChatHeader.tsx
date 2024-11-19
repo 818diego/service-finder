@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { Trash2, ShieldAlert, Lock, Archive } from "lucide-react";
 import { useSocket } from "../../Context/SocketContext";
 import { getUserStatus } from "../../services/chatsFetch";
+import Tooltip from "../Tooltip";
 import "./ChatHeader.css";
 
 interface ChatHeaderProps {
@@ -98,21 +99,29 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
                 </div>
                 <div className="flex gap-2">
                     {/* Botón para abrir el modal de confirmación */}
-                    <button
-                        onClick={onDeleteChat}
-                        className="p-2 bg-red-500 text-white rounded-full transition-colors hover:bg-red-600">
-                        <Trash2 className="h-5 w-5" />
-                    </button>
+                    <Tooltip text="Eliminar chat">
+                        <button
+                            onClick={onDeleteChat}
+                            className="p-2 bg-red-500 text-white rounded-full transition-colors hover:bg-red-600">
+                            <Trash2 className="h-5 w-5" />
+                        </button>
+                    </Tooltip>
                     {/* Otros botones (ej. ShieldAlert, Lock, Archive) */}
-                    <button className="p-2 bg-yellow-500 text-white rounded-full transition-colors hover:bg-yellow-600">
-                        <ShieldAlert className="h-5 w-5" />
-                    </button>
-                    <button className="p-2 bg-blue-500 text-white rounded-full transition-colors hover:bg-blue-600">
-                        <Lock className="h-5 w-5" />
-                    </button>
-                    <button className="p-2 bg-green-500 text-white rounded-full transition-colors hover:bg-green-600">
-                        <Archive className="h-5 w-5" />
-                    </button>
+                    <Tooltip text="Denunciar">
+                        <button className="p-2 bg-yellow-500 text-white rounded-full transition-colors hover:bg-yellow-600">
+                            <ShieldAlert className="h-5 w-5" />
+                        </button>
+                    </Tooltip>
+                    <Tooltip text="Bloquear">
+                        <button className="p-2 bg-blue-500 text-white rounded-full transition-colors hover:bg-blue-600">
+                            <Lock className="h-5 w-5" />
+                        </button>
+                    </Tooltip>
+                    <Tooltip text="Archivar">
+                        <button className="p-2 bg-green-500 text-white rounded-full transition-colors hover:bg-green-600">
+                            <Archive className="h-5 w-5" />
+                        </button>
+                    </Tooltip>
                 </div>
             </div>
         </div>

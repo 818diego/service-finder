@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useState, KeyboardEvent } from "react";
+import React, {
+    ChangeEvent,
+    useState,
+    KeyboardEvent,
+    useEffect,
+    useRef,
+} from "react";
 import {
     Plus,
     Send,
@@ -11,9 +17,9 @@ import {
 } from "lucide-react";
 
 interface ChatInputProps {
-    userType: "Proveedor" | "Cliente"; // Ensure `userType` is defined
+    userType: "Proveedor" | "Cliente";
     messageText: string;
-    onMessageChange: (e: ChangeEvent<HTMLInputElement>) => void; // Define the type of `e`
+    onMessageChange: (e: ChangeEvent<HTMLInputElement>) => void;
     onSendMessage: () => void;
     disabled: boolean;
 }
@@ -26,12 +32,37 @@ const ChatInput: React.FC<ChatInputProps> = ({
     disabled,
 }) => {
     const [isOptionsOpen, setIsOptionsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
 
     const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter" && !disabled) {
             onSendMessage();
         }
     };
+
+    const handleClickOutside = (event: MouseEvent) => {
+        if (
+            dropdownRef.current &&
+            !dropdownRef.current.contains(event.target as Node)
+        ) {
+            setIsOptionsOpen(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
+    const handleFileClick = () => console.log("Enviar archivo");
+    const handleVideoClick = () => console.log("Enviar video");
+    const handleImageClick = () => console.log("Enviar imagen");
+    const handlePaymentRequestClick = () => console.log("Solicitar pago");
+    const handleProposalClick = () => console.log("Enviar propuesta");
+    const handleMarkAsFinishedClick = () =>
+        console.log("Marcar como finalizado");
 
     return (
         <div className="bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 relative shadow-md">
@@ -44,37 +75,53 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
             {/* Options based on userType */}
             {isOptionsOpen && !disabled && (
-                <div className="absolute bottom-14 left-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-2 animate-fade-in">
+                <div
+                    ref={dropdownRef}
+                    className="absolute bottom-14 left-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 shadow-md rounded-lg p-2 animate-fade-in">
                     {userType === "Proveedor" ? (
                         <>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handleFileClick}>
                                 <File className="h-4 w-4 mr-2" />
                                 Enviar archivo
                             </button>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handleVideoClick}>
                                 <Video className="h-4 w-4 mr-2" />
                                 Enviar video
                             </button>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handleImageClick}>
                                 <Image className="h-4 w-4 mr-2" />
                                 Enviar imagen
                             </button>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handlePaymentRequestClick}>
                                 <DollarSign className="h-4 w-4 mr-2" />
                                 Solicitar pago
                             </button>
                         </>
                     ) : (
                         <>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handleProposalClick}>
                                 <FileText className="h-4 w-4 mr-2" />
                                 Enviar propuesta
                             </button>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handleMarkAsFinishedClick}>
                                 <CheckCircle className="h-4 w-4 mr-2" />
                                 Marcar como finalizado
                             </button>
-                            <button className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600">
+                            <button
+                                className="flex items-center w-full p-2 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded transition-colors hover:bg-gray-200 dark:hover:bg-gray-600"
+                                onClick={handleImageClick}>
                                 <Image className="h-4 w-4 mr-2" />
                                 Enviar imagen
                             </button>

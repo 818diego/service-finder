@@ -6,7 +6,7 @@ import { fetchUserChats } from "../../services/chatsFetch";
 import { useSocket } from "../../Context/SocketContext";
 
 interface ChatListProps {
-    onSelectChat: (id: string) => void; // Cambiamos para pasar solo el id
+    onSelectChat: (id: string) => void;
 }
 
 interface DecodedToken {
@@ -109,8 +109,8 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
             : "No hay mensajes";
         const time = lastMessage
             ? new Date(lastMessage.time).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
+                  hour: "2-digit",
+                  minute: "2-digit",
               })
             : "";
 

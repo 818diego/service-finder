@@ -181,23 +181,6 @@ const MyChatsPage: React.FC = () => {
                 token
             );
 
-            setSelectedChat((prevChat) =>
-                prevChat
-                    ? {
-                          ...prevChat,
-                          messages: [
-                              ...prevChat.messages,
-                              {
-                                  _id: sentMessage._id,
-                                  text: sentMessage.text,
-                                  sentBy: sentMessage.sentBy,
-                                  time: sentMessage.time,
-                              },
-                          ],
-                      }
-                    : null
-            );
-
             setMessageText("");
 
             // Emitir el mensaje al servidor
@@ -281,7 +264,7 @@ const MyChatsPage: React.FC = () => {
                             )}
 
                             <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gray-50 dark:bg-gray-900 relative max-w-full">
-                                {selectedChat.messages.map((msg) => {
+                                {selectedChat.messages.map((msg, index) => {
                                     const sentBy =
                                         msg.sentBy === selectedChat.clientId._id
                                             ? "Cliente"
@@ -306,7 +289,7 @@ const MyChatsPage: React.FC = () => {
 
                                     return (
                                         <ChatMessage
-                                            key={msg._id}
+                                            key={msg._id || index}
                                             text={msg.text}
                                             time={formattedTime}
                                             sentBy={sentBy}
