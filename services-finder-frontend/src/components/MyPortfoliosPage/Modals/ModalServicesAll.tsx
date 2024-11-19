@@ -141,47 +141,57 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
         }
     };
 
-    const openProposalModal = (service: Service) => {
-        console.log("Opening Proposal Modal for Service:", service);
-        setSelectedServiceForProposal(service);
-        setIsProposalModalOpen(true);
-    };
-
-    const handleProposalSubmit = async (initialMessage: string) => {
-        if (!selectedServiceForProposal) return;
-
-        const token = localStorage.getItem("token");
-        if (!token) {
-            console.error("No token found");
-            return;
-        }
-
-        try {
-            const payload = JSON.parse(atob(token.split(".")[1]));
-            if (payload.userType !== "Cliente") {
-                console.error("Unauthorized: User is not a Cliente");
+    const handleProposal = async (
+        service: Service,
+        initialMessage?: string
+    ) => {
+        if (initialMessage) {
+            if (!service) {
+                console.error("No service selected for proposal.");
+                toast.error("Servicio no seleccionado.");
                 return;
             }
 
-            const response = await createChat(
-                selectedServiceForProposal._id,
-                selectedServiceForProposal._id,
-                initialMessage,
-                token
-            );
+            const token = localStorage.getItem("token");
+            if (!token) {
+                console.error("No token found");
+                toast.error("No se encontró el token de autenticación.");
+                return;
+            }
 
-            console.log("Chat creado:", response);
-            toast.success("Propuesta enviada exitosamente.");
-        } catch (error) {
-            console.error(
-                "Error al decodificar el token o crear el chat:",
-                error
-            );
-            toast.error("Error al enviar la propuesta.");
-        } finally {
-            setIsProposalModalOpen(false);
-            setSelectedServiceForProposal(null);
+            try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                if (payload.userType !== "Cliente") {
+                    console.error("Unauthorized: User is not a Cliente");
+                    toast.error(
+                        "Usuario no autorizado para enviar propuestas."
+                    );
+                    return;
+                }
+
+                const response = await createChat(
+                    service._id,
+                    service._id,
+                    initialMessage,
+                    token
+                );
+
+                console.log("Chat creado:", response);
+                toast.success("Propuesta enviada exitosamente.");
+            } catch (error) {
+                console.error(
+                    "Error al decodificar el token o crear el chat:",
+                    error
+                );
+                toast.error("Error al enviar la propuesta.");
+            } finally {
+                handleCloseProposalModal();
+            }
+
+            return;
         }
+        setSelectedServiceForProposal(service);
+        setIsProposalModalOpen(true);
     };
 
     const handleCloseProposalModal = () => {
@@ -223,7 +233,7 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
                                         onDelete={() => handleDelete(service)}
                                         isEditable={userType === "Proveedor"}
                                         onSendProposalClick={() =>
-                                            openProposalModal(service)
+                                            handleProposal(service)
                                         }
                                     />
                                 ))
@@ -252,11 +262,17 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
                 }
                 className="modal-fade-in modal-scale-in"
             />
-            {isProposalModalOpen && (
+            {isProposalModalOpen && selectedServiceForProposal && (
                 <ProposalModal
                     isOpen={isProposalModalOpen}
                     onClose={handleCloseProposalModal}
-                    onSubmit={handleProposalSubmit}
+                    onSubmit={(initialMessage) =>
+                        handleProposal(
+                            selectedServiceForProposal,
+                            initialMessage
+                        )
+                    }
+                    jobOfferId={selectedServiceForProposal._id}
                 />
             )}
         </>

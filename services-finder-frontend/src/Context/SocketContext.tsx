@@ -14,21 +14,34 @@ const VITE_API_URL = import.meta.env.VITE_API_URL;
 interface DecodedToken {
     _id: string;
     userType: "Proveedor" | "Cliente";
+    name?: string; // Opcional: el nombre del usuario
+}
+
+interface Notification {
+    type: string;
+    message: string;
+    chatId?: string;
+    senderId?: string;
+    senderName?: string; // Nombre del remitente
+    proposal?: Record<string, unknown>; // Detalles de la propuesta
 }
 
 interface SocketContextProps {
     socket: Socket | null;
     user: DecodedToken | null;
     emitNotification: (type: string, payload: Record<string, unknown>) => void;
+    notifications: Notification[];
+    setNotifications: React.Dispatch<React.SetStateAction<Notification[]>>;
 }
 
 const SocketContext = createContext<SocketContextProps>({
     socket: null,
     user: null,
     emitNotification: () => {},
+    notifications: [],
+    setNotifications: () => {},
 });
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useSocket = () => useContext(SocketContext);
 
 interface SocketProviderProps {
@@ -38,19 +51,22 @@ interface SocketProviderProps {
 export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     const socketRef = useRef<Socket | null>(null);
     const [user, setUser] = useState<DecodedToken | null>(null);
+    const [notifications, setNotifications] = useState<Notification[]>([]);
 
     useEffect(() => {
         const token = localStorage.getItem("authToken");
+
         if (token) {
             try {
                 const decoded: DecodedToken = jwtDecode(token);
                 setUser(decoded);
 
-                // Inicializar Socket.IO client
+                // Inicializar el cliente Socket.IO
                 socketRef.current = io(import.meta.env.VITE_API_URL, {
                     auth: { token },
                 });
 
+                // Eventos de conexión
                 socketRef.current.on("connect", () => {
                     console.log("Conectado al servidor Socket.IO");
                     socketRef.current?.emit("userStatus", {
@@ -65,10 +81,20 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                     console.log("Desconectado del servidor Socket.IO");
                 });
 
+                socketRef.current.on("connect_error", (error) => {
+                    console.error("Error de conexión:", error);
+                    toast.error("Error al conectar con el servidor.");
+                });
+
                 // Listener para recibir notificaciones
-                socketRef.current.on("notification", (data) => {
+                socketRef.current.on("notification", (data: Notification) => {
                     console.log("Notificación recibida:", data);
-                    toast.info(`Tipo: ${data.type} - Mensaje: ${data.message}`);
+                    setNotifications((prev) => [data, ...prev]); // Almacena la notificación
+                    toast.info(
+                        `${data.message} ${
+                            data.senderName ? `de ${data.senderName}` : ""
+                        }`
+                    );
                 });
 
                 // Emitir el estado offline antes de cerrar la ventana o pestaña
@@ -104,7 +130,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
     ) => {
         if (socketRef.current) {
             console.log("Emitiendo notificación:", { type, ...payload });
-            socketRef.current.emit("notification", { type, ...payload });
+            socketRef.current.emit(type, payload); // Emite un evento genérico al servidor
         } else {
             console.error("Socket no está conectado.");
         }
@@ -112,7 +138,13 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
 
     return (
         <SocketContext.Provider
-            value={{ socket: socketRef.current, user, emitNotification }}>
+            value={{
+                socket: socketRef.current,
+                user,
+                emitNotification,
+                notifications,
+                setNotifications,
+            }}>
             {children}
         </SocketContext.Provider>
     );
