@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
-import { durationOptions, categoryOptions } from "../../../data/dropdownOptions";
+import {
+    durationOptions,
+    categoryOptions,
+} from "../../../data/dropdownOptions";
 import { FaTrash, FaTimes, FaUpload, FaCheck } from "react-icons/fa";
 
 interface ModalPortfolioProps {
@@ -44,6 +47,7 @@ const ModalPortfolio: React.FC<ModalPortfolioProps> = ({
         initialData?.image || null
     );
     const [isUploading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const resetForm = () => {
         setTitle("");
@@ -88,14 +92,17 @@ const ModalPortfolio: React.FC<ModalPortfolioProps> = ({
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
 
         if (!duration) {
             toast.error("Por favor, selecciona una duración.");
+            setIsLoading(false);
             return;
         }
 
         if (!category) {
             toast.error("Por favor, selecciona una categoría.");
+            setIsLoading(false);
             return;
         }
 
@@ -110,9 +117,11 @@ const ModalPortfolio: React.FC<ModalPortfolioProps> = ({
         onSubmit(data);
         resetForm();
         onClose();
+        setIsLoading(false);
     };
 
     const handleDelete = () => {
+        setIsLoading(true);
         onSubmit({
             title: "",
             description: "",
@@ -121,6 +130,7 @@ const ModalPortfolio: React.FC<ModalPortfolioProps> = ({
             image: undefined,
         });
         onClose();
+        setIsLoading(false);
     };
 
     useEffect(() => {
@@ -140,6 +150,11 @@ const ModalPortfolio: React.FC<ModalPortfolioProps> = ({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.3 }}>
+                    {isLoading && (
+                        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                            <div className="loader"></div>
+                        </div>
+                    )}
                     <motion.div
                         className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md overflow-auto"
                         initial={{ y: 50, opacity: 0 }}

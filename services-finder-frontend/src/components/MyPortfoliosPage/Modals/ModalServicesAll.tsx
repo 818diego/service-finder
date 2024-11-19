@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { X } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 import {
     fetchServices,
     updateService,
     deleteService,
+    createService,
 } from "../../../services/serviceFetch";
 import { Service, ServiceForm } from "../../../types/service";
 import ServiceCard from "../ServiceCard";
@@ -30,7 +31,9 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
 }) => {
     const [services, setServices] = useState<Service[]>([]);
     const [isModalServiceOpen, setIsModalServiceOpen] = useState(false);
-    const [modalMode, setModalMode] = useState<"edit" | "delete">("edit");
+    const [modalMode, setModalMode] = useState<"edit" | "delete" | "create">(
+        "edit"
+    );
     const [selectedService, setSelectedService] = useState<Service | null>(
         null
     );
@@ -38,6 +41,7 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
     const [selectedServiceForProposal, setSelectedServiceForProposal] =
         useState<Service | null>(null);
     const token = localStorage.getItem("authToken") || "";
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
@@ -72,6 +76,12 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
         setIsModalServiceOpen(true);
     };
 
+    const handleCreate = () => {
+        setSelectedService(null);
+        setModalMode("create");
+        setIsModalServiceOpen(true);
+    };
+
     const handleCloseModalService = () => {
         console.log("Closing Modal Service");
         setIsModalServiceOpen(false);
@@ -80,6 +90,7 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
 
     const handleSubmit = async (formData: FormData | null) => {
         console.log("Form Submitted:", formData);
+        setIsLoading(true);
         if (modalMode === "edit" && selectedService && formData) {
             try {
                 const updateData: ServiceForm = {
@@ -117,6 +128,8 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
             } catch (error) {
                 console.error("Failed to update service:", error);
                 toast.error("Error al actualizar el servicio.");
+            } finally {
+                setIsLoading(false);
             }
         } else if (modalMode === "delete" && selectedService) {
             try {
@@ -135,9 +148,40 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
             } catch (error) {
                 console.error("Failed to delete service:", error);
                 toast.error("Error al eliminar el servicio.");
+            } finally {
+                setIsLoading(false);
+            }
+        } else if (modalMode === "create" && formData) {
+            try {
+                setIsLoading(true); // Start loading
+                const createData: ServiceForm = {
+                    title: formData.get("title") as string,
+                    description: formData.get("description") as string,
+                    portfolio: portfolioId,
+                    price: parseFloat(formData.get("price") as string),
+                    category: formData.get("category") as string,
+                    images: formData.getAll("images") as File[],
+                };
+
+                console.log("Create Data:", createData);
+
+                const newService = await createService(createData, token);
+
+                console.log("New Service:", newService);
+
+                setServices((prevServices) => [...prevServices, newService]);
+
+                handleCloseModalService();
+                toast.success("Servicio creado exitosamente.");
+            } catch (error) {
+                console.error("Failed to create service:", error);
+                toast.error("Error al crear el servicio.");
+            } finally {
+                setIsLoading(false); // End loading
             }
         } else {
             console.log("No action taken.");
+            setIsLoading(false);
         }
     };
 
@@ -199,8 +243,22 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
         setSelectedServiceForProposal(null);
     };
 
+    function openCreateModal(
+        event:
+            | React.MouseEvent<HTMLDivElement, MouseEvent>
+            | React.KeyboardEvent<HTMLDivElement>
+    ): void {
+        if ("key" in event && event.key !== "Enter") return;
+        handleCreate();
+    }
+
     return (
         <>
+            {isLoading && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="loader"></div>
+                </div>
+            )}
             {isOpen && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-fade-in">
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-[1600px] max-h-[900px] h-full sm:h-auto mx-4 relative overflow-y-auto modal-scale-in">
@@ -220,25 +278,41 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
                         </p>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
-                            {services.length > 0 ? (
-                                services.map((service, index) => (
-                                    <ServiceCard
-                                        key={
-                                            service._id
-                                                ? service._id
-                                                : `service-${index}`
-                                        }
-                                        service={service}
-                                        onEdit={() => handleEdit(service)}
-                                        onDelete={() => handleDelete(service)}
-                                        isEditable={userType === "Proveedor"}
-                                        onSendProposalClick={() =>
-                                            handleProposal(service)
-                                        }
-                                    />
-                                ))
-                            ) : (
-                                <p>No hay servicios disponibles</p>
+                            {services.map((service, index) => (
+                                <ServiceCard
+                                    key={
+                                        service._id
+                                            ? service._id
+                                            : `service-${index}`
+                                    }
+                                    service={service}
+                                    onEdit={() => handleEdit(service)}
+                                    onDelete={() => handleDelete(service)}
+                                    isEditable={userType === "Proveedor"}
+                                    onSendProposalClick={() =>
+                                        handleProposal(service)
+                                    }
+                                />
+                            ))}
+                            {userType === "Proveedor" && (
+                                <div
+                                    onClick={openCreateModal}
+                                    className="flex flex-col justify-center items-center border-2 border-dashed border-gray-700 rounded-lg cursor-pointer hover:border-blue-600 hover:bg-blue-50 dark:hover:bg-gray-800 transition duration-300 ease-in-out shadow-sm hover:shadow-lg"
+                                    style={{ height: "500px" }}
+                                    role="button"
+                                    aria-label="Añadir nuevo servicio"
+                                    tabIndex={0}
+                                    onKeyDown={(e) =>
+                                        e.key === "Enter" && openCreateModal(e)
+                                    }>
+                                    <PlusCircle className="h-16 w-16 text-gray-700 transition duration-300 hover:text-blue-500" />
+                                    <p className="text-lg text-gray-500 font-semibold mt-4">
+                                        Añadir Servicio
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                        Haz clic para agregar un nuevo servicio
+                                    </p>
+                                </div>
                             )}
                         </div>
                     </div>

@@ -158,9 +158,9 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({
             <ModalServiceAll
                 isOpen={isModalServicesOpen}
                 onClose={() => handleCloseModalServicesAll()}
-                providerUsername={portfolio.provider.username}
+                providerUsername={providerUsername || portfolio.provider.username}
                 portfolioId={portfolio._id}
-                userType={user?.userType || null} // Pass userType here
+                userType={user?.userType || null}
                 className="modal-fade-in modal-scale-in"
             />
         </div>
@@ -173,7 +173,7 @@ const CustomButton: React.FC<{
 }> = ({ onClick, label }) => (
     <button
         onClick={onClick}
-        className="w-full flex items-center justify-center px-4 py-2 mt-2 text-sm font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+        className="w-full flex items-center justify-center px-4 py-2 mt-2 text-sm font-semibold text-white bg-blue-500 rounded-lg  hover:bg-blue-600 transition duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
         {label}
     </button>
 );

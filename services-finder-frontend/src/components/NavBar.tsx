@@ -45,6 +45,22 @@ const Navbar: React.FC = () => {
         };
     }, [socket]);
 
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target as Node)
+            ) {
+                setIsOptionsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     const toggleOptions = () => {
         setIsOptionsOpen((prev) => !prev);
     };
@@ -75,7 +91,7 @@ const Navbar: React.FC = () => {
 
         if (user?.userType === "Proveedor") {
             return [
-                { path: "/my-portfolios", label: "Mis portfolios" },
+                { path: "/my-portfolios", label: "Portfolios" },
                 ...baseLinks,
             ];
         } else if (user?.userType === "Cliente") {
@@ -136,7 +152,7 @@ const Navbar: React.FC = () => {
                                         <Tooltip text="User Options">
                                             <button
                                                 onClick={toggleOptions}
-                                                className="text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer mt-1">
+                                                className="text-gray-400 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-300 ease-in-out cursor-pointer">
                                                 <UserIcon />
                                             </button>
                                         </Tooltip>

@@ -37,6 +37,7 @@ const ModalService: React.FC<ModalServiceProps> = ({
         initialData?.images || []
     );
     const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen && initialData && mode === "edit") {
@@ -83,11 +84,13 @@ const ModalService: React.FC<ModalServiceProps> = ({
         );
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setIsLoading(true);
 
         if (price !== "" && price < 0) {
             toast.error("El precio no puede ser negativo.");
+            setIsLoading(false);
             return;
         }
 
@@ -116,15 +119,21 @@ const ModalService: React.FC<ModalServiceProps> = ({
             removeImageUrls: imagesToDelete,
         });
 
-        onSubmit(formData);
+        await onSubmit(formData);
         clearImages();
+        setTitle("");
+        setDescription("");
+        setPrice("");
+        setIsLoading(false);
         onClose();
     };
 
     const handleDeleteConfirm = () => {
+        setIsLoading(true);
         console.log("Confirming Delete");
         onSubmit(null);
         clearImages();
+        setIsLoading(false); // Mueve esta línea dentro de la función onSubmit
         onClose();
     };
 
@@ -145,6 +154,11 @@ const ModalService: React.FC<ModalServiceProps> = ({
         <>
             {isOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50 modal-slide-in">
+                    {isLoading && (
+                        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                            <div className="loader"></div>
+                        </div>
+                    )}
                     <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md relative">
                         <button
                             onClick={handleClose}
