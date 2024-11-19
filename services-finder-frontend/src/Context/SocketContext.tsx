@@ -9,7 +9,6 @@ import { io, Socket } from "socket.io-client";
 import { jwtDecode } from "jwt-decode";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-const VITE_API_URL = import.meta.env.VITE_API_URL;
 
 interface DecodedToken {
     _id: string;
