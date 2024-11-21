@@ -8,13 +8,11 @@ services:
     container_name: backend
     environment:
       - PORT=3000
-      - MONGO_URI=mongodb://admin:DlhRVHYalQv6e06@152.53.55.46:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.3
+      - MONGO_URI=mongodb://admin:DlhRVHYalQv6e06@152.53.55.46:27017/services-finder?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.3
     ports:
       - "3000:3000"
     networks:
       - app-network
-    depends_on:
-      - mongo
 
   frontend:
     build:
@@ -25,7 +23,8 @@ services:
       - "8081:80" # Cambiamos el puerto 80 del host al 8080
     networks:
       - app-network
-  networks:
-    app-network:
-      name: app-network
-      driver: bridge
+
+networks:
+  app-network:
+    name: app-network
+    driver: bridge
