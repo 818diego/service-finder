@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile-frontend
     container_name: frontend
     ports:
-      - "8080:80" # Cambiamos el puerto 80 del host al 8080
+      - "8081:80" # Cambiamos el puerto 80 del host al 8080
     networks:
       - app-network
 
