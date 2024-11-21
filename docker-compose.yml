@@ -13,6 +13,8 @@ services:
       - "3000:3000"
     networks:
       - app-network
+    depends_on:
+      - mongo
 
   frontend:
     build:
@@ -21,6 +23,17 @@ services:
     container_name: frontend
     ports:
       - "8081:80" # Cambiamos el puerto 80 del host al 8080
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=DlhRVHYalQv6e06
+    ports:
+      - "27017:27017"
     networks:
       - app-network
 
