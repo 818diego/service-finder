@@ -11,6 +11,8 @@ services:
       - MONGO_URI=mongodb://admin:DlhRVHYalQv6e06@152.53.55.46:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.3
     ports:
       - "3000:3000"
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -19,7 +21,10 @@ services:
     container_name: frontend
     ports:
       - "80:80"
+    networks:
+      - app-network
 
 networks:
-  default:
+  app-network:
+    name: app-network
     driver: bridge
