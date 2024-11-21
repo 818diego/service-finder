@@ -20,7 +20,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ['http://node2.frokie.it:5173', 'http://localhost:5173'],
+  origin: ['http://node2.frokie.it:5173', 'http://localhost:5173', 'http://152.53.55.46'],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
 }));
 app.use(express.json());
