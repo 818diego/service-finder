@@ -6,9 +6,9 @@ services:
     container_name: backend
     environment:
       - PORT=3000
-      - MONGO_URI=mongodb://admin:DlhRVHYalQv6e06@152.53.55.46:27017/services-finder?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.3
+      - MONGO_URI=mongodb://admin:DlhRVHYalQv6e06@152.53.55.46:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.3
     ports:
-      - "3000:3000"
+      - "3001:3000"
     networks:
       - app-network
     restart: always
