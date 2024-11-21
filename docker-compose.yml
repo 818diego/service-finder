@@ -25,19 +25,7 @@ services:
       - "8081:80" # Cambiamos el puerto 80 del host al 8080
     networks:
       - app-network
-
-  mongo:
-    image: mongo:latest
-    container_name: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=admin
-      - MONGO_INITDB_ROOT_PASSWORD=DlhRVHYalQv6e06
-    ports:
-      - "27017:27017"
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    name: app-network
-    driver: bridge
+  networks:
+    app-network:
+      name: app-network
+      driver: bridge
