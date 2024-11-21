@@ -11,6 +11,7 @@ services:
       - "3000:3000"
     networks:
       - app-network
+    restart: always
 
   frontend:
     build:
@@ -21,6 +22,9 @@ services:
       - "8081:80" # Cambiamos el puerto 80 del host al 8080
     networks:
       - app-network
+    depends_on:
+      - backend
+    restart: always
 
 networks:
   app-network:
