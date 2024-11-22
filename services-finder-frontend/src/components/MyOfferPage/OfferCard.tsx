@@ -17,7 +17,12 @@ interface OfferCardProps {
     isEditable: boolean;
 }
 
-const OfferCard: React.FC<OfferCardProps> = ({ offer, onEdit, onDelete, sendOffer, isEditable }) => {
+const OfferCard: React.FC<OfferCardProps> = ({ 
+    offer, 
+    onEdit, 
+    onDelete, 
+    sendOffer, 
+    isEditable }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const nextImage = () => {
