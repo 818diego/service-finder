@@ -12,5 +12,14 @@ COPY ./services-finder-backend .
 # Expone el puerto 3100
 EXPOSE 3100
 
+# Ensure the backend server uses the SSL certificates
+# This depends on the backend server implementation
+# Example for a Node.js server:
+# COPY your server configuration file and ensure it reads SSL_CERT_PATH and SSL_KEY_PATH environment variables
+
+# Example:
+# COPY server.js /app/server.js
+# CMD ["node", "/app/server.js"]
+
 # Comando para iniciar el backend
 CMD ["npm", "start"]

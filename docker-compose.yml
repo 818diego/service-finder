@@ -7,11 +7,15 @@ services:
     environment:
       - PORT=3100
       - MONGO_URI=mongodb://admin:DlhRVHYalQv6e06@152.53.55.46:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.3
+      - SSL_CERT_PATH=/etc/letsencrypt/live/services.supremito.xyz/fullchain.pem
+      - SSL_KEY_PATH=/etc/letsencrypt/live/services.supremito.xyz/privkey.pem
     ports:
       - "3100:3100"
     networks:
       - app-network
     restart: always
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro # Mount SSL certificates
   frontend:
     build:
       context: .

@@ -9,7 +9,7 @@ const configureSocket = (server) => {
 
   const io = new Server(server, {
     cors: {
-      origin: ["http://152.53.55.46:5173", "http://152.53.55.46:8081"], // Allow requests from multiple origins
+      origin: ["http://152.53.55.46:5173", "http://152.53.55.46:8081", 'https://services.supremito.xyz'], // Allow requests from multiple origins
       methods: ["GET", "POST"],
       credentials: true,
     },

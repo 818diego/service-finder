@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const http = require('http');
+const fs = require('fs');
+const https = require('https');
 require('dotenv').config();
 
 const connectDB = require('./config/db');
@@ -13,14 +14,21 @@ const chatRoutes = require('./routes/chatRoutes');
 const configureSocket = require('./socket/socketConfig');
 
 const app = express();
-const server = http.createServer(app);
+
+// Load SSL certificates
+const sslOptions = {
+  key: fs.readFileSync(process.env.SSL_KEY_PATH),
+  cert: fs.readFileSync(process.env.SSL_CERT_PATH)
+};
+
+const server = https.createServer(sslOptions, app);
 
 // Connect to MongoDB
 connectDB();
 
 // Middleware
 app.use(cors({
-  origin: ['http://152.53.55.46:5173', 'http://localhost:5173', 'http://152.53.55.46:8081'],
+  origin: ['http://152.53.55.46:5173', 'http://localhost:5173', 'http://152.53.55.46:8081', 'https://services.supremito.xyz'],
   methods: ["GET", "POST", "PATCH", "DELETE", "PUT"],
   credentials: true
 }));
