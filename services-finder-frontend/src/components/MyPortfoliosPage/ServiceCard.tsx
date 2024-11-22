@@ -7,25 +7,23 @@ import {
     ChevronRight,
 } from "lucide-react";
 import { Service } from "../../types/service";
-import ProposalModal from "../ClientComponents/ProposalModal";
 
 interface ServiceCardProps {
     service: Service;
     onEdit: () => void;
     onDelete: () => void;
+    sendProposal: () => void;
     isEditable: boolean;
-    onSendProposalClick: (initialMessage: string) => void;
 }
 
 const ServiceCard: React.FC<ServiceCardProps> = ({
     service,
     onEdit,
     onDelete,
+    sendProposal,
     isEditable,
-    onSendProposalClick,
 }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleNextImage = () => {
         setCurrentImageIndex((prevIndex) =>
@@ -37,11 +35,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         setCurrentImageIndex((prevIndex) =>
             prevIndex === 0 ? service.images.length - 1 : prevIndex - 1
         );
-    };
-
-    const handleProposalSubmit = (initialMessage: string) => {
-        // Add this function
-        onSendProposalClick(initialMessage);
     };
 
     return (
@@ -123,19 +116,12 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
                     </>
                 ) : (
                     <button
-                        onClick={() => setIsModalOpen(true)} // Modify this line
+                        onClick={sendProposal}
                         className="flex items-center px-4 py-2 text-green-500 hover:underline hover:text-green-700 transition duration-200">
                         Enviar Propuesta
                     </button>
                 )}
             </div>
-
-            <ProposalModal // Add this block
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
-                onSubmit={handleProposalSubmit}
-                jobOfferId={service._id}
-            />
         </div>
     );
 };
