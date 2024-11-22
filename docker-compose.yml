@@ -12,7 +12,6 @@ services:
     networks:
       - app-network
     restart: always
-
   frontend:
     build:
       context: .
@@ -20,12 +19,14 @@ services:
     container_name: frontend
     ports:
       - "8081:80" # Cambiamos el puerto 80 del host al 8080
+      - "8443:443" # Cambiamos el puerto 443 del host al 8443
     networks:
       - app-network
     depends_on:
       - backend
     restart: always
-
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro # Montar certificados SSL
 networks:
-  app-network:
-    driver: bridge
+    app-network:
+      driver: bridge
