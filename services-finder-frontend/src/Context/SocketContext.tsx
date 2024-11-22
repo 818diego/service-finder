@@ -63,6 +63,7 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
                 // Inicializar el cliente Socket.IO
                 socketRef.current = io(import.meta.env.VITE_API_URL, {
                     auth: { token },
+                    withCredentials: true, // Add this line to handle CORS
                 });
 
                 // Eventos de conexión
