@@ -72,12 +72,12 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
     return (
         <div ref={headerRef}>
             {/* Header del chat con iconos y detalles */}
-            <div className="bg-white dark:bg-gray-800 p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 shadow-md">
+            <div className="bg-white dark:bg-gray-800 p-2 sm:p-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-700 shadow-md">
                 <div className="flex items-center gap-3">
                     <img
                         src={image || "src/assets/images/perfil.png"}
                         alt={name}
-                        className="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-gray-200 dark:border-gray-700"
                     />
                     <div>
                         <h2 className="font-semibold text-gray-800 dark:text-gray-100">

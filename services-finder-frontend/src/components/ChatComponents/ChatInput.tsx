@@ -65,7 +65,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         console.log("Marcar como finalizado");
 
     return (
-        <div className="bg-white dark:bg-gray-800 p-4 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 relative shadow-md">
+        <div className="bg-white dark:bg-gray-800 p-2 sm:p-4 border-t border-gray-200 dark:border-gray-700 flex items-center gap-2 relative shadow-md">
             <button
                 onClick={() => setIsOptionsOpen(!isOptionsOpen)}
                 className="p-2 bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-100 rounded-full transition-colors hover:bg-gray-400 dark:hover:bg-gray-600"
