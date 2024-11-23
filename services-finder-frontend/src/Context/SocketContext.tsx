@@ -13,7 +13,7 @@ import "react-toastify/dist/ReactToastify.css";
 interface DecodedToken {
     _id: string;
     userType: "Proveedor" | "Cliente";
-    name?: string; // Opcional: el nombre del usuario
+    name?: string;
 }
 
 interface Notification {
@@ -21,8 +21,8 @@ interface Notification {
     message: string;
     chatId?: string;
     senderId?: string;
-    senderName?: string; // Nombre del remitente
-    proposal?: Record<string, unknown>; // Detalles de la propuesta
+    senderName?: string;
+    proposal?: Record<string, unknown>;
 }
 
 interface SocketContextProps {

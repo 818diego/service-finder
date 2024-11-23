@@ -7,12 +7,14 @@ import { useSocket } from "../../Context/SocketContext";
 
 interface ChatListProps {
     onSelectChat: (id: string) => void;
+    className?: string;
 }
 
 interface DecodedToken {
     userId: string;
     username: string;
     userType: string;
+
 }
 
 const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
@@ -118,7 +120,7 @@ const ChatList: React.FC<ChatListProps> = ({ onSelectChat }) => {
     };
 
     return (
-        <div className="w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full">
+        <div className="w-full sm:w-1/4 bg-gray-50 dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full">
             <div className="p-[18px] border-b border-gray-200 dark:border-gray-700">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400" />

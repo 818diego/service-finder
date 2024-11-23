@@ -16,6 +16,7 @@ const AppContent: React.FC = () => {
     const location = useLocation();
     const isChatPage = location.pathname === "/chats";
     const isHomePage = location.pathname === "/";
+    const isCategoryPage = location.pathname === "/category";
 
     return (
         <div
@@ -27,6 +28,8 @@ const AppContent: React.FC = () => {
                     isChatPage
                         ? "max-w-8xl h-full mx-auto py-6 sm:px-6 lg:px-8"
                         : isHomePage
+                        ? "max-w-8xl mx-auto py-6 sm:px-6 lg:px-8"
+                        : isCategoryPage
                         ? "max-w-8xl mx-auto py-6 sm:px-6 lg:px-8"
                         : "max-w-7xl mx-auto py-6 sm:px-6 lg:px-8"
                 }>
