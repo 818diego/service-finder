@@ -35,5 +35,6 @@ export const AppRoutes: React.FC = () => (
 
         {/* Options for a Cliente */}
         <Route path="/offers" element={<MyOffersPage />} />
+        
     </Routes>
 );
