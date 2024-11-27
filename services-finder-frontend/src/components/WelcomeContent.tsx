@@ -16,19 +16,19 @@ const WelcomeContent: React.FC = () => {
                     <div className="flex items-center space-x-2">
                         <FaTools className="text-indigo-400 text-3xl" />
                         <p className="text-md text-white opacity-80 sm:text-lg md:text-xl">
-                            Profesionales confiables y calificados
+                            Profesionales confiables
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
                         <FaUserFriends className="text-indigo-400 text-3xl" />
                         <p className="text-md text-white opacity-80 sm:text-lg md:text-xl">
-                            Comunidad activa y recomendaciones
+                            Comunidad activa
                         </p>
                     </div>
                     <div className="flex items-center space-x-2">
                         <FaStar className="text-indigo-400 text-3xl" />
                         <p className="text-md text-white opacity-80 sm:text-lg md:text-xl">
-                            Reseñas de usuarios
+                            Al alcanze de tu mano
                         </p>
                     </div>
                 </div>
