@@ -7,6 +7,7 @@ import { Portfolio } from "../types/portfolio";
 import PortfolioCard from "../components/MyPortfoliosPage/PortfolioCard";
 import { createChat } from "../services/chatsFetch";
 import ModalProposeProvider from "../components/ModalProposeProvider";
+import WelcomeContent from "../components/WelcomeContent"; // Import the new component
 
 const Home: React.FC = () => {
     const [userType, setUserType] = useState<"Cliente" | "Proveedor" | null>(
@@ -88,7 +89,12 @@ const Home: React.FC = () => {
             const token = localStorage.getItem("token");
             if (token) {
                 try {
-                    await createChat(selectedOffer._id, selectedOffer._id, initialMessage, token); // Ensure this uses _id and jobOfferId
+                    await createChat(
+                        selectedOffer._id,
+                        selectedOffer._id,
+                        initialMessage,
+                        token
+                    ); // Ensure this uses _id and jobOfferId
                     setShowModal(false);
                     setInitialMessage("");
                 } catch (error) {
@@ -150,17 +156,7 @@ const Home: React.FC = () => {
                     )}
                 </div>
             )}
-            {userType === null && (
-                <div className="flex flex-col items-center justify-center text-center">
-                    <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-200 mb-4">
-                        Bienvenido a Services Finder
-                    </h1>
-                    <p className="text-xl text-gray-600 dark:text-gray-400">
-                        Descubre los mejores servicios en tu área con solo unos
-                        clics
-                    </p>
-                </div>
-            )}
+            {userType === null && <WelcomeContent />}
             <ModalProposeProvider
                 showModal={showModal}
                 setShowModal={setShowModal}

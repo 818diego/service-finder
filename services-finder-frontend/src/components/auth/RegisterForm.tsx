@@ -6,7 +6,6 @@ import {
     Lock,
     Home,
     NotebookPen,
-    Briefcase,
     UserCheck,
     Eye,
     EyeOff,
@@ -22,11 +21,14 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import zxcvbn from "zxcvbn";
 
+interface RegisterFormProps {
+    userType: "Cliente" | "Proveedor";
+}
 interface RegisterUserType extends UserType {
     confirmPassword: string;
 }
 
-const RegisterForm: React.FC = () => {
+const RegisterForm: React.FC<RegisterFormProps> = ({ userType }) => {
     const {
         register,
         handleSubmit,
@@ -48,14 +50,12 @@ const RegisterForm: React.FC = () => {
         hasSpecialChar: false,
     });
 
-    const userType = watch("userType");
     const password = watch("password");
-    // const confirmPassword = watch("confirmPassword");
 
     const onSubmit: SubmitHandler<RegisterUserType> = async (data) => {
         setLoading(true);
         try {
-            await registerUser(data);
+            await registerUser({ ...data, userType });
             setLoading(false);
             setSuccess(true);
             toast.success("¡Registro exitoso!");
@@ -142,14 +142,14 @@ const RegisterForm: React.FC = () => {
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 p-4 max-w-md mx-auto">
             <div className="text-center text-gray-600 dark:text-gray-400">
                 <div className="flex justify-center space-x-4 mb-4">
                     <div
                         className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             step === 1
                                 ? "bg-blue-500 text-white"
-                                : "bg-gray-300 text-gray-600"
+                                : " text-gray-600"
                         }`}>
                         <span className="font-bold">1</span>
                     </div>
@@ -393,22 +393,6 @@ const RegisterForm: React.FC = () => {
                                     {errors.lastName.message}
                                 </p>
                             )}
-                            <FormInput
-                                label="Tipo de usuario"
-                                type="select"
-                                placeholder="Selecciona el tipo de usuario"
-                                register={register("userType", {
-                                    required: true,
-                                })}
-                                error={errors.userType}
-                                icon={Briefcase}
-                                validationMessage="El tipo de usuario es obligatorio"
-                                options={[
-                                    "Selecciona una opción",
-                                    "Proveedor",
-                                    "Cliente",
-                                ]}
-                            />
                             {errors.userType && (
                                 <p className="text-red-500 text-sm mt-1">
                                     {errors.userType.message}

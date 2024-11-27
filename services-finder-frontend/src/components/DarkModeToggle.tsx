@@ -4,7 +4,7 @@ import { Sun, Moon } from "lucide-react";
 const DarkModeToggle: React.FC = () => {
     const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
         const savedMode = localStorage.getItem("darkMode");
-        return savedMode === "true";
+        return savedMode === null ? true : savedMode === "true";
     });
 
     const toggleDarkMode = () => {
