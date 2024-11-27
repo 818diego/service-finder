@@ -73,6 +73,10 @@ const OffersPage: React.FC = () => {
      * @param offerData - Datos de la oferta
      */
     const handleConfirm = async (offerData: OfferForm) => {
+        if (modalMode === "create" && (!offerData.files || offerData.files.length === 0)) {
+            toast.error("Debe subir al menos una imagen.");
+            return;
+        }
         if (modalMode === "create") {
             try {
                 const newOffer = await createOffer(token, offerData);

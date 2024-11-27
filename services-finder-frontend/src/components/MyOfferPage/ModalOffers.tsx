@@ -86,6 +86,10 @@ const ModalOffers: React.FC<ModalOffersProps> = ({
             toast.error("El presupuesto no puede ser negativo.");
             return;
         }
+        if (mode === "create" && (!images || images.length === 0)) {
+            toast.error("Debe subir al menos una imagen.");
+            return;
+        }
         const offerData: OfferForm = {
             title,
             description,
