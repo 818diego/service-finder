@@ -9,8 +9,9 @@ const configureSocket = (server) => {
 
   const io = new Server(server, {
     cors: {
-      origin: "http://node2.frokie.it:5173", // Allow requests from your frontend
+      origin: ["http://152.53.55.46:5173", "http://152.53.55.46:8081", 'https://services.supremito.xyz'], // Allow requests from multiple origins
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
