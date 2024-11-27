@@ -89,13 +89,28 @@ const MyChatsPage: React.FC = () => {
             }
         };
 
+        const handleChatStatusUpdate = (data: { chatId: string; status: "accepted" | "rejected" | "pending" }) => {
+            if (data.chatId === selectedChat?._id) {
+                setSelectedChat((prevChat) =>
+                    prevChat
+                        ? {
+                              ...prevChat,
+                              status: data.status,
+                          }
+                        : null
+                );
+            }
+        };
+
         socket.on("receiveMessage", handleReceiveMessage);
         socket.on("userStatus", handleUserStatus);
+        socket.on("chatStatusUpdate", handleChatStatusUpdate);
 
         // Cleanup
         return () => {
             socket.off("receiveMessage", handleReceiveMessage);
             socket.off("userStatus", handleUserStatus);
+            socket.off("chatStatusUpdate", handleChatStatusUpdate);
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
@@ -144,11 +159,12 @@ const MyChatsPage: React.FC = () => {
 
         try {
             await updateChatStatus(selectedChat._id, action, token);
+            const newStatus = action === "accept" ? "accepted" : "rejected";
             setSelectedChat((prevChat) =>
                 prevChat
                     ? {
                           ...prevChat,
-                          status: action === "accept" ? "accepted" : "rejected",
+                          status: newStatus,
                       }
                     : null
             );
@@ -157,6 +173,24 @@ const MyChatsPage: React.FC = () => {
                     ? "El proveedor ha aceptado el chat."
                     : "El proveedor ha rechazado el chat.";
             await sendMessage(selectedChat._id, message, token);
+
+            // Emit the status update to the server
+            socket?.emit("updateChatStatus", {
+                chatId: selectedChat._id,
+                status: newStatus,
+            });
+
+            // Emit the status message to the server
+            socket?.emit("sendMessage", {
+                chatId: selectedChat._id,
+                message: {
+                    _id: new Date().getTime().toString(),
+                    text: message,
+                    sentBy: currentUserId,
+                    time: new Date().toISOString(),
+                },
+            });
+
             if (action === "reject") {
                 setSelectedChat(null);
             }

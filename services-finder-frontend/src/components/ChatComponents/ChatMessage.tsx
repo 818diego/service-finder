@@ -23,7 +23,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({
 
     return (
         <div
-            className={`w-fit max-w-[35%] min-w-[100px] p-3 transition-opacity duration-300 rounded-lg mb-2 relative ${
+            className={`w-fit max-w-[90%] sm:max-w-[35%] min-w-[100px] p-2 sm:p-3 transition-opacity duration-300 rounded-lg mb-2 relative ${
                 isStatusMessage
                     ? `mx-auto text-center ${statusMessageStyle}`
                     : isCurrentUser

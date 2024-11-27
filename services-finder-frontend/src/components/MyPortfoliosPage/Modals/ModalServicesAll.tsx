@@ -42,6 +42,7 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
         useState<Service | null>(null);
     const token = localStorage.getItem("authToken") || "";
     const [isLoading, setIsLoading] = useState(false);
+    const [initialMessage, setInitialMessage] = useState("");
 
     useEffect(() => {
         if (isOpen) {
@@ -185,55 +186,26 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
         }
     };
 
-    const handleProposal = async (
-        service: Service,
-        initialMessage?: string
-    ) => {
-        if (initialMessage) {
-            if (!service) {
-                console.error("No service selected for proposal.");
-                toast.error("Servicio no seleccionado.");
-                return;
-            }
-
-            const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("No token found");
-                toast.error("No se encontró el token de autenticación.");
-                return;
-            }
-
+    const handleCreateChat = async () => {
+        if (selectedServiceForProposal) {
             try {
-                const payload = JSON.parse(atob(token.split(".")[1]));
-                if (payload.userType !== "Cliente") {
-                    console.error("Unauthorized: User is not a Cliente");
-                    toast.error(
-                        "Usuario no autorizado para enviar propuestas."
-                    );
-                    return;
-                }
-
-                const response = await createChat(
-                    service._id,
-                    service._id,
+                await createChat(
+                    selectedServiceForProposal._id,
+                    selectedServiceForProposal._id,
                     initialMessage,
                     token
                 );
-
-                console.log("Chat creado:", response);
-                toast.success("Propuesta enviada exitosamente.");
+                setIsProposalModalOpen(false);
+                setInitialMessage("");
+                toast.success("Chat creado exitosamente.");
             } catch (error) {
-                console.error(
-                    "Error al decodificar el token o crear el chat:",
-                    error
-                );
-                toast.error("Error al enviar la propuesta.");
-            } finally {
-                handleCloseProposalModal();
+                console.error("Error creating chat:", error);
+                toast.error("Error al crear el chat.");
             }
-
-            return;
         }
+    };
+
+    const handleSendProposal = (service: Service) => {
         setSelectedServiceForProposal(service);
         setIsProposalModalOpen(true);
     };
@@ -289,8 +261,8 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
                                     onEdit={() => handleEdit(service)}
                                     onDelete={() => handleDelete(service)}
                                     isEditable={userType === "Proveedor"}
-                                    onSendProposalClick={() =>
-                                        handleProposal(service)
+                                    sendProposal={() =>
+                                        handleSendProposal(service)
                                     }
                                 />
                             ))}
@@ -338,15 +310,11 @@ const ModalServicesAll: React.FC<ModalServicesAllProps> = ({
             />
             {isProposalModalOpen && selectedServiceForProposal && (
                 <ProposalModal
-                    isOpen={isProposalModalOpen}
-                    onClose={handleCloseProposalModal}
-                    onSubmit={(initialMessage) =>
-                        handleProposal(
-                            selectedServiceForProposal,
-                            initialMessage
-                        )
-                    }
-                    jobOfferId={selectedServiceForProposal._id}
+                    showModal={isProposalModalOpen}
+                    setShowModal={handleCloseProposalModal}
+                    initialMessage={initialMessage}
+                    setInitialMessage={setInitialMessage}
+                    handleCreateChat={handleCreateChat}
                 />
             )}
         </>
